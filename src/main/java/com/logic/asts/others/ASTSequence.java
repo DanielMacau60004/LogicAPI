@@ -9,11 +9,15 @@ import java.util.List;
 
 public class ASTSequence extends AASTExp {
 
-    public List<IASTExp> sequence;
+    private List<IASTExp> sequence;
 
     public ASTSequence(IASTExp firstExp) {
         sequence = new LinkedList<>();
         sequence.add(firstExp);
+    }
+
+    public List<IASTExp> getSequence() {
+        return sequence;
     }
 
     public void addExp(IASTExp exp) {

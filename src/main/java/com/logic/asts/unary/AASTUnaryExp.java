@@ -5,10 +5,14 @@ import com.logic.asts.IASTExp;
 
 public abstract class AASTUnaryExp extends AASTExp implements IASTExp {
 
-    public final IASTExp exp;
+    protected final IASTExp exp;
 
     public AASTUnaryExp(IASTExp exp) {
         this.exp = exp;
+    }
+
+    public IASTExp getExp() {
+        return exp;
     }
 
 }

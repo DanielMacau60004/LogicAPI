@@ -3,6 +3,7 @@ package com.logic.asts.binary;
 
 import com.logic.asts.IASTExp;
 import com.logic.interpreters.IInterpreter;
+import com.logic.parser.ExpressionsParser;
 
 public class ASTAnd extends AASTBinaryExp {
 

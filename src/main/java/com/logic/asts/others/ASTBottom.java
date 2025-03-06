@@ -3,6 +3,7 @@ package com.logic.asts.others;
 
 import com.logic.asts.AASTExp;
 import com.logic.interpreters.IInterpreter;
+import com.logic.parser.ExpressionsParser;
 
 public class ASTBottom extends AASTExp {
 
@@ -12,5 +13,5 @@ public class ASTBottom extends AASTExp {
     }
 
     @Override
-    public String toString() {return ExpressionsParser.BOTTOM;}
+    public String toString() {return getToken(ExpressionsParser.BOTTOM);}
 }

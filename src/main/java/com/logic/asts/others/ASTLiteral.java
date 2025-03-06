@@ -7,10 +7,14 @@ import com.logic.interpreters.IInterpreter;
 
 public class ASTLiteral extends AASTExp implements IASTExp {
 
-    public String id;
+    private final String id;
 
     public ASTLiteral(String id) {
         this.id = id;
+    }
+
+    public String getId() {
+        return id;
     }
 
     @Override

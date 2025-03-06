@@ -13,7 +13,9 @@ import com.logic.asts.binary.ASTUniversal;
 
 public interface IInterpreter<T, E> {
 
-    T visit(ASTSignature e, E env);
+    T visit(ASTSigFun e, E env);
+
+    T visit(ASTSigPred e, E env);
 
 
     T visit(ASTTop e, E env);
@@ -23,9 +25,7 @@ public interface IInterpreter<T, E> {
 
     T visit(ASTLiteral e, E env);
 
-    T visit(ASTConstant e, E env);
-
-    T visit(ASTVariable e, E env);
+    T visit(ASTBasicTerm e, E env);
 
 
     T visit(ASTNot e, E env);

@@ -3,6 +3,7 @@ package com.logic.asts.binary;
 
 import com.logic.asts.IASTExp;
 import com.logic.interpreters.IInterpreter;
+import com.logic.parser.ExpressionsParser;
 
 public class ASTExistential extends AASTBinaryExp {
 
@@ -17,6 +18,6 @@ public class ASTExistential extends AASTBinaryExp {
 
     @Override
     public String toString() {
-        return getToken(ExpressionsParser.EXISTENTIAL) + left.toString() + " (" + right.toString()+")";
+        return getToken(ExpressionsParser.EXISTENTIAL) + left.toString() + " " + right.toString();
     }
 }

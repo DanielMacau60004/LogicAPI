@@ -11,45 +11,61 @@ public interface ExpressionsParserConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int SINGLE_LINE_COMMENT = 4;
+  int ENTER = 4;
   /** RegularExpression Id. */
-  int MULTI_LINE_COMMENT = 5;
+  int SINGLE_LINE_COMMENT = 5;
   /** RegularExpression Id. */
-  int LPAR = 6;
+  int MULTI_LINE_COMMENT = 6;
   /** RegularExpression Id. */
-  int RPAR = 7;
+  int SF = 7;
   /** RegularExpression Id. */
-  int TOP = 8;
+  int SP = 8;
   /** RegularExpression Id. */
-  int BOTTOM = 9;
+  int LPAR = 9;
   /** RegularExpression Id. */
-  int NOT = 10;
+  int RPAR = 10;
   /** RegularExpression Id. */
-  int AND = 11;
+  int TOP = 11;
   /** RegularExpression Id. */
-  int OR = 12;
+  int BOTTOM = 12;
   /** RegularExpression Id. */
-  int CONDITIONAL = 13;
+  int NOT = 13;
   /** RegularExpression Id. */
-  int BICONDITIONAL = 14;
+  int AND = 14;
   /** RegularExpression Id. */
-  int UNIVERSAL = 15;
+  int OR = 15;
   /** RegularExpression Id. */
-  int EXISTENTIAL = 16;
+  int CONDITIONAL = 16;
   /** RegularExpression Id. */
-  int SLASH = 17;
+  int BICONDITIONAL = 17;
   /** RegularExpression Id. */
-  int COMMA = 18;
+  int UNIVERSAL = 18;
   /** RegularExpression Id. */
-  int GREEK = 19;
+  int EXISTENTIAL = 19;
   /** RegularExpression Id. */
-  int CHAR = 20;
+  int SLASH = 20;
   /** RegularExpression Id. */
-  int U_WORD = 21;
+  int COMMA = 21;
   /** RegularExpression Id. */
-  int L_WORD = 22;
+  int GREEK = 22;
   /** RegularExpression Id. */
-  int ENTER = 23;
+  int U_CHAR = 23;
+  /** RegularExpression Id. */
+  int U_WORD = 24;
+  /** RegularExpression Id. */
+  int L_CHAR = 25;
+  /** RegularExpression Id. */
+  int L_WORD = 26;
+  /** RegularExpression Id. */
+  int DOT = 27;
+  /** RegularExpression Id. */
+  int EQUALS = 28;
+  /** RegularExpression Id. */
+  int LBRA = 29;
+  /** RegularExpression Id. */
+  int RBRA = 30;
+  /** RegularExpression Id. */
+  int NUMBER = 31;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -60,8 +76,11 @@ public interface ExpressionsParserConstants {
     "\" \"",
     "\"\\t\"",
     "\"\\r\"",
+    "\"\\n\"",
     "<SINGLE_LINE_COMMENT>",
     "<MULTI_LINE_COMMENT>",
+    "\"SF\"",
+    "\"SP\"",
     "\"(\"",
     "\")\"",
     "\"\\u22a4\"",
@@ -76,10 +95,15 @@ public interface ExpressionsParserConstants {
     "\"/\"",
     "\",\"",
     "<GREEK>",
-    "<CHAR>",
+    "<U_CHAR>",
     "<U_WORD>",
+    "<L_CHAR>",
     "<L_WORD>",
-    "\"\\n\"",
+    "\".\"",
+    "\"=\"",
+    "\"{\"",
+    "\"}\"",
+    "<NUMBER>",
   };
 
 }

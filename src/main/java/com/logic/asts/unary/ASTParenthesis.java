@@ -2,14 +2,19 @@ package com.logic.asts.unary;
 
 import com.logic.asts.IASTExp;
 import com.logic.interpreters.IInterpreter;
+import com.logic.parser.ExpressionsParser;
 
 public class ASTParenthesis extends AASTUnaryExp {
 
-    public IASTExp e;
+    private final IASTExp e;
 
     public ASTParenthesis(IASTExp e) {
         super(e);
         this.e = e;
+    }
+
+    public IASTExp getE() {
+        return e;
     }
 
     @Override

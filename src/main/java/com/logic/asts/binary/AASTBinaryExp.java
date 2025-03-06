@@ -5,8 +5,8 @@ import com.logic.asts.IASTExp;
 
 public abstract class AASTBinaryExp extends AASTExp implements IASTExp {
 
-    public IASTExp left;
-    public IASTExp right;
+    protected final IASTExp left;
+    protected final IASTExp right;
 
     public AASTBinaryExp(IASTExp left, IASTExp right) {
         this.left = left;

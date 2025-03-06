@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 
 public class ASTPred extends AASTExp {
 
-    public final String predicate;
-    public final List<IASTExp> terms;
+    private final String predicate;
+    private final List<IASTExp> terms;
 
     public ASTPred(String predicate) {
        this(predicate, new LinkedList<>());
@@ -20,6 +20,10 @@ public class ASTPred extends AASTExp {
     public ASTPred(String predicate, List<IASTExp> terms) {
         this.predicate = predicate;
         this.terms = terms;
+    }
+
+    public List<IASTExp> getTerms() {
+        return terms;
     }
 
     public void addTerm(IASTExp term) {

@@ -2,66 +2,53 @@
 package com.logic.parser;
 
 import com.logic.asts.*;
+import com.logic.asts.binary.*;
+import com.logic.asts.unary.*;
+import com.logic.asts.others.*;
 
 public class ExpressionsParser implements ExpressionsParserConstants {
 
-  final public Exp parseExp() throws ParseException {
-    Exp e;
-    e = sequences();
+/*
+* Parser for propositional logic expressions
+*/
+  final public IASTExp parsePL() throws ParseException {
+    IASTExp e;
+    e = sequencesPL();
     jj_consume_token(0);
       {if (true) return e;}
     throw new Error("Missing return statement in function");
   }
 
-  final private Exp sequences() throws ParseException {
+  final private IASTExp sequencesPL() throws ParseException {
     ASTSequence exps;
-    Exp e;
+    IASTExp e;
+    e = operations();
+                       exps = new ASTSequence(e);
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case ENTER:
+      case LPAR:
+      case TOP:
+      case BOTTOM:
+      case NOT:
+      case GREEK:
+      case L_CHAR:
         ;
         break;
       default:
         jj_la1[0] = jj_gen;
         break label_1;
       }
-      jj_consume_token(ENTER);
+      e = operations();
+                         exps.addExp(e);
     }
-    e = connectives();
-                          exps = new ASTSequence(e);
-    label_2:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case ENTER:
-        ;
-        break;
-      default:
-        jj_la1[1] = jj_gen;
-        break label_2;
-      }
-      label_3:
-      while (true) {
-        jj_consume_token(ENTER);
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case ENTER:
-          ;
-          break;
-        default:
-          jj_la1[2] = jj_gen;
-          break label_3;
-        }
-      }
-      e = connectives();
-                                        exps.addExp(e);
-    }
-        {if (true) return exps;}
+      {if (true) return exps;}
     throw new Error("Missing return statement in function");
   }
 
-  final private Exp connectives() throws ParseException {
-    Exp e1, e2;
-    e1 = atomics();
+  final private IASTExp operations() throws ParseException {
+    IASTExp e1, e2;
+    e1 = atomicsPL();
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case AND:
     case OR:
@@ -70,41 +57,41 @@ public class ExpressionsParser implements ExpressionsParserConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case AND:
         jj_consume_token(AND);
-        e2 = atomics();
-                               e1 = new ASTAnd(e1, e2);
+        e2 = atomicsPL();
+                                 e1 = new ASTAnd(e1, e2);
         break;
       case OR:
         jj_consume_token(OR);
-        e2 = atomics();
-                              e1 = new ASTOr(e1, e2);
+        e2 = atomicsPL();
+                                e1 = new ASTOr(e1, e2);
         break;
       case CONDITIONAL:
         jj_consume_token(CONDITIONAL);
-        e2 = atomics();
-                                       e1 = new ASTImplication(e1, e2);
+        e2 = atomicsPL();
+                                         e1 = new ASTConditional(e1, e2);
         break;
       case BICONDITIONAL:
         jj_consume_token(BICONDITIONAL);
-        e2 = atomics();
-                                         e1 = new ASTBiconditional(e1, e2);
+        e2 = atomicsPL();
+                                           e1 = new ASTBiconditional(e1, e2);
         break;
       default:
-        jj_la1[3] = jj_gen;
+        jj_la1[1] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
       break;
     default:
-      jj_la1[4] = jj_gen;
+      jj_la1[2] = jj_gen;
       ;
     }
       {if (true) return e1;}
     throw new Error("Missing return statement in function");
   }
 
-  final private Exp atomics() throws ParseException {
+  final private IASTExp atomicsPL() throws ParseException {
     Token t;
-    Exp e;
+    IASTExp e;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case TOP:
       jj_consume_token(TOP);
@@ -116,25 +103,392 @@ public class ExpressionsParser implements ExpressionsParserConstants {
       break;
     case NOT:
       jj_consume_token(NOT);
-      e = atomics();
-                          {if (true) return new ASTNot(e);}
+      e = atomicsPL();
+                            {if (true) return new ASTNot(e);}
       break;
     case LPAR:
       jj_consume_token(LPAR);
-      e = connectives();
+      e = operations();
       jj_consume_token(RPAR);
-                                      {if (true) return new ASTParenthesis(e);}
+                                     {if (true) return new ASTParenthesis(e);}
       break;
-    case CHAR:
-      t = jj_consume_token(CHAR);
-                 {if (true) return new ASTLiteral(t.image);}
+    case L_CHAR:
+      t = jj_consume_token(L_CHAR);
+                   {if (true) return new ASTLiteral(t.image);}
       break;
     case GREEK:
       t = jj_consume_token(GREEK);
                   {if (true) return new ASTLiteral(t.image);}
       break;
     default:
+      jj_la1[3] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    throw new Error("Missing return statement in function");
+  }
+
+/*
+* Parser for first-order logic expressions
+*/
+  final public IASTExp parseFOL() throws ParseException {
+    IASTExp e;
+    e = sequencesFOL();
+    jj_consume_token(0);
+      {if (true) return e;}
+    throw new Error("Missing return statement in function");
+  }
+
+  final private IASTExp sequencesFOL() throws ParseException {
+    ASTSequence exps;
+    IASTExp e;
+    e = signaturesFOL();
+                          exps = new ASTSequence(e);
+    label_2:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SF:
+      case SP:
+      case LPAR:
+      case TOP:
+      case BOTTOM:
+      case NOT:
+      case UNIVERSAL:
+      case EXISTENTIAL:
+      case GREEK:
+      case U_CHAR:
+      case U_WORD:
+        ;
+        break;
+      default:
+        jj_la1[4] = jj_gen;
+        break label_2;
+      }
+      e = signaturesFOL();
+                            exps.addExp(e);
+    }
+      {if (true) return exps;}
+    throw new Error("Missing return statement in function");
+  }
+
+  final private IASTExp signaturesFOL() throws ParseException {
+    IASTExp e;
+
+    Token name, arity;
+    ASTSigFun fun = new ASTSigFun();
+    ASTSigPred pred = new ASTSigPred();
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case LPAR:
+    case TOP:
+    case BOTTOM:
+    case NOT:
+    case UNIVERSAL:
+    case EXISTENTIAL:
+    case GREEK:
+    case U_CHAR:
+    case U_WORD:
+      e = operationsFOL();
+                          {if (true) return e;}
+      break;
+    case SF:
+      jj_consume_token(SF);
+      jj_consume_token(EQUALS);
+      jj_consume_token(LBRA);
+      e = signaturesSFFOL();
+      jj_consume_token(RBRA);
+                                                          {if (true) return e;}
+      break;
+    case SP:
+      jj_consume_token(SP);
+      jj_consume_token(EQUALS);
+      jj_consume_token(LBRA);
+      e = signaturesSPFOL();
+      jj_consume_token(RBRA);
+                                                          {if (true) return e;}
+      break;
+    default:
       jj_la1[5] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    throw new Error("Missing return statement in function");
+  }
+
+  final private IASTExp signaturesSFFOL() throws ParseException {
+    String name;
+    Token arity;
+    ASTSigFun fun = new ASTSigFun();
+    name = funName();
+    jj_consume_token(SLASH);
+    arity = jj_consume_token(NUMBER);
+                                                   fun.addFunction(name, arity.image);
+    label_3:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case COMMA:
+        ;
+        break;
+      default:
+        jj_la1[6] = jj_gen;
+        break label_3;
+      }
+      jj_consume_token(COMMA);
+      name = funName();
+      jj_consume_token(SLASH);
+      arity = jj_consume_token(NUMBER);
+                                                              fun.addFunction(name, arity.image);
+    }
+           {if (true) return fun;}
+    throw new Error("Missing return statement in function");
+  }
+
+  final private IASTExp signaturesSPFOL() throws ParseException {
+    String name;
+    Token arity;
+    ASTSigPred pred = new ASTSigPred();
+    name = predName();
+    jj_consume_token(SLASH);
+    arity = jj_consume_token(NUMBER);
+                                                    pred.addPredicate(name, arity.image);
+    label_4:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case COMMA:
+        ;
+        break;
+      default:
+        jj_la1[7] = jj_gen;
+        break label_4;
+      }
+      jj_consume_token(COMMA);
+      name = predName();
+      jj_consume_token(SLASH);
+      arity = jj_consume_token(NUMBER);
+                                                               pred.addPredicate(name, arity.image);
+    }
+           {if (true) return pred;}
+    throw new Error("Missing return statement in function");
+  }
+
+  final private IASTExp operationsFOL() throws ParseException {
+    IASTExp e1, e2;
+    e1 = atomicsFOL();
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case AND:
+    case OR:
+    case CONDITIONAL:
+    case BICONDITIONAL:
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case AND:
+        jj_consume_token(AND);
+        e2 = atomicsFOL();
+                                  e1 = new ASTAnd(e1, e2);
+        break;
+      case OR:
+        jj_consume_token(OR);
+        e2 = atomicsFOL();
+                                 e1 = new ASTOr(e1, e2);
+        break;
+      case CONDITIONAL:
+        jj_consume_token(CONDITIONAL);
+        e2 = atomicsFOL();
+                                          e1 = new ASTConditional(e1, e2);
+        break;
+      case BICONDITIONAL:
+        jj_consume_token(BICONDITIONAL);
+        e2 = atomicsFOL();
+                                            e1 = new ASTBiconditional(e1, e2);
+        break;
+      default:
+        jj_la1[8] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      break;
+    default:
+      jj_la1[9] = jj_gen;
+      ;
+    }
+      {if (true) return e1;}
+    throw new Error("Missing return statement in function");
+  }
+
+  final private IASTExp atomicsFOL() throws ParseException {
+    Token t;
+    IASTExp e, e1;
+    ASTPred pred;
+    String name;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case TOP:
+      jj_consume_token(TOP);
+            {if (true) return new ASTTop();}
+      break;
+    case BOTTOM:
+      jj_consume_token(BOTTOM);
+               {if (true) return new ASTBottom();}
+      break;
+    case NOT:
+      jj_consume_token(NOT);
+      e = atomicsFOL();
+                             {if (true) return new ASTNot(e);}
+      break;
+    case LPAR:
+      jj_consume_token(LPAR);
+      e = operationsFOL();
+      jj_consume_token(RPAR);
+                                        {if (true) return new ASTParenthesis(e);}
+      break;
+    case GREEK:
+      t = jj_consume_token(GREEK);
+                  {if (true) return new ASTLiteral(t.image);}
+      break;
+    case EXISTENTIAL:
+      jj_consume_token(EXISTENTIAL);
+      t = jj_consume_token(L_CHAR);
+                                e = new ASTBasicTerm(t.image);
+      e1 = atomicsFOL();
+                                                                                    {if (true) return new ASTExistential(e, e1);}
+      break;
+    case UNIVERSAL:
+      jj_consume_token(UNIVERSAL);
+      t = jj_consume_token(L_CHAR);
+                              e = new ASTBasicTerm(t.image);
+      e1 = atomicsFOL();
+                                                                                  {if (true) return new ASTUniversal(e, e1);}
+      break;
+    case U_CHAR:
+    case U_WORD:
+      name = predName();
+      e = predicateFOL(name);
+                                              {if (true) return  e;}
+      break;
+    default:
+      jj_la1[10] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    throw new Error("Missing return statement in function");
+  }
+
+  final private IASTExp predicateFOL(String name) throws ParseException {
+    IASTExp e;
+    ASTPred pred = new ASTPred(name);
+    jj_consume_token(LPAR);
+    e = termFOL();
+                           pred.addTerm(e);
+    label_5:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case COMMA:
+        ;
+        break;
+      default:
+        jj_la1[11] = jj_gen;
+        break label_5;
+      }
+      jj_consume_token(COMMA);
+      e = termFOL();
+                                                                        pred.addTerm(e);
+    }
+    jj_consume_token(RPAR);
+                                                                                                      {if (true) return pred;}
+    throw new Error("Missing return statement in function");
+  }
+
+  final private IASTExp termFOL() throws ParseException {
+   Token t;
+   IASTExp e;
+   ASTFun fun;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case L_CHAR:
+      t = jj_consume_token(L_CHAR);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LPAR:
+        e = functionFOL(t.image);
+                                             {if (true) return e;}
+        break;
+      default:
+        jj_la1[12] = jj_gen;
+                                                             {if (true) return new ASTBasicTerm(t.image);}
+      }
+      break;
+    case L_WORD:
+      t = jj_consume_token(L_WORD);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case LPAR:
+        e = functionFOL(t.image);
+                                             {if (true) return e;}
+        break;
+      default:
+        jj_la1[13] = jj_gen;
+                                                             {if (true) return new ASTBasicTerm(t.image);}
+      }
+      break;
+    default:
+      jj_la1[14] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    throw new Error("Missing return statement in function");
+  }
+
+  final private IASTExp functionFOL(String name) throws ParseException {
+    IASTExp e;
+    ASTFun fun = new ASTFun(name);
+    jj_consume_token(LPAR);
+    e = termFOL();
+                           fun.addTerm(e);
+    label_6:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case COMMA:
+        ;
+        break;
+      default:
+        jj_la1[15] = jj_gen;
+        break label_6;
+      }
+      jj_consume_token(COMMA);
+      e = termFOL();
+                                                                       fun.addTerm(e);
+    }
+    jj_consume_token(RPAR);
+                                                                                                     {if (true) return fun;}
+    throw new Error("Missing return statement in function");
+  }
+
+  final private String funName() throws ParseException {
+    Token t;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case L_CHAR:
+      t = jj_consume_token(L_CHAR);
+                   {if (true) return t.image;}
+      break;
+    case L_WORD:
+      t = jj_consume_token(L_WORD);
+                     {if (true) return t.image;}
+      break;
+    default:
+      jj_la1[16] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    throw new Error("Missing return statement in function");
+  }
+
+  final private String predName() throws ParseException {
+    Token t;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case U_CHAR:
+      t = jj_consume_token(U_CHAR);
+                   {if (true) return t.image;}
+      break;
+    case U_WORD:
+      t = jj_consume_token(U_WORD);
+                     {if (true) return t.image;}
+      break;
+    default:
+      jj_la1[17] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -150,13 +504,13 @@ public class ExpressionsParser implements ExpressionsParserConstants {
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[6];
+  final private int[] jj_la1 = new int[18];
   static private int[] jj_la1_0;
   static {
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x800000,0x800000,0x800000,0x7800,0x7800,0x180740,};
+      jj_la1_0 = new int[] {0x2403a00,0x3c000,0x3c000,0x2403a00,0x1cc3b80,0x1cc3b80,0x200000,0x200000,0x3c000,0x3c000,0x1cc3a00,0x200000,0x200,0x200,0x6000000,0x200000,0x6000000,0x1800000,};
    }
 
   /** Constructor with InputStream. */
@@ -170,7 +524,7 @@ public class ExpressionsParser implements ExpressionsParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -184,7 +538,7 @@ public class ExpressionsParser implements ExpressionsParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -194,7 +548,7 @@ public class ExpressionsParser implements ExpressionsParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -204,7 +558,7 @@ public class ExpressionsParser implements ExpressionsParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -213,7 +567,7 @@ public class ExpressionsParser implements ExpressionsParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -222,7 +576,7 @@ public class ExpressionsParser implements ExpressionsParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 18; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -273,12 +627,12 @@ public class ExpressionsParser implements ExpressionsParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[24];
+    boolean[] la1tokens = new boolean[32];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 18; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -287,7 +641,7 @@ public class ExpressionsParser implements ExpressionsParserConstants {
         }
       }
     }
-    for (int i = 0; i < 24; i++) {
+    for (int i = 0; i < 32; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

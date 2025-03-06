@@ -9,6 +9,9 @@ PARSER_BEGIN(ExpressionsParser)
 package com.logic.parser;
 
 import com.logic.asts.*;
+import com.logic.asts.binary.*;
+import com.logic.asts.unary.*;
+import com.logic.asts.others.*;
 
 public class ExpressionsParser {
 }
@@ -19,8 +22,14 @@ SKIP : {
     " "
   | "\t"
   | "\r"
-  | <SINGLE_LINE_COMMENT: "//" (~["\n", "\r"])* ("\n" | "\r" | "\r\n") >
+  | < ENTER: "\n">
+  | <SINGLE_LINE_COMMENT: "//" (~["\n", "\r"])* ("\n" | "\r" | "\r\n")>
   | <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
+}
+
+TOKEN : {
+    < SF: "SF" >
+  | < SP: "SP" >
 }
 
 TOKEN : {
@@ -35,125 +44,179 @@ TOKEN : {
   | < BICONDITIONAL: "↔" >
   | < UNIVERSAL: "∀" >
   | < EXISTENTIAL: "∃" >
-
-  | < SLASH: "/">
+  | < SLASH: "/" >
   | < COMMA : "," >
-
-  | < GREEK : ("Γ"|"Δ"|"Θ"|"Π"|"Σ"|"Φ"|"Ψ"|"Ω") >
-  | < CHAR: ["a"-"z"] >
-  | < U_WORD: ["A"-"Z"] (["a"-"z", "A"-"Z"])* >
-  | < L_WORD: (["a"-"z"])(["a"-"z"])+ >
-
-  | <ENTER: "\n">
+  | < GREEK : ("φ" | "δ" | "ψ" | "α" | "β" | "γ" | "ε" | "λ" | "μ" | "ρ" | "σ" | "τ" | "ω") >
+  | < U_CHAR: ["A"-"Z"] >
+  | < U_WORD: ["A"-"Z"] (["a"-"z", "A"-"Z"])+ >
+  | < L_CHAR: (["a"-"z"]) >
+  | < L_WORD: ["a"-"z"] (["a"-"z", "A"-"Z"])+ >
+  | < DOT: ".">
+  | < EQUALS: "=">
+  | < LBRA : "{" >
+  | < RBRA : "}" >
+  | < NUMBER: (["0"-"9"])+ >
 }
 
-Exp parseExp() : {
-    Exp e;
+/*
+* Parser for propositional logic expressions
+*/
+IASTExp parsePL() : {
+    IASTExp e;
 } {
-    e = sequences() <EOF>
+    e = sequencesPL() <EOF>
     { return e; }
 }
 
-private Exp sequences() : {
+private IASTExp sequencesPL() : {
     ASTSequence exps;
-    Exp e;
+    IASTExp e;
 } {
-      ( <ENTER> )*
-      e = connectives() { exps = new ASTSequence(e); }
-      (( <ENTER> )+ e = connectives() { exps.addExp(e); } )*
-      { return exps; }
- }
+    e = operations() { exps = new ASTSequence(e); }
+    ( e = operations() { exps.addExp(e); } )*
+    { return exps; }
+}
 
-private Exp connectives() : {
-    Exp e1, e2;
+private IASTExp operations() : {
+    IASTExp e1, e2;
 } {
-    e1 = atomics()
+    e1 = atomicsPL()
     (
-        <AND> e2 = atomics() { e1 = new ASTAnd(e1, e2); }
-      | <OR> e2 = atomics() { e1 = new ASTOr(e1, e2); }
-      | <CONDITIONAL> e2 = atomics() { e1 = new ASTImplication(e1, e2); }
-      | <BICONDITIONAL> e2 = atomics() { e1 = new ASTBiconditional(e1, e2); }
+        <AND> e2 = atomicsPL() { e1 = new ASTAnd(e1, e2); }
+      | <OR> e2 = atomicsPL() { e1 = new ASTOr(e1, e2); }
+      | <CONDITIONAL> e2 = atomicsPL() { e1 = new ASTConditional(e1, e2); }
+      | <BICONDITIONAL> e2 = atomicsPL() { e1 = new ASTBiconditional(e1, e2); }
     )?
     { return e1; }
 }
 
-private Exp atomics() : {
+private IASTExp atomicsPL() : {
     Token t;
-    Exp e;
+    IASTExp e;
 } {
     <TOP> { return new ASTTop(); }
   | <BOTTOM> { return new ASTBottom(); }
-  | <NOT> e = atomics() { return new ASTNot(e); }
-  | <LPAR> e = connectives() <RPAR> { return new ASTParenthesis(e); }
-  | t = <CHAR> { return new ASTLiteral(t.image); }
+  | <NOT> e = atomicsPL() { return new ASTNot(e); }
+  | <LPAR> e = operations() <RPAR> { return new ASTParenthesis(e); }
+  | t = <L_CHAR> { return new ASTLiteral(t.image); }
   | t = <GREEK> { return new ASTLiteral(t.image); }
 }
 
 /*
-* Parser for first-order expressions
+* Parser for first-order logic expressions
 */
-/*
-Exp parseFOL() : {
-    Exp e;
+
+IASTExp parseFOL() : {
+    IASTExp e;
 } {
-    e = folLogicSequences() <EOF>
+    e = sequencesFOL() <EOF>
     { return e; }
 }
 
-private Exp folLogicSequences() : {
+private IASTExp sequencesFOL() : {
     ASTSequence exps;
-    Exp e;
+    IASTExp e;
 } {
-    e = folLogicExpressions() <PERIOD> { exps = new ASTSequence(e); }
-    ( e = folLogicExpressions() <PERIOD> { exps.addExp(e); } )*
+    e = signaturesFOL() { exps = new ASTSequence(e); }
+    ( e = signaturesFOL() { exps.addExp(e); } )*
     { return exps; }
 }
 
-private Exp folLogicExpressions() : {
-    Token t;
-    Exp e1, e2;
+private IASTExp signaturesFOL() : {
+    IASTExp e;
+
+    Token name, arity;
+    ASTSigFun fun = new ASTSigFun();
+    ASTSigPred pred = new ASTSigPred();
 } {
-    t = <DEL_PREDICATE> { return new ASTDelPred(t.image); }
-    | e1 = folLogicBinary() ( <CMP> e2 = folLogicBinary() { e1 = new ASTComp(e1, e2); } )?
-    { return e1; }
+    e = operationsFOL() { return e; }
+    | <SF> <EQUALS> <LBRA> e = signaturesSFFOL() <RBRA> { return e; }
+    | <SP> <EQUALS> <LBRA> e = signaturesSPFOL() <RBRA> { return e; }
 }
 
-private Exp folLogicBinary() : {
-    Exp e1, e2;
+private IASTExp signaturesSFFOL() : {
+    String name;
+    Token arity;
+    ASTSigFun fun = new ASTSigFun();
 } {
-    e1 = folLogicUnary()
+        name = funName() <SLASH> arity = <NUMBER> {fun.addFunction(name, arity.image); }
+         ( <COMMA> name = funName() <SLASH> arity = <NUMBER> {fun.addFunction(name, arity.image);})*
+         { return fun; }
+}
+
+private IASTExp signaturesSPFOL() : {
+    String name;
+    Token arity;
+    ASTSigPred pred = new ASTSigPred();
+} {
+        name = predName() <SLASH> arity = <NUMBER> {pred.addPredicate(name, arity.image); }
+         ( <COMMA> name = predName() <SLASH> arity = <NUMBER> {pred.addPredicate(name, arity.image);})*
+         { return pred; }
+}
+
+private IASTExp operationsFOL() : {
+    IASTExp e1, e2;
+} {
+    e1 = atomicsFOL()
     (
-        <AND> e2 = folLogicUnary() { e1 = new ASTAnd(e1, e2); }
-      | <OR> e2 = folLogicUnary() { e1 = new ASTOr(e1, e2); }
-      | <IMPLICATION> e2 = folLogicUnary() { e1 = new ASTImplication(e1, e2); }
-      | <BICONDITIONAL> e2 = folLogicUnary() { e1 = new ASTBiconditional(e1, e2); }
-    )*
+        <AND> e2 = atomicsFOL() { e1 = new ASTAnd(e1, e2); }
+      | <OR> e2 = atomicsFOL() { e1 = new ASTOr(e1, e2); }
+      | <CONDITIONAL> e2 = atomicsFOL() { e1 = new ASTConditional(e1, e2); }
+      | <BICONDITIONAL> e2 = atomicsFOL() { e1 = new ASTBiconditional(e1, e2); }
+    )?
     { return e1; }
 }
 
-//TODO I NEED TO FIND A WAY TO DECLARE TERMS BEFOREHAND likes/2.
-//TODO FOR EXAMPLE: likes(a,b) expects 2 terms, but found 3 (likes(a,b,c))
-private Exp folLogicUnary() : {
+private IASTExp atomicsFOL() : {
     Token t;
-    Exp e, e1;
+    IASTExp e, e1;
     ASTPred pred;
+    String name;
 } {
-    <TRUE> { return new ASTBool(true); }
-  | <FALSE> { return new ASTBool(false); }
-  | <NOT> e = folLogicUnary() { return new ASTNot(e); }
-  | <LPAR> e = folLogicBinary() <RPAR> { return new ASTParenthesis(e); }
-  | <EXISTENTIAL> e = folTerm() e1 = folLogicUnary(){ return new ASTExistential(e, e1); }
-  | <UNIVERSAL> e = folTerm() e1 = folLogicUnary() { return new ASTUniversal(e, e1); }
-  | t = <PREDICATE> { pred = new ASTPred(t.image); }
-    <LPAR> e = folTerm() { pred.addTerm(e); } ( <COMMA> e = folTerm() { pred.addTerm(e); } )* <RPAR> {return pred; }
+    <TOP> { return new ASTTop(); }
+  | <BOTTOM> { return new ASTBottom(); }
+  | <NOT> e = atomicsFOL() { return new ASTNot(e); }
+  | <LPAR> e = operationsFOL() <RPAR> { return new ASTParenthesis(e); }
+  | t = <GREEK> { return new ASTLiteral(t.image); }
+  | <EXISTENTIAL> t = <L_CHAR> {e = new ASTBasicTerm(t.image);} e1 = atomicsFOL() { return new ASTExistential(e, e1); }
+  | <UNIVERSAL> t = <L_CHAR> {e = new ASTBasicTerm(t.image);} e1 = atomicsFOL() { return new ASTUniversal(e, e1); }
+  | name = predName() e = predicateFOL(name) {return  e;}
 }
 
-private Exp folTerm() : {
-   Token t;
+private IASTExp predicateFOL(String name) : {
+    IASTExp e;
+    ASTPred pred = new ASTPred(name);
 } {
-    t = <VARIABLE> {return new ASTVariable(t.image); }
-  | t = <CONSTANT> {return new ASTConstant(t.image); }
+    <LPAR> e = termFOL() { pred.addTerm(e); } ( <COMMA> e = termFOL() { pred.addTerm(e); } )* <RPAR> {return pred; }
 }
-+/
- */
+
+private IASTExp termFOL() : {
+   Token t;
+   IASTExp e;
+   ASTFun fun;
+} {
+    t = <L_CHAR> (e = functionFOL(t.image) { return e; } | { return new ASTBasicTerm(t.image); })
+  | t = <L_WORD> (e = functionFOL(t.image) { return e; } | { return new ASTBasicTerm(t.image); })
+}
+
+private IASTExp functionFOL(String name) : {
+    IASTExp e;
+    ASTFun fun = new ASTFun(name);
+} {
+    <LPAR> e = termFOL() { fun.addTerm(e); } ( <COMMA> e = termFOL() { fun.addTerm(e); } )* <RPAR> { return fun; }
+}
+
+private String funName() : {
+    Token t;
+} {
+    t = <L_CHAR> { return t.image; }
+    | t = <L_WORD> { return t.image; }
+}
+
+private String predName() : {
+    Token t;
+} {
+    t = <U_CHAR> { return t.image; }
+    | t = <U_WORD> { return t.image; }
+}
 

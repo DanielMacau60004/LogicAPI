@@ -2,11 +2,7 @@ package com.logic.asts.unary;
 
 import com.logic.asts.IASTExp;
 import com.logic.interpreters.IInterpreter;
-import logic.ast.Exp;
-import logic.ast.FOLVisitor;
-import logic.ast.PropVisitor;
-import logic.ast.types.ASTASingleExp;
-import logic.parser.ExpressionsParser;
+import com.logic.parser.ExpressionsParser;
 
 public class ASTNot extends AASTUnaryExp {
 
