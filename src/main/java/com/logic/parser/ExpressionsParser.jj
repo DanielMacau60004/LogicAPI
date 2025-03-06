@@ -1,0 +1,159 @@
+options {
+    STATIC = false;
+    UNICODE_INPUT = true;
+    JAVA_UNICODE_ESCAPE = true;
+}
+
+PARSER_BEGIN(ExpressionsParser)
+
+package com.logic.parser;
+
+import com.logic.asts.*;
+
+public class ExpressionsParser {
+}
+
+PARSER_END(ExpressionsParser)
+
+SKIP : {
+    " "
+  | "\t"
+  | "\r"
+  | <SINGLE_LINE_COMMENT: "//" (~["\n", "\r"])* ("\n" | "\r" | "\r\n") >
+  | <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
+}
+
+TOKEN : {
+    < LPAR : "(" >
+  | < RPAR : ")" >
+  | < TOP: "⊤" >
+  | < BOTTOM: "⊥" >
+  | < NOT: "¬" >
+  | < AND: "∧" >
+  | < OR: "∨" >
+  | < CONDITIONAL: "→" >
+  | < BICONDITIONAL: "↔" >
+  | < UNIVERSAL: "∀" >
+  | < EXISTENTIAL: "∃" >
+
+  | < SLASH: "/">
+  | < COMMA : "," >
+
+  | < GREEK : ("Γ"|"Δ"|"Θ"|"Π"|"Σ"|"Φ"|"Ψ"|"Ω") >
+  | < CHAR: ["a"-"z"] >
+  | < U_WORD: ["A"-"Z"] (["a"-"z", "A"-"Z"])* >
+  | < L_WORD: (["a"-"z"])(["a"-"z"])+ >
+
+  | <ENTER: "\n">
+}
+
+Exp parseExp() : {
+    Exp e;
+} {
+    e = sequences() <EOF>
+    { return e; }
+}
+
+private Exp sequences() : {
+    ASTSequence exps;
+    Exp e;
+} {
+      ( <ENTER> )*
+      e = connectives() { exps = new ASTSequence(e); }
+      (( <ENTER> )+ e = connectives() { exps.addExp(e); } )*
+      { return exps; }
+ }
+
+private Exp connectives() : {
+    Exp e1, e2;
+} {
+    e1 = atomics()
+    (
+        <AND> e2 = atomics() { e1 = new ASTAnd(e1, e2); }
+      | <OR> e2 = atomics() { e1 = new ASTOr(e1, e2); }
+      | <CONDITIONAL> e2 = atomics() { e1 = new ASTImplication(e1, e2); }
+      | <BICONDITIONAL> e2 = atomics() { e1 = new ASTBiconditional(e1, e2); }
+    )?
+    { return e1; }
+}
+
+private Exp atomics() : {
+    Token t;
+    Exp e;
+} {
+    <TOP> { return new ASTTop(); }
+  | <BOTTOM> { return new ASTBottom(); }
+  | <NOT> e = atomics() { return new ASTNot(e); }
+  | <LPAR> e = connectives() <RPAR> { return new ASTParenthesis(e); }
+  | t = <CHAR> { return new ASTLiteral(t.image); }
+  | t = <GREEK> { return new ASTLiteral(t.image); }
+}
+
+/*
+* Parser for first-order expressions
+*/
+/*
+Exp parseFOL() : {
+    Exp e;
+} {
+    e = folLogicSequences() <EOF>
+    { return e; }
+}
+
+private Exp folLogicSequences() : {
+    ASTSequence exps;
+    Exp e;
+} {
+    e = folLogicExpressions() <PERIOD> { exps = new ASTSequence(e); }
+    ( e = folLogicExpressions() <PERIOD> { exps.addExp(e); } )*
+    { return exps; }
+}
+
+private Exp folLogicExpressions() : {
+    Token t;
+    Exp e1, e2;
+} {
+    t = <DEL_PREDICATE> { return new ASTDelPred(t.image); }
+    | e1 = folLogicBinary() ( <CMP> e2 = folLogicBinary() { e1 = new ASTComp(e1, e2); } )?
+    { return e1; }
+}
+
+private Exp folLogicBinary() : {
+    Exp e1, e2;
+} {
+    e1 = folLogicUnary()
+    (
+        <AND> e2 = folLogicUnary() { e1 = new ASTAnd(e1, e2); }
+      | <OR> e2 = folLogicUnary() { e1 = new ASTOr(e1, e2); }
+      | <IMPLICATION> e2 = folLogicUnary() { e1 = new ASTImplication(e1, e2); }
+      | <BICONDITIONAL> e2 = folLogicUnary() { e1 = new ASTBiconditional(e1, e2); }
+    )*
+    { return e1; }
+}
+
+//TODO I NEED TO FIND A WAY TO DECLARE TERMS BEFOREHAND likes/2.
+//TODO FOR EXAMPLE: likes(a,b) expects 2 terms, but found 3 (likes(a,b,c))
+private Exp folLogicUnary() : {
+    Token t;
+    Exp e, e1;
+    ASTPred pred;
+} {
+    <TRUE> { return new ASTBool(true); }
+  | <FALSE> { return new ASTBool(false); }
+  | <NOT> e = folLogicUnary() { return new ASTNot(e); }
+  | <LPAR> e = folLogicBinary() <RPAR> { return new ASTParenthesis(e); }
+  | <EXISTENTIAL> e = folTerm() e1 = folLogicUnary(){ return new ASTExistential(e, e1); }
+  | <UNIVERSAL> e = folTerm() e1 = folLogicUnary() { return new ASTUniversal(e, e1); }
+  | t = <PREDICATE> { pred = new ASTPred(t.image); }
+    <LPAR> e = folTerm() { pred.addTerm(e); } ( <COMMA> e = folTerm() { pred.addTerm(e); } )* <RPAR> {return pred; }
+}
+
+private Exp folTerm() : {
+   Token t;
+} {
+    t = <VARIABLE> {return new ASTVariable(t.image); }
+  | t = <CONSTANT> {return new ASTConstant(t.image); }
+}
++/
+ */
+

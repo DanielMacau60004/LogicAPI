@@ -1,4 +1,4 @@
-package com.logic.api;
+package com.logic;
 
 public class Main {
 
