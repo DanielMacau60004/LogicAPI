@@ -1,7 +1,6 @@
 package com.logic.asts.others;
 
 import com.logic.asts.AASTExp;
-import com.logic.interpreters.IInterpreter;
 
 public abstract class AASTTerm extends AASTExp {
 

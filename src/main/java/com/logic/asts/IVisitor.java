@@ -1,4 +1,4 @@
-package com.logic.interpreters;
+package com.logic.asts;
 
 
 import com.logic.asts.binary.ASTAnd;
@@ -11,7 +11,7 @@ import com.logic.asts.unary.ASTParenthesis;
 import com.logic.asts.unary.ASTNot;
 import com.logic.asts.binary.ASTUniversal;
 
-public interface IInterpreter<T, E> {
+public interface IVisitor<T, E> {
 
     T visit(ASTSigFun e, E env);
 

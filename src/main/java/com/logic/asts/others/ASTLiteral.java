@@ -3,7 +3,7 @@ package com.logic.asts.others;
 
 import com.logic.asts.AASTExp;
 import com.logic.asts.IASTExp;
-import com.logic.interpreters.IInterpreter;
+import com.logic.asts.IVisitor;
 
 public class ASTLiteral extends AASTExp implements IASTExp {
 
@@ -18,7 +18,7 @@ public class ASTLiteral extends AASTExp implements IASTExp {
     }
 
     @Override
-    public <T, E> T accept(IInterpreter<T, E> v, E env) {
+    public <T, E> T accept(IVisitor<T, E> v, E env) {
         return v.visit(this, env);
     }
 

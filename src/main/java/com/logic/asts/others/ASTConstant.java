@@ -1,7 +1,7 @@
 package com.logic.asts.others;
 
 
-import com.logic.interpreters.IInterpreter;
+import com.logic.asts.IVisitor;
 
 public class ASTConstant extends AASTTerm {
 
@@ -10,7 +10,7 @@ public class ASTConstant extends AASTTerm {
     }
 
     @Override
-    public <T, E> T accept(IInterpreter<T, E> v, E env) {
+    public <T, E> T accept(IVisitor<T, E> v, E env) {
         return v.visit(this, env);
     }
 

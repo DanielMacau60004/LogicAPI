@@ -17,55 +17,39 @@ public interface ExpressionsParserConstants {
   /** RegularExpression Id. */
   int MULTI_LINE_COMMENT = 6;
   /** RegularExpression Id. */
-  int SF = 7;
+  int LPAR = 7;
   /** RegularExpression Id. */
-  int SP = 8;
+  int RPAR = 8;
   /** RegularExpression Id. */
-  int LPAR = 9;
+  int TOP = 9;
   /** RegularExpression Id. */
-  int RPAR = 10;
+  int BOTTOM = 10;
   /** RegularExpression Id. */
-  int TOP = 11;
+  int NOT = 11;
   /** RegularExpression Id. */
-  int BOTTOM = 12;
+  int AND = 12;
   /** RegularExpression Id. */
-  int NOT = 13;
+  int OR = 13;
   /** RegularExpression Id. */
-  int AND = 14;
+  int CONDITIONAL = 14;
   /** RegularExpression Id. */
-  int OR = 15;
+  int BICONDITIONAL = 15;
   /** RegularExpression Id. */
-  int CONDITIONAL = 16;
+  int UNIVERSAL = 16;
   /** RegularExpression Id. */
-  int BICONDITIONAL = 17;
+  int EXISTENTIAL = 17;
   /** RegularExpression Id. */
-  int UNIVERSAL = 18;
+  int COMMA = 18;
   /** RegularExpression Id. */
-  int EXISTENTIAL = 19;
+  int GREEK = 19;
   /** RegularExpression Id. */
-  int SLASH = 20;
+  int LITERAL = 20;
   /** RegularExpression Id. */
-  int COMMA = 21;
+  int VARIABLE = 21;
   /** RegularExpression Id. */
-  int GREEK = 22;
+  int FUNCTION = 22;
   /** RegularExpression Id. */
-  int DOT = 23;
-  /** RegularExpression Id. */
-  int EQUALS = 24;
-  /** RegularExpression Id. */
-  int LBRA = 25;
-  /** RegularExpression Id. */
-  int RBRA = 26;
-  /** RegularExpression Id. */
-  int NUMBER = 27;
-  /** RegularExpression Id. */
-  int LITERAL = 28;
-  /** RegularExpression Id. */
-  int VARIABLE = 29;
-  /** RegularExpression Id. */
-  int FUNCTION = 30;
-  /** RegularExpression Id. */
-  int PREDICATE = 31;
+  int PREDICATE = 23;
 
   /** Lexical state. */
   int PL = 0;
@@ -83,8 +67,6 @@ public interface ExpressionsParserConstants {
     "\"\\n\"",
     "<SINGLE_LINE_COMMENT>",
     "<MULTI_LINE_COMMENT>",
-    "\"SF\"",
-    "\"SP\"",
     "\"(\"",
     "\")\"",
     "\"\\u22a4\"",
@@ -96,14 +78,8 @@ public interface ExpressionsParserConstants {
     "\"\\u2194\"",
     "\"\\u2200\"",
     "\"\\u2203\"",
-    "\"/\"",
     "\",\"",
     "<GREEK>",
-    "\".\"",
-    "\"=\"",
-    "\"{\"",
-    "\"}\"",
-    "<NUMBER>",
     "<LITERAL>",
     "<VARIABLE>",
     "<FUNCTION>",

@@ -1,4 +1,4 @@
 package com.logic.api;
 
-public interface Exp {
+public interface IExp {
 }

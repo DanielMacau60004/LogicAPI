@@ -27,11 +27,6 @@ PARSER_END(ExpressionsParser)
   | <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
 }
 
-//Reserved words
-<PL, FOL> TOKEN : {
-    < SF: "SF" >
-  | < SP: "SP" >
-}
 
 //Symbols
 <PL, FOL> TOKEN : {
@@ -46,14 +41,8 @@ PARSER_END(ExpressionsParser)
   | < BICONDITIONAL: "↔" >
   | < UNIVERSAL: "∀" >
   | < EXISTENTIAL: "∃" >
-  | < SLASH: "/" >
   | < COMMA : "," >
   | < GREEK : ("φ" | "δ" | "ψ" | "α" | "β" | "γ" | "ε" | "λ" | "μ" | "ρ" | "σ" | "τ" | "ω") >
-  | < DOT: ".">
-  | < EQUALS: "=">
-  | < LBRA : "{" >
-  | < RBRA : "}" >
-  | < NUMBER: (["0"-"9"])+ >
 }
 
 <PL> TOKEN : {
@@ -110,47 +99,8 @@ IASTExp parseFOL() : {
     IASTExp e;
 } {
 { token_source.curLexState = FOL; }
-    e = sequencesFOL() <EOF>
+    e = operationsFOL() <EOF>
     { return e; }
-}
-
-private IASTExp sequencesFOL() : {
-    ASTSequence exps;
-    IASTExp e;
-} {
-    e = signaturesFOL() { exps = new ASTSequence(e); }
-    ( e = signaturesFOL() { exps.addExp(e); } )*
-    { return exps; }
-}
-
-private IASTExp signaturesFOL() : {
-    IASTExp e;
-
-    Token name, arity;
-    ASTSigFun fun = new ASTSigFun();
-    ASTSigPred pred = new ASTSigPred();
-} {
-    e = operationsFOL() { return e; }
-    | <SF> <EQUALS> <LBRA> e = signaturesSFFOL() <RBRA> { return e; }
-    | <SP> <EQUALS> <LBRA> e = signaturesSPFOL() <RBRA> { return e; }
-}
-
-private IASTExp signaturesSFFOL() : {
-    Token name, arity;
-    ASTSigFun fun = new ASTSigFun();
-} {
-        name = <FUNCTION> <SLASH> arity = <NUMBER> {fun.addFunction(name.image, arity.image); }
-         ( <COMMA> name = <FUNCTION> <SLASH> arity = <NUMBER> {fun.addFunction(name.image, arity.image);})*
-         { return fun; }
-}
-
-private IASTExp signaturesSPFOL() : {
-    Token name, arity;
-    ASTSigPred pred = new ASTSigPred();
-} {
-        name = <PREDICATE> <SLASH> arity = <NUMBER> {pred.addPredicate(name.image, arity.image); }
-         ( <COMMA> name = <PREDICATE> <SLASH> arity = <NUMBER> {pred.addPredicate(name.image, arity.image);})*
-         { return pred; }
 }
 
 private IASTExp operationsFOL() : {

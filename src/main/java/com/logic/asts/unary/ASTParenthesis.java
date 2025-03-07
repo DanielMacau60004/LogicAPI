@@ -1,7 +1,7 @@
 package com.logic.asts.unary;
 
 import com.logic.asts.IASTExp;
-import com.logic.interpreters.IInterpreter;
+import com.logic.asts.IVisitor;
 import com.logic.parser.ExpressionsParser;
 
 public class ASTParenthesis extends AASTUnaryExp {
@@ -18,7 +18,7 @@ public class ASTParenthesis extends AASTUnaryExp {
     }
 
     @Override
-    public <T, E> T accept(IInterpreter<T, E> v, E env) {
+    public <T, E> T accept(IVisitor<T, E> v, E env) {
         return v.visit(this, env);
     }
 

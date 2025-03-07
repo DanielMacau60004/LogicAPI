@@ -1,21 +1,21 @@
 package com.logic.asts.others;
 
 import com.logic.asts.AASTExp;
-import com.logic.interpreters.IInterpreter;
+import com.logic.asts.IVisitor;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ASTSigPred extends AASTExp {
 
-    private Map<String, Integer> predicates;
+    private final Map<String, Integer> predicates;
 
     public ASTSigPred() {
         predicates = new HashMap<>();
     }
 
-    public void addPredicate(String func, String arity) {
-        predicates.put(func, Integer.parseInt(arity));
+    public void addPredicate(String func, int arity) {
+        predicates.put(func, arity);
     }
 
     public Map<String, Integer> getPredicates() {
@@ -23,7 +23,7 @@ public class ASTSigPred extends AASTExp {
     }
 
     @Override
-    public <T, E> T accept(IInterpreter<T, E> v, E env) {
+    public <T, E> T accept(IVisitor<T, E> v, E env) {
         return v.visit(this, env);
     }
 

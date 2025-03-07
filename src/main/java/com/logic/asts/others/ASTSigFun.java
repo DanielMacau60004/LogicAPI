@@ -1,22 +1,21 @@
 package com.logic.asts.others;
 
 import com.logic.asts.AASTExp;
-import com.logic.interpreters.IInterpreter;
-import com.logic.parser.ExpressionsParser;
+import com.logic.asts.IVisitor;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ASTSigFun extends AASTExp {
 
-    private Map<String, Integer> functions;
+    private final Map<String, Integer> functions;
 
     public ASTSigFun() {
         functions = new HashMap<>();
     }
 
-    public void addFunction(String func, String arity) {
-        functions.put(func, Integer.parseInt(arity));
+    public void addFunction(String func, int arity) {
+        functions.put(func, arity);
     }
 
     public Map<String, Integer> getFunctions() {
@@ -24,7 +23,7 @@ public class ASTSigFun extends AASTExp {
     }
 
     @Override
-    public <T, E> T accept(IInterpreter<T, E> v, E env) {
+    public <T, E> T accept(IVisitor<T, E> v, E env) {
         return v.visit(this, env);
     }
 

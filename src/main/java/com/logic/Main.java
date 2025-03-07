@@ -11,10 +11,8 @@ public class Main {
         System.out.println(LogicAPI.parseFOL(
                 """
                 
-                SF = {m/2, ba/3}
-                SP = {P/3, Party/2}
+                ∃x P(marta,ba(marta,x), x)
                 
-                ∃x D(a,aa, a(a), a(a(a(a,b))),c) ∧ D(ab, pedro)
                 """));
     }
 

@@ -2,7 +2,7 @@ package com.logic.asts.others;
 
 import com.logic.asts.AASTExp;
 import com.logic.asts.IASTExp;
-import com.logic.interpreters.IInterpreter;
+import com.logic.asts.IVisitor;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -25,7 +25,7 @@ public class ASTSequence extends AASTExp {
     }
 
     @Override
-    public <T, E> T accept(IInterpreter<T, E> v, E env) {
+    public <T, E> T accept(IVisitor<T, E> v, E env) {
         return v.visit(this, env);
     }
 

@@ -1,7 +1,7 @@
 package com.logic.asts.binary;
 
 import com.logic.asts.IASTExp;
-import com.logic.interpreters.IInterpreter;
+import com.logic.asts.IVisitor;
 import com.logic.parser.ExpressionsParser;
 
 public class ASTOr extends AASTBinaryExp {
@@ -11,7 +11,7 @@ public class ASTOr extends AASTBinaryExp {
 	}
 
 	@Override
-	public <T, E> T accept(IInterpreter<T, E> v, E env) {
+	public <T, E> T accept(IVisitor<T, E> v, E env) {
 		return v.visit(this, env);
 	}
 

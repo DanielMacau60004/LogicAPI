@@ -108,136 +108,9 @@ public class ExpressionsParser implements ExpressionsParserConstants {
   final public IASTExp parseFOL() throws ParseException {
     IASTExp e;
   token_source.curLexState = FOL;
-    e = sequencesFOL();
+    e = operationsFOL();
     jj_consume_token(0);
       {if (true) return e;}
-    throw new Error("Missing return statement in function");
-  }
-
-  final private IASTExp sequencesFOL() throws ParseException {
-    ASTSequence exps;
-    IASTExp e;
-    e = signaturesFOL();
-                          exps = new ASTSequence(e);
-    label_1:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case SF:
-      case SP:
-      case LPAR:
-      case TOP:
-      case BOTTOM:
-      case NOT:
-      case UNIVERSAL:
-      case EXISTENTIAL:
-      case GREEK:
-      case PREDICATE:
-        ;
-        break;
-      default:
-        jj_la1[3] = jj_gen;
-        break label_1;
-      }
-      e = signaturesFOL();
-                            exps.addExp(e);
-    }
-      {if (true) return exps;}
-    throw new Error("Missing return statement in function");
-  }
-
-  final private IASTExp signaturesFOL() throws ParseException {
-    IASTExp e;
-
-    Token name, arity;
-    ASTSigFun fun = new ASTSigFun();
-    ASTSigPred pred = new ASTSigPred();
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case LPAR:
-    case TOP:
-    case BOTTOM:
-    case NOT:
-    case UNIVERSAL:
-    case EXISTENTIAL:
-    case GREEK:
-    case PREDICATE:
-      e = operationsFOL();
-                          {if (true) return e;}
-      break;
-    case SF:
-      jj_consume_token(SF);
-      jj_consume_token(EQUALS);
-      jj_consume_token(LBRA);
-      e = signaturesSFFOL();
-      jj_consume_token(RBRA);
-                                                          {if (true) return e;}
-      break;
-    case SP:
-      jj_consume_token(SP);
-      jj_consume_token(EQUALS);
-      jj_consume_token(LBRA);
-      e = signaturesSPFOL();
-      jj_consume_token(RBRA);
-                                                          {if (true) return e;}
-      break;
-    default:
-      jj_la1[4] = jj_gen;
-      jj_consume_token(-1);
-      throw new ParseException();
-    }
-    throw new Error("Missing return statement in function");
-  }
-
-  final private IASTExp signaturesSFFOL() throws ParseException {
-    Token name, arity;
-    ASTSigFun fun = new ASTSigFun();
-    name = jj_consume_token(FUNCTION);
-    jj_consume_token(SLASH);
-    arity = jj_consume_token(NUMBER);
-                                                    fun.addFunction(name.image, arity.image);
-    label_2:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case COMMA:
-        ;
-        break;
-      default:
-        jj_la1[5] = jj_gen;
-        break label_2;
-      }
-      jj_consume_token(COMMA);
-      name = jj_consume_token(FUNCTION);
-      jj_consume_token(SLASH);
-      arity = jj_consume_token(NUMBER);
-                                                               fun.addFunction(name.image, arity.image);
-    }
-           {if (true) return fun;}
-    throw new Error("Missing return statement in function");
-  }
-
-  final private IASTExp signaturesSPFOL() throws ParseException {
-    Token name, arity;
-    ASTSigPred pred = new ASTSigPred();
-    name = jj_consume_token(PREDICATE);
-    jj_consume_token(SLASH);
-    arity = jj_consume_token(NUMBER);
-                                                     pred.addPredicate(name.image, arity.image);
-    label_3:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case COMMA:
-        ;
-        break;
-      default:
-        jj_la1[6] = jj_gen;
-        break label_3;
-      }
-      jj_consume_token(COMMA);
-      name = jj_consume_token(PREDICATE);
-      jj_consume_token(SLASH);
-      arity = jj_consume_token(NUMBER);
-                                                                pred.addPredicate(name.image, arity.image);
-    }
-           {if (true) return pred;}
     throw new Error("Missing return statement in function");
   }
 
@@ -271,13 +144,13 @@ public class ExpressionsParser implements ExpressionsParserConstants {
                                             e1 = new ASTBiconditional(e1, e2);
         break;
       default:
-        jj_la1[7] = jj_gen;
+        jj_la1[3] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
       break;
     default:
-      jj_la1[8] = jj_gen;
+      jj_la1[4] = jj_gen;
       ;
     }
       {if (true) return e1;}
@@ -332,7 +205,7 @@ public class ExpressionsParser implements ExpressionsParserConstants {
                                                      {if (true) return  e;}
       break;
     default:
-      jj_la1[9] = jj_gen;
+      jj_la1[5] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -345,15 +218,15 @@ public class ExpressionsParser implements ExpressionsParserConstants {
     jj_consume_token(LPAR);
     e = termFOL();
                            pred.addTerm(e);
-    label_4:
+    label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case COMMA:
         ;
         break;
       default:
-        jj_la1[10] = jj_gen;
-        break label_4;
+        jj_la1[6] = jj_gen;
+        break label_1;
       }
       jj_consume_token(COMMA);
       e = termFOL();
@@ -381,12 +254,12 @@ public class ExpressionsParser implements ExpressionsParserConstants {
                                                {if (true) return e;}
         break;
       default:
-        jj_la1[11] = jj_gen;
+        jj_la1[7] = jj_gen;
                                                                {if (true) return new ASTConstant(t.image);}
       }
       break;
     default:
-      jj_la1[12] = jj_gen;
+      jj_la1[8] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -399,15 +272,15 @@ public class ExpressionsParser implements ExpressionsParserConstants {
     jj_consume_token(LPAR);
     e = termFOL();
                            fun.addTerm(e);
-    label_5:
+    label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case COMMA:
         ;
         break;
       default:
-        jj_la1[13] = jj_gen;
-        break label_5;
+        jj_la1[9] = jj_gen;
+        break label_2;
       }
       jj_consume_token(COMMA);
       e = termFOL();
@@ -427,13 +300,13 @@ public class ExpressionsParser implements ExpressionsParserConstants {
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[14];
+  final private int[] jj_la1 = new int[10];
   static private int[] jj_la1_0;
   static {
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x3c000,0x3c000,0x10403a00,0x804c3b80,0x804c3b80,0x200000,0x200000,0x3c000,0x3c000,0x804c3a00,0x200000,0x200,0x60000000,0x200000,};
+      jj_la1_0 = new int[] {0xf000,0xf000,0x180e80,0xf000,0xf000,0x8b0e80,0x40000,0x80,0x600000,0x40000,};
    }
 
   /** Constructor with InputStream. */
@@ -447,7 +320,7 @@ public class ExpressionsParser implements ExpressionsParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 10; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -461,7 +334,7 @@ public class ExpressionsParser implements ExpressionsParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 10; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -471,7 +344,7 @@ public class ExpressionsParser implements ExpressionsParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 10; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -481,7 +354,7 @@ public class ExpressionsParser implements ExpressionsParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 10; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -490,7 +363,7 @@ public class ExpressionsParser implements ExpressionsParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 10; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -499,7 +372,7 @@ public class ExpressionsParser implements ExpressionsParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 10; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -550,12 +423,12 @@ public class ExpressionsParser implements ExpressionsParserConstants {
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[32];
+    boolean[] la1tokens = new boolean[24];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 14; i++) {
+    for (int i = 0; i < 10; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -564,7 +437,7 @@ public class ExpressionsParser implements ExpressionsParserConstants {
         }
       }
     }
-    for (int i = 0; i < 32; i++) {
+    for (int i = 0; i < 24; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
