@@ -8,7 +8,7 @@ import com.logic.parser.ExpressionsParser;
 public class ASTTop extends AASTExp {
 
     @Override
-    public <T, E> T interpret(IInterpreter<T, E> v, E env) {
+    public <T, E> T accept(IInterpreter<T, E> v, E env) {
         return v.visit(this, env);
     }
 

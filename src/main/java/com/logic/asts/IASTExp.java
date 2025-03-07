@@ -5,6 +5,6 @@ import com.logic.interpreters.IInterpreter;
 
 public interface IASTExp extends Exp {
 
-    <T,E> T interpret(IInterpreter<T,E> v, E env);
+    <T,E> T accept(IInterpreter<T,E> v, E env);
 
 }

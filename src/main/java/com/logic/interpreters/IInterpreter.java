@@ -25,7 +25,9 @@ public interface IInterpreter<T, E> {
 
     T visit(ASTLiteral e, E env);
 
-    T visit(ASTBasicTerm e, E env);
+    T visit(ASTConstant e, E env);
+
+    T visit(ASTVariable e, E env);
 
 
     T visit(ASTNot e, E env);

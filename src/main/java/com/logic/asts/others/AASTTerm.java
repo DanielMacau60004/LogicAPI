@@ -3,12 +3,12 @@ package com.logic.asts.others;
 import com.logic.asts.AASTExp;
 import com.logic.interpreters.IInterpreter;
 
-public class ASTBasicTerm extends AASTExp {
+public abstract class AASTTerm extends AASTExp {
 
     private final String name;
     private boolean variable;
 
-    public ASTBasicTerm(String value) {
+    public AASTTerm(String value) {
         this.name = value;
     }
 
@@ -22,11 +22,6 @@ public class ASTBasicTerm extends AASTExp {
 
     public boolean isVariable() {
         return variable;
-    }
-
-    @Override
-    public <T, E> T interpret(IInterpreter<T, E> v, E env) {
-        return v.visit(this, env);
     }
 
     @Override

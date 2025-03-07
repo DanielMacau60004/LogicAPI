@@ -49,26 +49,30 @@ public interface ExpressionsParserConstants {
   /** RegularExpression Id. */
   int GREEK = 22;
   /** RegularExpression Id. */
-  int U_CHAR = 23;
+  int DOT = 23;
   /** RegularExpression Id. */
-  int U_WORD = 24;
+  int EQUALS = 24;
   /** RegularExpression Id. */
-  int L_CHAR = 25;
+  int LBRA = 25;
   /** RegularExpression Id. */
-  int L_WORD = 26;
+  int RBRA = 26;
   /** RegularExpression Id. */
-  int DOT = 27;
+  int NUMBER = 27;
   /** RegularExpression Id. */
-  int EQUALS = 28;
+  int LITERAL = 28;
   /** RegularExpression Id. */
-  int LBRA = 29;
+  int VARIABLE = 29;
   /** RegularExpression Id. */
-  int RBRA = 30;
+  int FUNCTION = 30;
   /** RegularExpression Id. */
-  int NUMBER = 31;
+  int PREDICATE = 31;
 
   /** Lexical state. */
-  int DEFAULT = 0;
+  int PL = 0;
+  /** Lexical state. */
+  int FOL = 1;
+  /** Lexical state. */
+  int DEFAULT = 2;
 
   /** Literal token values. */
   String[] tokenImage = {
@@ -95,15 +99,15 @@ public interface ExpressionsParserConstants {
     "\"/\"",
     "\",\"",
     "<GREEK>",
-    "<U_CHAR>",
-    "<U_WORD>",
-    "<L_CHAR>",
-    "<L_WORD>",
     "\".\"",
     "\"=\"",
     "\"{\"",
     "\"}\"",
     "<NUMBER>",
+    "<LITERAL>",
+    "<VARIABLE>",
+    "<FUNCTION>",
+    "<PREDICATE>",
   };
 
 }
