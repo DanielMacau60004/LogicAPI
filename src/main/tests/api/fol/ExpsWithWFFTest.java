@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -33,12 +34,20 @@ public class ExpsWithWFFTest {
 
         if (!boundedStr.isEmpty()) {
             Set<String> bounded = new HashSet<>(Arrays.asList(boundedStr.split(",")));
-            Assertions.assertEquals(exp.get().getBoundedVariables(), bounded);
+            Iterator<String> it = exp.get().iterateBoundedVariables();
+            Set<String> iteratedBounded = new HashSet<>();
+            it.forEachRemaining(iteratedBounded::add);
+
+            Assertions.assertEquals(iteratedBounded, bounded);
         }
 
         if (!unboundedStr.isEmpty()) {
             Set<String> unbounded = new HashSet<>(Arrays.asList(unboundedStr.split(",")));
-            Assertions.assertEquals(exp.get().getUnboundedVariables(), unbounded);
+            Iterator<String> it = exp.get().iterateUnboundedVariables();
+            Set<String> iteratedUnbounded = new HashSet<>();
+            it.forEachRemaining(iteratedUnbounded::add);
+
+            Assertions.assertEquals(iteratedUnbounded, unbounded);
         }
 
         System.out.println(exp.get());

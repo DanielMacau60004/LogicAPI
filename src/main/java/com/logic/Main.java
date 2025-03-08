@@ -2,7 +2,7 @@ package com.logic;
 
 import com.logic.api.IPLExp;
 import com.logic.api.LogicAPI;
-import com.logic.parser.ParseException;
+import com.logic.exps.parser.ParseException;
 
 public class Main {
 

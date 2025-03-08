@@ -2,7 +2,7 @@ package api.pl;
 
 import com.logic.api.IPLExp;
 import com.logic.api.LogicAPI;
-import com.logic.parser.ParseException;
+import com.logic.exps.parser.ParseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;

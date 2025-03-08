@@ -1,0 +1,156 @@
+options {
+    STATIC = false;
+    UNICODE_INPUT = true;
+    JAVA_UNICODE_ESCAPE = true;
+}
+
+PARSER_BEGIN(ExpressionsParser)
+
+package com.logic.exps.parser;
+
+import com.logic.exps.asts.*;
+import com.logic.exps.asts.binary.*;
+import com.logic.exps.asts.unary.*;
+import com.logic.exps.asts.others.*;
+
+public class ExpressionsParser {
+}
+
+PARSER_END(ExpressionsParser)
+
+<PL, FOL> SKIP : {
+    " "
+  | "\t"
+  | "\r"
+  | < ENTER: "\n">
+  | <SINGLE_LINE_COMMENT: "//" (~["\n", "\r"])* ("\n" | "\r" | "\r\n")>
+  | <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
+}
+
+
+//Symbols
+<PL, FOL> TOKEN : {
+    < LPAR : "(" >
+  | < RPAR : ")" >
+  | < TOP: "⊤" >
+  | < BOTTOM: "⊥" >
+  | < NOT: "¬" >
+  | < AND: "∧" >
+  | < OR: "∨" >
+  | < CONDITIONAL: "→" >
+  | < BICONDITIONAL: "↔" >
+  | < GREEK : ("φ" | "δ" | "ψ" | "α" | "β" | "γ" | "ε" | "λ" | "μ" | "ρ" | "σ" | "τ" | "ω") >
+}
+
+<PL> TOKEN : {
+  < LITERAL: ["a"-"z"] >
+}
+
+<FOL> TOKEN : {
+  < VARIABLE: ["x"-"z"] (["0"-"9"])* >
+  | < FUNCTION: ["a"-"w"] | ["a"-"z"](["a"-"z", "A"-"Z", "0"-"9"])+ >
+  | < PREDICATE: ["A"-"Z"](["a"-"z", "A"-"Z", "0"-"9"])* >
+  | < UNIVERSAL: "∀" >
+  | < EXISTENTIAL: "∃" >
+  | < COMMA : "," >
+}
+
+/*
+* Parser for propositional logic expressions
+*/
+
+IASTExp parsePL() : {
+    IASTExp e;
+} {
+    { token_source.curLexState = PL; }
+    e = operations()<EOF> { return e; }
+}
+
+private IASTExp operations() : {
+    IASTExp e1, e2;
+} {
+    e1 = atomicsPL()
+    (
+        <AND> e2 = atomicsPL() { e1 = new ASTAnd(e1, e2); }
+      | <OR> e2 = atomicsPL() { e1 = new ASTOr(e1, e2); }
+      | <CONDITIONAL> e2 = atomicsPL() { e1 = new ASTConditional(e1, e2); }
+      | <BICONDITIONAL> e2 = atomicsPL() { e1 = new ASTBiconditional(e1, e2); }
+    )?
+    { return e1; }
+}
+
+private IASTExp atomicsPL() : {
+    Token t;
+    IASTExp e;
+} {
+    <TOP> { return new ASTTop(); }
+  | <BOTTOM> { return new ASTBottom(); }
+  | <NOT> e = atomicsPL() { return new ASTNot(e); }
+  | <LPAR> e = operations() <RPAR> { return new ASTParenthesis(e); }
+  | t = <LITERAL> { return new ASTLiteral(t.image); }
+  | t = <GREEK> { return new ASTArbitrary(t.image); }
+}
+
+/*
+* Parser for first-order logic expressions
+*/
+
+IASTExp parseFOL() : {
+    IASTExp e;
+} {
+{ token_source.curLexState = FOL; }
+    e = operationsFOL() <EOF>
+    { return e; }
+}
+
+private IASTExp operationsFOL() : {
+    IASTExp e1, e2;
+} {
+    e1 = atomicsFOL()
+    (
+        <AND> e2 = atomicsFOL() { e1 = new ASTAnd(e1, e2); }
+      | <OR> e2 = atomicsFOL() { e1 = new ASTOr(e1, e2); }
+      | <CONDITIONAL> e2 = atomicsFOL() { e1 = new ASTConditional(e1, e2); }
+      | <BICONDITIONAL> e2 = atomicsFOL() { e1 = new ASTBiconditional(e1, e2); }
+    )?
+    { return e1; }
+}
+
+private IASTExp atomicsFOL() : {
+    Token name, t;
+    IASTExp e, e1;
+    ASTPred pred;
+} {
+    <TOP> { return new ASTTop(); }
+  | <BOTTOM> { return new ASTBottom(); }
+  | <NOT> e = atomicsFOL() { return new ASTNot(e); }
+  | <LPAR> e = operationsFOL() <RPAR> { return new ASTParenthesis(e); }
+  | t = <GREEK> { return new ASTArbitrary(t.image); }
+  | <EXISTENTIAL> t = <VARIABLE> {e = new ASTVariable(t.image);} e1 = atomicsFOL() { return new ASTExistential(e, e1); }
+  | <UNIVERSAL> t = <VARIABLE> {e = new ASTVariable(t.image);} e1 = atomicsFOL() { return new ASTUniversal(e, e1); }
+  | name = <PREDICATE> (e = predicateFOL(name.image) {return  e;} | {return new ASTLiteral(name.image); })
+}
+
+private IASTExp predicateFOL(String name) : {
+    IASTExp e;
+    ASTPred pred = new ASTPred(name);
+} {
+    <LPAR> e = termFOL() { pred.addTerm(e); } ( <COMMA> e = termFOL() { pred.addTerm(e); } )* <RPAR> {return pred; }
+}
+
+private IASTExp termFOL() : {
+   Token t;
+   IASTExp e;
+   ASTFun fun;
+} {
+    t = <VARIABLE> { return new ASTVariable(t.image); }
+  | t = <FUNCTION> (e = functionFOL(t.image) { return e; } | { return new ASTConstant(t.image); })
+}
+
+private IASTExp functionFOL(String name) : {
+    IASTExp e;
+    ASTFun fun = new ASTFun(name);
+} {
+    <LPAR> e = termFOL() { fun.addTerm(e); } ( <COMMA> e = termFOL() { fun.addTerm(e); } )* <RPAR> { return fun; }
+}
+

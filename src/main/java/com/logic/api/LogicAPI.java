@@ -1,9 +1,9 @@
 package com.logic.api;
 
-import com.logic.checkers.FOLWFFChecker;
-import com.logic.checkers.PLWFFChecker;
-import com.logic.parser.ExpressionsParser;
-import com.logic.parser.ParseException;
+import com.logic.exps.checkers.FOLWFFChecker;
+import com.logic.exps.checkers.PLWFFChecker;
+import com.logic.exps.parser.ExpressionsParser;
+import com.logic.exps.parser.ParseException;
 
 import java.io.ByteArrayInputStream;
 
