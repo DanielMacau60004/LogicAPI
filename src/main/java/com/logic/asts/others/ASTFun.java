@@ -22,6 +22,10 @@ public class ASTFun extends AASTExp {
         this.terms = terms;
     }
 
+    public String getName() {
+        return fun;
+    }
+
     public List<IASTExp> getTerms() {
         return terms;
     }

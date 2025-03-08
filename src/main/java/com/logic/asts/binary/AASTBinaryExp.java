@@ -13,5 +13,12 @@ public abstract class AASTBinaryExp extends AASTExp implements IASTExp {
         this.right = right;
     }
 
+    public IASTExp getLeft() {
+        return left;
+    }
+
+    public IASTExp getRight() {
+        return right;
+    }
 }
 

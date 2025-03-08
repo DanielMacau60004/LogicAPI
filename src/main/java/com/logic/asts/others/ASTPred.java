@@ -22,6 +22,10 @@ public class ASTPred extends AASTExp {
         this.terms = terms;
     }
 
+    public String getName() {
+        return predicate;
+    }
+
     public List<IASTExp> getTerms() {
         return terms;
     }

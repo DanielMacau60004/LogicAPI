@@ -13,10 +13,6 @@ public class ASTParenthesis extends AASTUnaryExp {
         this.e = e;
     }
 
-    public IASTExp getE() {
-        return e;
-    }
-
     @Override
     public <T, E> T accept(IVisitor<T, E> v, E env) {
         return v.visit(this, env);

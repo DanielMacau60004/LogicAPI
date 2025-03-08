@@ -1,7 +1,7 @@
 package com.logic.api;
 
-import com.logic.asts.FOLExp;
-import com.logic.asts.PLExp;
+import com.logic.checkers.FOLWFFChecker;
+import com.logic.checkers.PLWFFChecker;
 import com.logic.parser.ExpressionsParser;
 import com.logic.parser.ParseException;
 
@@ -13,12 +13,12 @@ public class LogicAPI {
 
     public static IPLExp parsePL(String expression) throws ParseException {
         ExpressionsParser parser = new ExpressionsParser(new ByteArrayInputStream((expression).getBytes()));
-        return new PLExp(parser.parsePL());
+        return PLWFFChecker.check(parser.parsePL());
     }
 
     public static IFOLExp parseFOL(String expression) throws ParseException {
         ExpressionsParser parser = new ExpressionsParser(new ByteArrayInputStream((expression).getBytes()));
-        return new FOLExp(parser.parseFOL());
+        return FOLWFFChecker.check(parser.parseFOL());
     }
 
 }

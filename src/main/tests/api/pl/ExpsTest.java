@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-public class PropositionalExpsTest {
+public class ExpsTest {
 
     @ParameterizedTest
     @ValueSource(strings = {

@@ -1,38 +1,45 @@
 package com.logic.asts;
 
-import com.logic.api.IExp;
 import com.logic.api.IFOLExp;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public class FOLExp implements IFOLExp {
 
-    //TODO implement the rest
-    private final IExp exp;
-    private final Set<IExp> freeVariables;
-    private final Set<IExp> boundedVariables;
+    private final IASTExp exp;
 
-    private final Set<IExp> functions;
-    private final Set<IExp> predicates;
+    private final Set<String> boundedVariables;
+    private final Set<String> unboundedVariables;
 
-    public FOLExp(IExp exp) {
+    public FOLExp(IASTExp exp,
+                  Set<String> boundedVariables, Set<String> unboundedVariables) {
         this.exp = exp;
-
-        this.freeVariables = new HashSet<>();
-        this.boundedVariables = new HashSet<>();
-        this.functions = new HashSet<>();
-        this.predicates = new HashSet<>();
+        this.boundedVariables = boundedVariables;
+        this.unboundedVariables = unboundedVariables;
     }
 
-    //A sentence of first-order logic is a formula having no free variables
+    @Override
+    public Set<String> getBoundedVariables() {
+        return boundedVariables;
+    }
+
+    @Override
+    public boolean isABoundedVariable(String variable) {
+        return boundedVariables.contains(variable);
+    }
+
+    @Override
+    public Set<String> getUnboundedVariables() {
+        return unboundedVariables;
+    }
+
     @Override
     public boolean isASentence() {
-        return freeVariables.isEmpty();
+        return unboundedVariables.isEmpty();
     }
 
     @Override
     public String toString() {
-        return super.toString();
+        return exp.toString();
     }
 }

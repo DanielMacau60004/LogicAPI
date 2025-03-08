@@ -13,19 +13,17 @@ import com.logic.asts.binary.ASTUniversal;
 
 public interface IVisitor<T, E> {
 
-    T visit(ASTSigFun e, E env);
-
-    T visit(ASTSigPred e, E env);
-
 
     T visit(ASTTop e, E env);
 
     T visit(ASTBottom e, E env);
 
 
+    T visit(ASTConstant e, E env);
+
     T visit(ASTLiteral e, E env);
 
-    T visit(ASTConstant e, E env);
+    T visit(ASTArbitrary e, E env);
 
     T visit(ASTVariable e, E env);
 
@@ -51,7 +49,5 @@ public interface IVisitor<T, E> {
 
 
     T visit(ASTParenthesis e, E env);
-
-    T visit(ASTSequence e, E env);
 
 }

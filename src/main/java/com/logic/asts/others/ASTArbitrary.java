@@ -5,16 +5,16 @@ import com.logic.asts.AASTExp;
 import com.logic.asts.IASTExp;
 import com.logic.asts.IVisitor;
 
-public class ASTLiteral extends AASTExp implements IASTExp {
+public class ASTArbitrary extends AASTExp implements IASTExp {
 
-    private final String name;
+    private final String id;
 
-    public ASTLiteral(String name) {
-        this.name = name;
+    public ASTArbitrary(String id) {
+        this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getId() {
+        return id;
     }
 
     @Override
@@ -24,7 +24,7 @@ public class ASTLiteral extends AASTExp implements IASTExp {
 
     @Override
     public String toString() {
-        return name;
+        return id;
     }
 
 }

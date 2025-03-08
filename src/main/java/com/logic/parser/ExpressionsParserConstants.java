@@ -35,21 +35,21 @@ public interface ExpressionsParserConstants {
   /** RegularExpression Id. */
   int BICONDITIONAL = 15;
   /** RegularExpression Id. */
-  int UNIVERSAL = 16;
+  int GREEK = 16;
   /** RegularExpression Id. */
-  int EXISTENTIAL = 17;
+  int LITERAL = 17;
   /** RegularExpression Id. */
-  int COMMA = 18;
+  int VARIABLE = 18;
   /** RegularExpression Id. */
-  int GREEK = 19;
+  int FUNCTION = 19;
   /** RegularExpression Id. */
-  int LITERAL = 20;
+  int PREDICATE = 20;
   /** RegularExpression Id. */
-  int VARIABLE = 21;
+  int UNIVERSAL = 21;
   /** RegularExpression Id. */
-  int FUNCTION = 22;
+  int EXISTENTIAL = 22;
   /** RegularExpression Id. */
-  int PREDICATE = 23;
+  int COMMA = 23;
 
   /** Lexical state. */
   int PL = 0;
@@ -76,14 +76,14 @@ public interface ExpressionsParserConstants {
     "\"\\u2228\"",
     "\"\\u2192\"",
     "\"\\u2194\"",
-    "\"\\u2200\"",
-    "\"\\u2203\"",
-    "\",\"",
     "<GREEK>",
     "<LITERAL>",
     "<VARIABLE>",
     "<FUNCTION>",
     "<PREDICATE>",
+    "\"\\u2200\"",
+    "\"\\u2203\"",
+    "\",\"",
   };
 
 }
