@@ -2,7 +2,7 @@ package com.logic.exps.asts.others;
 
 import com.logic.exps.asts.AASTExp;
 import com.logic.exps.asts.IASTExp;
-import com.logic.exps.asts.IVisitor;
+import com.logic.exps.asts.IExpsVisitor;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -35,7 +35,7 @@ public class ASTPred extends AASTExp {
     }
 
     @Override
-    public <T, E> T accept(IVisitor<T, E> v, E env) {
+    public <T, E> T accept(IExpsVisitor<T, E> v, E env) {
         return v.visit(this, env);
     }
 

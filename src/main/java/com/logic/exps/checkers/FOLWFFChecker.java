@@ -3,7 +3,7 @@ package com.logic.exps.checkers;
 import com.logic.api.IFOLExp;
 import com.logic.exps.asts.FOLExp;
 import com.logic.exps.asts.IASTExp;
-import com.logic.exps.asts.IVisitor;
+import com.logic.exps.asts.IExpsVisitor;
 import com.logic.exps.asts.binary.*;
 import com.logic.exps.asts.others.*;
 import com.logic.exps.asts.unary.ASTNot;
@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class FOLWFFChecker implements IVisitor<Void, Env<IASTExp>> {
+public class FOLWFFChecker implements IExpsVisitor<Void, Env<IASTExp>> {
 
     public static final String ERROR_MESSAGE_FUNCTION = "Function %s was declared with different arities: %d and %d!";
     public static final String ERROR_MESSAGE_PREDICATE = "Predicate %s was declared with different arities: %d and %d!";

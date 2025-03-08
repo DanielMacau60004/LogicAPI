@@ -11,7 +11,7 @@ import com.logic.exps.asts.unary.ASTParenthesis;
 import com.logic.exps.asts.unary.ASTNot;
 import com.logic.exps.asts.binary.ASTUniversal;
 
-public interface IVisitor<T, E> {
+public interface IExpsVisitor<T, E> {
 
 
     T visit(ASTTop e, E env);

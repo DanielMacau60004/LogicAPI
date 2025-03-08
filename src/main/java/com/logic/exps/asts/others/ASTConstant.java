@@ -1,7 +1,7 @@
 package com.logic.exps.asts.others;
 
 
-import com.logic.exps.asts.IVisitor;
+import com.logic.exps.asts.IExpsVisitor;
 
 public class ASTConstant extends AASTTerm {
 
@@ -10,7 +10,7 @@ public class ASTConstant extends AASTTerm {
     }
 
     @Override
-    public <T, E> T accept(IVisitor<T, E> v, E env) {
+    public <T, E> T accept(IExpsVisitor<T, E> v, E env) {
         return v.visit(this, env);
     }
 

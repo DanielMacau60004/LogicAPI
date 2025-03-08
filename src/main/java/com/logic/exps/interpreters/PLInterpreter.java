@@ -1,7 +1,7 @@
 package com.logic.exps.interpreters;
 
 import com.logic.exps.asts.IASTExp;
-import com.logic.exps.asts.IVisitor;
+import com.logic.exps.asts.IExpsVisitor;
 import com.logic.exps.asts.binary.*;
 import com.logic.exps.asts.others.*;
 import com.logic.exps.asts.unary.ASTNot;
@@ -9,7 +9,7 @@ import com.logic.exps.asts.unary.ASTParenthesis;
 
 import java.util.Map;
 
-public class PLInterpreter implements IVisitor<Boolean, Void> {
+public class PLInterpreter implements IExpsVisitor<Boolean, Void> {
 
     public static final String ERROR_MESSAGE = "PL expressions only!";
     public static final String ERROR_MESSAGE_ARBITRARY = "Cannot evaluate an expression with arbitrary expressions!";

@@ -2,7 +2,7 @@ package com.logic.exps.checkers;
 
 import com.logic.api.IPLExp;
 import com.logic.exps.asts.IASTExp;
-import com.logic.exps.asts.IVisitor;
+import com.logic.exps.asts.IExpsVisitor;
 import com.logic.exps.asts.PLExp;
 import com.logic.exps.asts.binary.*;
 import com.logic.exps.asts.others.*;
@@ -12,7 +12,7 @@ import com.logic.exps.asts.unary.ASTParenthesis;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class PLWFFChecker implements IVisitor<Void, Void> {
+public class PLWFFChecker implements IExpsVisitor<Void, Void> {
 
     public static final String ERROR_MESSAGE = "PL expressions only!";
     final Set<String> literals;

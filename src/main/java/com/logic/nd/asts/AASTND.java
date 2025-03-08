@@ -1,16 +1,17 @@
-package com.logic.exps.asts;
+package com.logic.nd.asts;
 
 import com.logic.exps.parser.ExpressionsParser;
 import com.logic.others.Utils;
 
-public abstract class AASTExp implements IASTExp {
+public abstract class AASTND implements IASTND {
 
     protected String getToken(int kind) {
         return Utils.getToken(ExpressionsParser.tokenImage[kind].replace("\"",""));
     }
+
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof AASTExp s)
+        if(obj instanceof AASTND s)
             return this.toString().equals(s.toString());
         return false;
     }
