@@ -6,7 +6,7 @@ import com.logic.exps.parser.ParseException;
 
 public class Main {
 
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) throws Exception {
         System.out.println("Evaluating:");
 
         IPLExp e1 = LogicAPI.parsePL("a → b");

@@ -7,8 +7,6 @@ import java.util.Iterator;
  * This interface provides methods to iterate over various components of a first-order logic expression,
  * such as functions, predicates, bounded variables, unbounded variables, and to check whether the expression
  * is a sentence or contains free variables.
- *
- * <p>
  * An instance of {@code IFOLExp} can represent any first-order logic expression, which may include:
  * <ul>
  *     <li>Functions</li>
@@ -17,7 +15,7 @@ import java.util.Iterator;
  *     <li>Unbounded variables (free variables)</li>
  *     <li>Sentences (logical expressions with no free variables)</li>
  * </ul>
- * </p>
+ *
  *
  * <p>
  * The methods in this interface allow for working with first-order logic expressions, such as determining the set of bounded and unbounded variables,

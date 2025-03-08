@@ -7,8 +7,6 @@ import java.util.Map;
  * The {@code IPLExp} interface represents a propositional logic expression.
  * This interface provides methods to interpret the expression, iterate over the literals, compute its truth table, and
  * check logical equivalence between different propositional logic expressions.
- *
- * <p>
  * An instance of {@code IPLExp} can represent any propositional logic expression, such as:
  * <ul>
  *     <li>Atomic propositions</li>
@@ -17,7 +15,6 @@ import java.util.Map;
  *     <li>Disjunctions</li>
  *     <li>Implications</li>
  * </ul>
- * </p>
  *
  * <p>
  * The methods in this interface allow for evaluating logical expressions, generating truth tables, and determining equivalence

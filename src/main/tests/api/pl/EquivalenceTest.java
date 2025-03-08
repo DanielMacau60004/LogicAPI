@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 public class EquivalenceTest {
 
     // Helper method to parse and evaluate equivalences of expressions
-    private boolean evaluateEquivalence(String exp1, String exp2) throws ParseException {
+    private boolean evaluateEquivalence(String exp1, String exp2) throws Exception {
         IPLExp e1 = LogicAPI.parsePL(exp1);
         IPLExp e2 = LogicAPI.parsePL(exp2);
         return e1.isEquivalentTo(e2);
@@ -29,7 +29,7 @@ public class EquivalenceTest {
             "¬(a ∨ b), ¬a ∨ ¬b",
             "a → (b → c), (a → b) → c"
     })
-    void testNonEquivalentPropositionalLogicExpressions(String expressions) throws ParseException {
+    void testNonEquivalentPropositionalLogicExpressions(String expressions) throws Exception {
         String[] exprParts = expressions.split(", ");
         String exp1 = exprParts[0].trim();
         String exp2 = exprParts[1].trim();
@@ -54,7 +54,7 @@ public class EquivalenceTest {
             "a ∨ (a ∧ b), a",
             "a ∧ (a ∨ b), a"
     })
-    void testPropositionalLogicEquivalences(String expressions) throws ParseException {
+    void testPropositionalLogicEquivalences(String expressions) throws Exception {
         String[] exprParts = expressions.split(", ");
         String exp1 = exprParts[0].trim();
         String exp2 = exprParts[1].trim();
