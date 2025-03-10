@@ -13,6 +13,10 @@ public class ASTLiteral extends AASTExp implements IASTExp {
         this.name = name;
     }
 
+    public ASTLiteral(int kind) {
+        this.name = getToken(kind);
+    }
+
     public String getName() {
         return name;
     }

@@ -2,7 +2,7 @@ package com.logic.exps.asts.unary;
 
 import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.IExpsVisitor;
-import com.logic.exps.parser.ExpressionsParser;
+import com.logic.parser.Parser;
 
 public class ASTParenthesis extends AASTUnaryExp {
 
@@ -20,6 +20,6 @@ public class ASTParenthesis extends AASTUnaryExp {
 
     @Override
     public String toString() {
-        return getToken(ExpressionsParser.LPAR) + e.toString() + getToken(ExpressionsParser.RPAR);
+        return getToken(Parser.LPAR) + e.toString() + getToken(Parser.RPAR);
     }
 }

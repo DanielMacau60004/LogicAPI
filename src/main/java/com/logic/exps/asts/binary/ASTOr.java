@@ -2,7 +2,7 @@ package com.logic.exps.asts.binary;
 
 import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.IExpsVisitor;
-import com.logic.exps.parser.ExpressionsParser;
+import com.logic.parser.Parser;
 
 public class ASTOr extends AASTBinaryExp {
 
@@ -17,6 +17,6 @@ public class ASTOr extends AASTBinaryExp {
 
 	@Override
 	public String toString() {
-		return left.toString() + " " + getToken(ExpressionsParser.OR) + " " + right.toString();
+		return left.toString() + " " + getToken(Parser.OR) + " " + right.toString();
 	}
 }

@@ -2,7 +2,7 @@ package com.logic.exps.asts.unary;
 
 import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.IExpsVisitor;
-import com.logic.exps.parser.ExpressionsParser;
+import com.logic.parser.Parser;
 
 public class ASTNot extends AASTUnaryExp {
 
@@ -17,6 +17,6 @@ public class ASTNot extends AASTUnaryExp {
 
     @Override
     public String toString() {
-        return getToken(ExpressionsParser.NOT) + exp.toString();
+        return getToken(Parser.NOT) + exp.toString();
     }
 }

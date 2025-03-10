@@ -1,21 +1,35 @@
 package com.logic.nd.asts.others;
 
+import com.logic.exps.asts.IASTExp;
 import com.logic.nd.asts.AASTND;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
 
-public abstract class ASTPremiseND extends AASTND implements IASTND {
+public class ASTPremiseND extends AASTND implements IASTND {
 
-    protected final IASTND premise;
+    private final IASTExp premise;
+    private final int m;
 
-    public ASTPremiseND(IASTND hyp) {
+    public ASTPremiseND(IASTExp hyp, int m) {
         this.premise = hyp;
+        this.m = m;
     }
 
-    public IASTND getPremise() {return premise;}
+    public int getM() {
+        return m;
+    }
+
+    public IASTExp getConclusion() {
+        return premise;
+    }
 
     @Override
     public <T, E> T accept(INDVisitor<T, E> v, E env) {
         return v.visit(this, env);
+    }
+
+    @Override
+    public String toString() {
+        return "[P, " + m + "] [" + premise + ".]";
     }
 }

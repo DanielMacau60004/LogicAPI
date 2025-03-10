@@ -4,32 +4,36 @@ options {
     JAVA_UNICODE_ESCAPE = true;
 }
 
-PARSER_BEGIN(ExpressionsParser)
+PARSER_BEGIN(Parser)
 
-package com.logic.exps.parser;
+package com.logic.parser;
 
 import com.logic.exps.asts.*;
 import com.logic.exps.asts.binary.*;
 import com.logic.exps.asts.unary.*;
 import com.logic.exps.asts.others.*;
 
-public class ExpressionsParser {
+import com.logic.nd.asts.*;
+import com.logic.nd.asts.binary.*;
+import com.logic.nd.asts.unary.*;
+import com.logic.nd.asts.others.*;import java.util.Stack;
+
+public class Parser {
 }
 
-PARSER_END(ExpressionsParser)
+PARSER_END(Parser)
 
-<PL, FOL> SKIP : {
-    " "
-  | "\t"
-  | "\r"
+<PL, FOL, ND> SKIP : {
+  < RESET: "\r">
+  | < SPACE: " ">
+  | < TAB: ("\t")>
   | < ENTER: "\n">
-  | <SINGLE_LINE_COMMENT: "//" (~["\n", "\r"])* ("\n" | "\r" | "\r\n")>
-  | <MULTI_LINE_COMMENT: "/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
+  | < SINGLE_LINE_COMMENT: "//" (~["\n", "\r"])* ("\n" | "\r" | "\r\n") >
+  | < MULTI_LINE_COMMENT: "/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
 }
-
 
 //Symbols
-<PL, FOL> TOKEN : {
+<PL, FOL, ND> TOKEN : {
     < LPAR : "(" >
   | < RPAR : ")" >
   | < TOP: "⊤" >
@@ -40,6 +44,16 @@ PARSER_END(ExpressionsParser)
   | < CONDITIONAL: "→" >
   | < BICONDITIONAL: "↔" >
   | < GREEK : ("φ" | "δ" | "ψ" | "α" | "β" | "γ" | "ε" | "λ" | "μ" | "ρ" | "σ" | "τ" | "ω") >
+  | < DOT : "." >
+  | < LRPAR : "[" >
+  | < RRPAR : "]" >
+  | < LBRA : "{" >
+  | < RBRA : "}" >
+  | < COMMA : "," >
+  | < NUMBER : (["0"-"9"])+ >
+  | < PROVE: "prove">
+  | < CONSEQUENCE: "⊢">
+  | < COLON: ":">
 }
 
 <PL> TOKEN : {
@@ -52,7 +66,25 @@ PARSER_END(ExpressionsParser)
   | < PREDICATE: ["A"-"Z"](["a"-"z", "A"-"Z", "0"-"9"])* >
   | < UNIVERSAL: "∀" >
   | < EXISTENTIAL: "∃" >
-  | < COMMA : "," >
+}
+
+<ND> TOKEN : {
+    < INEG: "¬I" >
+  | < ENEG: "¬E" >
+  | < ELAND: "∧EL" >
+  | < ERAND: "∧ER" >
+  | < IAND: "∧I" >
+  | < ILOR: "∨IL" >
+  | < IROR: "∨IR" >
+  | < EOR: "∨E" >
+  | < ICOND: "→I" >
+  | < ECOND: "→E" >
+  | < IUNI: "∀I" >
+  | < EUNI: "∀E" >
+  | < IEXIST: "∃I" >
+  | < EEXIST: "∃E" >
+  | < HYPOTHESIS: "H" >
+  | < PREMISSE: "P" >
 }
 
 /*
@@ -62,8 +94,8 @@ PARSER_END(ExpressionsParser)
 IASTExp parsePL() : {
     IASTExp e;
 } {
-    { token_source.curLexState = PL; }
-    e = operations()<EOF> { return e; }
+    { token_source.curLexState = PL;}
+    e = operations() (<DOT> | <EOF>) { return e; }
 }
 
 private IASTExp operations() : {
@@ -153,4 +185,48 @@ private IASTExp functionFOL(String name) : {
 } {
     <LPAR> e = termFOL() { fun.addTerm(e); } ( <COMMA> e = termFOL() { fun.addTerm(e); } )* <RPAR> { return fun; }
 }
+
+/*
+* Parser for propositional logic natural deduction proofs
+*/
+
+IASTND parseNDPL() : {
+    IASTND e;
+} {
+    {token_source.curLexState = PL;}
+    e = proofNDPL() <EOF> { return e; }
+}
+
+private IASTND proofNDPL() : {
+     IASTExp exp;
+     IASTND n1, n2, n3;
+     Token m, n;
+     token_source.curLexState = ND;
+} {
+
+    <LRPAR>(
+        <IAND> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() n2 = proofNDPL() <RRPAR>{ return new ASTIConjND(n1, n2, exp); }
+        | <ELAND> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTELConjND(n1, exp); }
+        | <ERAND> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTERConjND(n1, exp); }
+        | <ECOND> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() n2 = proofNDPL() <RRPAR> { return new ASTEImpND(n1, n2, exp); }
+        | <ILOR> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTILDisND(n1, exp); }
+        | <IROR> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTIRDisND(n1, exp); }
+        | <INEG> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR>
+        { return new ASTINegND(n1, exp, Integer.valueOf(m.toString())); }
+        | <ENEG> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() n2 = proofNDPL() <RRPAR> { return new ASTENegND(n1, n2, exp); }
+        | <EOR> <COMMA> m = <NUMBER> <COMMA> n = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() n2 = proofNDPL() n3 = proofNDPL() <RRPAR>
+            { return new ASTEDisjND(n1, n2, n3, exp, Integer.valueOf(m.toString()), Integer.valueOf(n.toString()));}
+        | <ICOND> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR>
+        {return new ASTIImpND(n1, exp, Integer.valueOf(m.toString())); }
+        | <BOTTOM> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR>
+        {return new ASTAbsurdityND(n1, exp, Integer.valueOf(m.toString())); }
+        | <HYPOTHESIS> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() <RRPAR>
+        {return new ASTHypothesisND(exp, Integer.valueOf(m.toString()));}
+        | <PREMISSE> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() <RRPAR>
+        {return new ASTPremiseND(exp, Integer.valueOf(m.toString()));}
+    ) | {throw new RuntimeException("Incomplete proof!");}
+
+}
+
+
 

@@ -2,21 +2,21 @@ package com.logic.others;
 
 import java.util.*;
 
-public class Env<T> {
+public class Env<K, T> {
 
-    private final Map<String, T> table;
-    private Env<T> prev;
+    private final Map<K, T> table;
+    private Env<K, T> prev;
 
     public Env() {
         table = new LinkedHashMap<>();
     }
 
-    Env(Env<T> prev) {
+    Env(Env<K, T> prev) {
         this();
         this.prev = prev;
     }
 
-    public void bind(String id, T val) {
+    public void bind(K id, T val) {
         table.put(id, val);
     }
 
@@ -31,7 +31,7 @@ public class Env<T> {
         return list;
     }
 
-    public T find(String id) {
+    public T find(K id) {
         T value = table.get(id);
 
         if (value != null)
@@ -41,11 +41,11 @@ public class Env<T> {
         return null;
     }
 
-    public Env<T> beginScope() {
+    public Env<K, T> beginScope() {
         return new Env<>(this);
     }
 
-    public Env<T> endScope() {
+    public Env<K, T> endScope() {
         return prev;
     }
 

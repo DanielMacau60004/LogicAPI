@@ -1,0 +1,60 @@
+/*
+¬ : negation
+→ : implication
+↔ : bi-conditional (if and only if)
+∧ : conjunction (and)
+∨ : disjunction (or)
+∀ : universal quantifier (for all)
+∃ : existential quantifier (there exists)
+⊥, ⊤, ≡
+*/
+
+//prove {p ∨ q. q.} ⊢ ((p ∨ q) ∨ (r ∨ s)) → ((p ∨ s) ∨ (r ∨ q)).
+
+/*
+[→I, 1] [((p ∨ q) ∨ (r ∨ s)) → ((p ∨ s) ∨ (r ∨ q)).
+    [∨E, 2, 3] [(p ∨ s) ∨ (r ∨ q).
+        [H, 1] [(p ∨ q) ∨ (r ∨ s).]
+        [∨E, 4, 5] [(p ∨ s) ∨ (r ∨ q).
+            [H,2] [p ∨ q.]
+            [∨IR] [(p ∨ s) ∨ (r ∨ q).
+                [∨IR] [p ∨ s.
+                    [H, 4] [p.]]]
+            [∨IL] [(p ∨ s) ∨ (r ∨ q).
+                [∨IL] [r ∨ q.
+                    [H, 5] [q.]]]
+        ]
+        [∨E, 6, 7] [(p ∨ s) ∨ (r ∨ q).
+            [H, 3] [r ∨ s.]
+            [∨IL] [(p ∨ s) ∨ (r ∨ q).
+                [∨IR] [r ∨ q.
+                    [H, 6] [r.]]]
+            [∨IR] [(p ∨ s) ∨ (r ∨ q).
+                [∨IL] [p ∨ s.
+                    [H, 7] [s.]]]
+        ]
+    ]
+]*/
+
+
+    [∨E, 2, 3] [(p ∨ s) ∨ (r ∨ q).
+        [P, 1] [(p ∨ q) ∨ (r ∨ s).]
+        [∨E, 4, 5] [(p ∨ s) ∨ (r ∨ q).
+            [H,2] [p ∨ q.]
+            [∨IR] [(p ∨ s) ∨ (r ∨ q).
+                [∨IR] [p ∨ s.
+                    [H, 4] [p.]]]
+            [∨IL] [(p ∨ s) ∨ (r ∨ q).
+                [∨IL] [r ∨ q.
+                    [H, 5] [q.]]]
+        ]
+        [∨E, 6, 7] [(p ∨ s) ∨ (r ∨ q).
+            [H, 3] [r ∨ s.]
+            [∨IL] [(p ∨ s) ∨ (r ∨ q).
+                [∨IR] [r ∨ q.
+                    [H, 6] [r.]]]
+            [∨IR] [(p ∨ s) ∨ (r ∨ q).
+                [∨IL] [p ∨ s.
+                    [H, 7] [s.]]]
+        ]
+    ]

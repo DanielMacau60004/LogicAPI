@@ -3,7 +3,7 @@ package com.logic.exps.asts.binary;
 
 import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.IExpsVisitor;
-import com.logic.exps.parser.ExpressionsParser;
+import com.logic.parser.Parser;
 
 public class ASTConditional extends AASTBinaryExp {
 
@@ -18,6 +18,6 @@ public class ASTConditional extends AASTBinaryExp {
 
 	@Override
 	public String toString() {
-		return left.toString() + " " + getToken(ExpressionsParser.CONDITIONAL) + " " + right.toString();
+		return left.toString() + " " + getToken(Parser.CONDITIONAL) + " " + right.toString();
 	}
 }

@@ -219,4 +219,14 @@ public class ExpsTest {
         assertDoesNotThrow(() -> LogicAPI.parsePL(expression));
     }
 
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "(p ∧ φ) → (q ∨ ψ).dwadawd",
+            "(r → (α ∧ b)) ∨ (β ∨ λ).WDAWDAWDC ADAW DA DA",
+    })
+    void testEOF(String expression) {
+        assertDoesNotThrow(() -> System.out.println(LogicAPI.parsePL(expression)));
+    }
+
 }

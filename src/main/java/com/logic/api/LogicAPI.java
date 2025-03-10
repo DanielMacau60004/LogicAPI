@@ -2,7 +2,7 @@ package com.logic.api;
 
 import com.logic.exps.checkers.FOLWFFChecker;
 import com.logic.exps.checkers.PLWFFChecker;
-import com.logic.exps.parser.ExpressionsParser;
+import com.logic.parser.Parser;
 
 import java.io.ByteArrayInputStream;
 
@@ -31,11 +31,11 @@ public class LogicAPI {
      * @param expression The propositional logic expression to parse and check.
      * @return The parsed {@code IPLExp} representation of the propositional logic expression.
      * @throws Exception If the expression is invalid or cannot be parsed.
-     * @see ExpressionsParser
+     * @see Parser
      * @see PLWFFChecker
      */
     public static IPLExp parsePL(String expression) throws Exception {
-        ExpressionsParser parser = new ExpressionsParser(new ByteArrayInputStream((expression).getBytes()));
+        Parser parser = new Parser(new ByteArrayInputStream((expression).getBytes()));
         return PLWFFChecker.check(parser.parsePL());
     }
 
@@ -48,11 +48,11 @@ public class LogicAPI {
      * @param expression The first-order logic expression to parse and check.
      * @return The parsed {@code IFOLExp} representation of the first-order logic expression.
      * @throws Exception If the expression is invalid or cannot be parsed.
-     * @see ExpressionsParser
+     * @see Parser
      * @see FOLWFFChecker
      */
     public static IFOLExp parseFOL(String expression) throws Exception {
-        ExpressionsParser parser = new ExpressionsParser(new ByteArrayInputStream((expression).getBytes()));
+        Parser parser = new Parser(new ByteArrayInputStream((expression).getBytes()));
         return FOLWFFChecker.check(parser.parseFOL());
     }
 

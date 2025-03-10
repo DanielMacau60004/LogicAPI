@@ -1,16 +1,25 @@
 package com.logic.nd.asts.others;
 
+import com.logic.exps.asts.IASTExp;
 import com.logic.nd.asts.AASTND;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
 
-public abstract class ASTHypothesisND extends AASTND implements IASTND {
+public class ASTHypothesisND extends AASTND implements IASTND {
 
-    protected final IASTND hyp;
+    private final IASTExp hyp;
+    private final int m;
 
-    public ASTHypothesisND(IASTND hyp) {this.hyp = hyp;}
+    public ASTHypothesisND(IASTExp hyp, int m) {
+        this.hyp = hyp;
+        this.m = m;
+    }
 
-    public IASTND getHyp() {
+    public int getM() {
+        return m;
+    }
+
+    public IASTExp getConclusion() {
         return hyp;
     }
 
@@ -19,4 +28,8 @@ public abstract class ASTHypothesisND extends AASTND implements IASTND {
         return v.visit(this, env);
     }
 
+    @Override
+    public String toString() {
+        return "[H, " + m + "] [" + hyp + ".]";
+    }
 }

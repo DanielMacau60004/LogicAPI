@@ -3,6 +3,7 @@ package com.logic.nd.asts;
 import com.logic.nd.asts.binary.ASTEImpND;
 import com.logic.nd.asts.binary.ASTENegND;
 import com.logic.nd.asts.binary.ASTIConjND;
+import com.logic.nd.asts.others.ASTEDisjND;
 import com.logic.nd.asts.others.ASTHypothesisND;
 import com.logic.nd.asts.others.ASTPremiseND;
 import com.logic.nd.asts.unary.*;
@@ -30,7 +31,10 @@ public interface INDVisitor <T, E> {
 
     T visit(ASTIConjND r, E env);
 
+    T visit(ASTEDisjND r, E env);
+
     T visit(ASTEImpND r, E env);
 
     T visit(ASTENegND r, E env);
+
 }
