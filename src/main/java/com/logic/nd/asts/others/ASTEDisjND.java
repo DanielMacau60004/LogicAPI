@@ -1,6 +1,7 @@
 package com.logic.nd.asts.others;
 
 import com.logic.exps.asts.IASTExp;
+import com.logic.nd.ERule;
 import com.logic.nd.asts.AASTND;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
@@ -55,7 +56,8 @@ public class ASTEDisjND extends AASTND implements IASTND {
 
     @Override
     public String toString() {
-        return "[" + getToken(ParserConstants.EOR) + ", " + m + ", " + n + "] " +
+        return "[" + ERule.ELIM_DISJUNCTION + ", " + m + ", " + n + "] " +
                 "[" + conclusion + ". " + hyp1 + " " + hyp2 + " " + hyp3 + "]";
     }
+
 }

@@ -1,6 +1,7 @@
 package com.logic.nd.asts.unary;
 
 import com.logic.exps.asts.IASTExp;
+import com.logic.nd.ERule;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
 import com.logic.parser.ParserConstants;
@@ -25,7 +26,7 @@ public class ASTAbsurdityND extends AASTUnaryND {
 
     @Override
     public String toString() {
-        return "[" + getToken(ParserConstants.BOTTOM) + ", " + m + "] " + super.toString();
+        return "[" + ERule.ABSURDITY + ", " + m + "] " + super.toString();
     }
 
 }

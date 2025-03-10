@@ -1,13 +1,13 @@
 package com.logic;
 
+import com.logic.api.INDProof;
+import com.logic.exps.asts.IASTExp;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.checkers.NDChecker;
 import com.logic.nd.interpreters.NDInterpreter;
 import com.logic.parser.Parser;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class Main {
 
@@ -26,15 +26,29 @@ public class Main {
         return new ByteArrayInputStream(contentBuilder.toString().getBytes());
     }
 
+    public static IASTExp parsePL(String expression) throws Exception {
+        Parser parser = new Parser(new ByteArrayInputStream((expression).getBytes()));
+        return parser.parsePL();
+    }
+
 
     public static void main(String[] args) throws Exception {
         System.out.println("Evaluating:");
 
+        //TransitionGraph t = new TransitionGraph(
+        //        parsePL("((p ∨ q) ∨ (r ∨ s)) → ((p ∨ s) ∨ (r ∨ q))"), new HashSet<>());
+        //StateGraph s = new ParallelStateGraph(t, 20, 500);
+
+        //System.out.println(s.findSolution());
+
         IASTND proof = new Parser(readFile("src/main/java/com/logic/code.logic")).parseNDPL();
         NDChecker.checkPL(proof);
-        NDInterpreter.interpret(proof);
 
         System.out.println(proof);
+        INDProof proofObj =  NDInterpreter.interpret(proof);
+
+        System.out.println(proofObj.size()+" " + proofObj.height());
+        System.out.println(proofObj);
 
         //ByteArrayInputStream stream = new ByteArrayInputStream((proof).getBytes());
         //System.out.println(new Parser(stream).parseNDPL());

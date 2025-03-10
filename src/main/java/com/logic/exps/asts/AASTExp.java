@@ -1,12 +1,11 @@
 package com.logic.exps.asts;
 
 import com.logic.parser.Parser;
-import com.logic.others.Utils;
 
 public abstract class AASTExp implements IASTExp {
 
     protected String getToken(int kind) {
-        return Utils.getToken(Parser.tokenImage[kind].replace("\"",""));
+        return Parser.tokenImage[kind].replace("\"","");
     }
     @Override
     public boolean equals(Object obj) {
@@ -19,4 +18,5 @@ public abstract class AASTExp implements IASTExp {
     public int hashCode() {
         return this.toString().hashCode();
     }
+
 }

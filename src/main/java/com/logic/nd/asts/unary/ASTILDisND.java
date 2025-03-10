@@ -1,11 +1,12 @@
 package com.logic.nd.asts.unary;
 
 import com.logic.exps.asts.IASTExp;
+import com.logic.nd.ERule;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
 import com.logic.parser.ParserConstants;
 
-public class ASTILDisND extends AASTUnaryND {
+public class ASTILDisND extends AASTUnaryND  {
 
     public ASTILDisND(IASTND hypothesis, IASTExp conclusion) {
         super(hypothesis, conclusion);
@@ -18,6 +19,7 @@ public class ASTILDisND extends AASTUnaryND {
 
     @Override
     public String toString() {
-        return "[" + getToken(ParserConstants.ILOR) + "] " + super.toString();
+        return "[" + ERule.INTRO_DISJUNCTION_LEFT + "] " + super.toString();
     }
+
 }

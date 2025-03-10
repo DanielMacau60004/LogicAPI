@@ -6,7 +6,7 @@ import com.logic.others.Utils;
 public abstract class AASTND implements IASTND {
 
     protected String getToken(int kind) {
-        return Utils.getToken(Parser.tokenImage[kind].replace("\"",""));
+        return Parser.tokenImage[kind].replace("\"","");
     }
 
     @Override

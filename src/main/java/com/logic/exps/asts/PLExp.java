@@ -2,6 +2,7 @@ package com.logic.exps.asts;
 
 import com.logic.api.IPLExp;
 import com.logic.exps.interpreters.PLInterpreter;
+import com.logic.others.Utils;
 
 import java.util.*;
 
@@ -86,6 +87,6 @@ public class PLExp implements IPLExp {
 
     @Override
     public String toString() {
-        return exp.toString();
+        return Utils.getToken(exp.toString());
     }
 }

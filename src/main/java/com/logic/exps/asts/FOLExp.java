@@ -1,6 +1,7 @@
 package com.logic.exps.asts;
 
 import com.logic.api.IFOLExp;
+import com.logic.others.Utils;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -57,6 +58,6 @@ public class FOLExp implements IFOLExp {
 
     @Override
     public String toString() {
-        return exp.toString();
+        return Utils.getToken(exp.toString());
     }
 }

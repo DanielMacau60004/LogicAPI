@@ -1,9 +1,9 @@
 package com.logic.nd.asts.unary;
 
 import com.logic.exps.asts.IASTExp;
+import com.logic.nd.ERule;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
-import com.logic.parser.ParserConstants;
 
 public class ASTIRDisND extends AASTUnaryND {
 
@@ -18,6 +18,7 @@ public class ASTIRDisND extends AASTUnaryND {
 
     @Override
     public String toString() {
-        return "[" + getToken(ParserConstants.IROR) + "] " + super.toString();
+        return "[" + ERule.INTRO_DISJUNCTION_RIGHT + "] " + super.toString();
     }
+
 }

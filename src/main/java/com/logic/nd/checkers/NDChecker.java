@@ -1,11 +1,5 @@
 package com.logic.nd.checkers;
 
-import com.logic.exps.ExpsLogic;
-import com.logic.exps.asts.IASTExp;
-import com.logic.exps.asts.binary.ASTAnd;
-import com.logic.exps.asts.binary.ASTConditional;
-import com.logic.exps.asts.binary.ASTOr;
-import com.logic.exps.asts.unary.ASTNot;
 import com.logic.exps.checkers.FOLWFFChecker;
 import com.logic.exps.checkers.PLWFFChecker;
 import com.logic.nd.asts.IASTND;
