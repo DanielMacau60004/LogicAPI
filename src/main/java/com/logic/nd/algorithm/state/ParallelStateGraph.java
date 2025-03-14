@@ -4,10 +4,7 @@ import com.logic.nd.algorithm.transition.TransitionEdge;
 import com.logic.nd.algorithm.transition.TransitionGraph;
 import com.logic.nd.algorithm.transition.TransitionNode;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
@@ -17,15 +14,15 @@ public class ParallelStateGraph extends StateGraph {
 
     private static final int MAX_BATCH = 5000;
 
-    public ParallelStateGraph(TransitionGraph transitionGraph, int heightLimit, int nodesLimit) {
-        super(transitionGraph, heightLimit, nodesLimit);
+    public ParallelStateGraph(TransitionGraph transitionGraph, int heightLimit, int nodesLimit , int hypothesisLimit) {
+        super(transitionGraph, heightLimit, nodesLimit, hypothesisLimit);
     }
 
     @Override
-    void build(TransitionGraph transitionGraph, int heightLimit, int nodesLimit) {
-        graph = new ConcurrentHashMap<>();
+    void build(TransitionGraph transitionGraph, int heightLimit, int nodesLimit, int hypothesisLimit) {
         nodes = new ConcurrentHashMap<>();
 
+        ConcurrentMap<StateNode, Set<StateEdge>> graph = new ConcurrentHashMap<>();
         Queue<StateNode> closed = new ConcurrentLinkedQueue<>();
         Queue<StateNode> explore = new ConcurrentLinkedQueue<>();
         ConcurrentMap<StateNode, Set<StateEdge>> inverted = new ConcurrentHashMap<>();
@@ -45,18 +42,20 @@ public class ParallelStateGraph extends StateGraph {
 
             pool.submit(() ->
                     batch.parallelStream().forEach(state ->
-                            processNode(state, transitionGraph, heightLimit, nodesLimit, closed, explore, inverted)
+                            processNode(state, transitionGraph, heightLimit, nodesLimit, hypothesisLimit, closed, explore, inverted, graph)
                     )
             ).join();
         }
 
-        trim(closed, inverted);
+        trim(closed, inverted, graph);
     }
 
-    private void processNode(StateNode state, TransitionGraph transitionGraph, int heightLimit, int nodesLimit,
-                             Queue<StateNode> closed, Queue<StateNode> explore, ConcurrentMap<StateNode, Set<StateEdge>> inverted) {
+    private void processNode(StateNode state, TransitionGraph transitionGraph, int heightLimit, int nodesLimit , int hypothesisLimit,
+                             Queue<StateNode> closed, Queue<StateNode> explore,
+                             ConcurrentMap<StateNode, Set<StateEdge>> inverted, ConcurrentMap<StateNode, Set<StateEdge>> graph) {
 
-        if (graph.containsKey(state) || state.getHeight() > heightLimit || closed.size() >= nodesLimit) return;
+        if (graph.containsKey(state) || state.getHeight() > heightLimit || closed.size() >= nodesLimit
+            || state.getHypotheses().size() > hypothesisLimit) return;
 
         Set<StateEdge> edges = ConcurrentHashMap.newKeySet();
         Set<StateEdge> existingEdges = graph.putIfAbsent(state, edges);

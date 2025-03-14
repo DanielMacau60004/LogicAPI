@@ -121,7 +121,7 @@ public class NDPLTest {
         }
 
         TransitionGraph t = new TransitionGraph(createExpression(expression), premisses);
-        StateGraph s = new ParallelStateGraph(t, 20, 2000);
+        StateGraph s = new ParallelStateGraph(t, 20, 2000, 5);
 
         Assertions.assertTrue(s.isSolvable());
         Assertions.assertDoesNotThrow(() -> {
@@ -179,7 +179,7 @@ public class NDPLTest {
         }
 
         TransitionGraph t = new TransitionGraph(createExpression(expression), premisses);
-        StateGraph s = new ParallelStateGraph(t, 20, 2000);
+        StateGraph s = new ParallelStateGraph(t, 20, 2000, 5);
 
         Assertions.assertTrue(s.isSolvable());
         Assertions.assertDoesNotThrow(() -> {
@@ -211,7 +211,7 @@ public class NDPLTest {
             "((a → d) → a) → a",
             "¬¬¬p → ¬p",
             "⊥ → a",
-            "(¬(¬a ∨ ¬b)) → (a ∧ b)",
+            "¬(¬a ∨ ¬b) → (a ∧ b)",
             "((a → b) ∧ (b → a)) → (((a ∧ c) → (b ∧ c)) ∧ ((b ∧ c) → (a ∧ c)))",
             "(p ∨ q) → (q ∨ p)",
             "(p ∨ q) → (p ∨ (q ∨ p))",
@@ -220,10 +220,9 @@ public class NDPLTest {
             "((p ∨ q) ∨ (r ∨ s)) → ((p ∨ s) ∨ (r ∨ q))",
             "(¬(p ∧ q) → (¬p ∨ ¬q)) ∧ ((¬p ∨ ¬q) → ¬(p ∧ q))",
             "((a ∨ b) ∧ (a ∨ c)) → (a ∨(b ∧ c))",
-            "(¬(¬a ∨ ¬b)) → (a ∧ b)",
+            "¬(¬a ∨ ¬b) → (a ∧ b)",
             "(a ∨ a) → a",
-            "(a → ¬(¬a)) ∧ (¬(¬a) → a)",
-            "¬(¬(¬p)) → ¬p"
+            "(a → ¬¬a) ∧ (¬¬a → a)",
     })
     void testMore(String premissesAndExpression) throws ParseException {
         String[] parts = premissesAndExpression.split(",");
@@ -235,7 +234,7 @@ public class NDPLTest {
         }
 
         TransitionGraph t = new TransitionGraph(createExpression(expression), premisses);
-        StateGraph s = new ParallelStateGraph(t, 20, 2000);
+        StateGraph s = new ParallelStateGraph(t, 20, 2000, 5);
 
         Assertions.assertTrue(s.isSolvable());
         Assertions.assertDoesNotThrow(() -> {
@@ -248,7 +247,10 @@ public class NDPLTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "¬(¬(¬p)) → ¬p"
+            "¬¬¬p → ¬p",
+            "(a → ¬¬a) ∧ (¬¬a → a)",
+            "⊥ → a",
+            "¬⊥"
     })
     void testSingle(String premissesAndExpression) throws ParseException {
         String[] parts = premissesAndExpression.split(",");
@@ -260,7 +262,7 @@ public class NDPLTest {
         }
 
         TransitionGraph t = new TransitionGraph(createExpression(expression), premisses);
-        StateGraph s = new ParallelStateGraph(t, 5, 300);
+        StateGraph s = new ParallelStateGraph(t, 5, 300, 5);
 
         Assertions.assertTrue(s.isSolvable());
         Assertions.assertDoesNotThrow(() -> {

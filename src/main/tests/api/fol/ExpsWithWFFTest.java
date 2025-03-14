@@ -24,7 +24,7 @@ public class ExpsWithWFFTest {
             "'∀x (φ → (α ∨ β))', '', ''",
             "'P(x) ∧ Father(x, y)', '', 'x,y'",
             "'P(x) ∧ Father(x, dani)', '', 'x'",
-            "'(∃x (P(x) ∧ ∀y Father(x, y)))', 'x,y', ''",
+            "'∃x (P(x) ∧ ∀y Father(x, y))', 'x,y', ''",
             "'∀x (L(x) → (P(f(x)) ∧ Q(y)))', 'x', 'y'",
             "'∀x (L(x) → (P(dani) ∧ Q(y))) ∧ ∀y (L(x) → (P(dani) ∧ Q(y)))','x,y', 'x,y'",
     })
@@ -56,7 +56,7 @@ public class ExpsWithWFFTest {
     @ParameterizedTest
     @ValueSource(strings = {
             "P(x) ∧ P(x, y)",
-            "P(f(x)) ∧ P(f(x, y))",
+            "P(f(x)) ∧ P(f(x, y(a, b(c, t))))",
             "P ∧ P(x)",
             "L(dani, dani(x))"
     })

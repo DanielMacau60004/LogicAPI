@@ -21,28 +21,28 @@ public class StateGraph {
 
     //Necessary to keep the refs of the nodes
     protected Map<StateNode, StateNode> nodes;
-    protected Map<StateNode, Set<StateEdge>> graph;
+
     protected Map<StateNode, StateEdge> tree;
 
     private final IASTExp conclusion;
     private final Set<IASTExp> premisses;
 
-    public StateGraph(TransitionGraph transitionGraph, int heightLimit, int nodesLimit) {
+    public StateGraph(TransitionGraph transitionGraph, int heightLimit, int nodesLimit, int hypothesisLimit) {
         this.nodes = new HashMap<>();
-        this.graph = new HashMap<>();
         this.tree = new HashMap<>();
 
         this.conclusion = transitionGraph.getConclusion();
         this.premisses = transitionGraph.getPremisses();
 
-        build(transitionGraph, heightLimit, nodesLimit);
+        build(transitionGraph, heightLimit, nodesLimit, hypothesisLimit);
     }
 
     StateNode getInitState() {
         return new StateNode(conclusion, premisses);
     }
 
-    void build(TransitionGraph transitionGraph, int heightLimit, int nodesLimit) {
+    void build(TransitionGraph transitionGraph, int heightLimit, int nodesLimit, int hypothesisLimit) {
+        Map<StateNode, Set<StateEdge>> graph = new HashMap<>();
         Queue<StateNode> closed = new LinkedList<>();
         Queue<StateNode> explore = new LinkedList<>();
         Map<StateNode, Set<StateEdge>> inverted = new HashMap<>();
@@ -54,7 +54,9 @@ public class StateGraph {
 
             if (graph.containsKey(state))
                 continue;
-            if (state.getHeight() > heightLimit || closed.size() == nodesLimit)
+
+            if (state.getHeight() > heightLimit || closed.size() == nodesLimit
+                    || state.getHypotheses().size()> hypothesisLimit)
                 break;
 
             Set<StateEdge> edges = new HashSet<>();
@@ -85,10 +87,10 @@ public class StateGraph {
             }
         }
 
-        trim(closed, inverted);
+        trim(closed, inverted, graph);
     }
 
-    void trim(Queue<StateNode> explore, Map<StateNode, Set<StateEdge>> inverted) {
+    void trim(Queue<StateNode> explore, Map<StateNode, Set<StateEdge>> inverted, Map<StateNode, Set<StateEdge>> graph) {
         Set<StateNode> explored = new HashSet<>();
 
         while (!explore.isEmpty()) {

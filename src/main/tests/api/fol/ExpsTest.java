@@ -11,7 +11,7 @@ public class ExpsTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "φ", "ψ", "α", "β", "γ", "ε", "λ", "μ", "ρ", "σ", "τ", "ω",
+            "φ", "ψ", "α", "β", "γ", "φ1", "φ2", "φ3", "φ4", "φ5", "φ6", "φ7",
             "Father(x)", "Adult(y)", "L(z, x)",
             "∀x (P(x) → Q(x))", "∃y R(y)", "¬∃z (S(z) ∧ T(z))", "∀x ∃y (L(x, y) → M(y, x))",
             "P(x) → (Q(y) ∧ R(z))", "¬(A(x) ∨ B(y))", "(C(x) → D(y)) ↔ (E(z) ∧ F(x))",
@@ -22,7 +22,7 @@ public class ExpsTest {
             "(K(x) ∨ L(y)) → (M(z) ∧ N(w))", "∃x (P(x) ↔ Q(x))",
             "∀x ∃y (R(x, y) ∨ S(y, x))", "∀x (T(x) → (U(x) ↔ V(x)))",
             "(W(x) ∨ X(y)) → ¬Y(z)", "¬(Z(x) → ∀y A(y))",
-            "∀x ∃y ∃z (B(x) ∧ (C(y) ∨ D(z)))", "∃x (E(x) ∧ F(x, x))"
+            "∀x ∃y ∃z (B(x) ∧ (C(y) ∨ D(z)))", "∃x (E(f(x, x)) ∧ F(f(c,x), f(c,d)))"
     })
     void testCorrectExps(String expression) {
         assertDoesNotThrow(() -> LogicAPI.parseFOL(expression));
@@ -47,12 +47,12 @@ public class ExpsTest {
     @ValueSource(strings = {
             "∀x P(x)", "∃y Q(y)", "∀x ∃y R(x, y)", "∃x ∀y (P(x) → Q(y))",
             "∀x (P(x) ∧ ∃y Q(y))", "∀x ∃y ∃z ((P(x) ∧ Q(y)) → R(z))",
-            "∃x ∃y ∀z ((P(x) ∨ Q(y)) ∧ R(z))", "∀x (∃y (P(y) ∧ Q(x)))",
-            "∃x (∀y P(y) → ∃z Q(z))", "∀x ∃y (R(x, y) ↔ S(y, x))",
+            "∃x ∃y ∀z ((P(x) ∨ Q(y)) ∧ R(z))", "∀x ∃y (P(y) ∧ Q(x))",
+            "∃x ∀y P(y) → ∃z Q(z)", "∀x ∃y (R(x, y) ↔ S(y, x))",
             "∀x (∃y (P(x) → Q(y)) → ∀z R(z))", "¬∀x ∃y (S(x) ∧ T(y))",
-            "∃x (P(x) → ∀y (Q(y) ∨ R(y)))", "∀x (∃y ∀z P(x, y, z))",
-            "∃x (∃y ∀z (P(x) ∧ (Q(y) ∨ R(z))))", "∀x ∃y (A(x) ↔ B(y))",
-            "∀x (P(x) → (∃y Q(y) ∨ ∀z R(z)))", "∃x (∀y (P(y) → Q(x)))",
+            "∃x (P(x) → ∀y (Q(y) ∨ R(y)))", "∀x ∃y ∀z P(x, y, z)",
+            "∃x ∃y ∀z (P(x) ∧ (Q(y) ∨ R(z)))", "∀x ∃y (A(x) ↔ B(y))",
+            "∀x (P(x) → (∃y Q(y) ∨ ∀z R(z)))", "∃x ∀y (P(y) → Q(x))",
             "∀x (∃y (P(y) ↔ Q(x)) ∧ ∀z R(z, x))", "∃x ∃y ((P(x) ∧ Q(y)) → ∀z R(z))"
     })
     void testCorrectQuantifiers(String expression) {
@@ -62,15 +62,16 @@ public class ExpsTest {
     @ParameterizedTest
     @ValueSource(strings = {
             "∀x (φ → (α ∨ β))",
-            "∃y (λ ∧ μ) → (ρ ∧ σ)",
-            "∀z (τ → ω) ↔ (λ ∨ (ρ ∧ σ))",
+            "∃y (φ2 ∧ φ3) → (φ4 ∧ φ5)",
+            "∀z (φ6 → φ7) ↔ (φ2 ∨ (φ4 ∧ φ5))",
             "(α ↔ β) ∧ (γ → δ)",
             "((φ → (ψ ↔ α)) ∨ (β ∧ (γ → δ)))",
-            "∃x (λ ∧ μ) ↔ ((ρ ∨ σ) → (τ ∧ ω))",
-            "(α ∨ (β ∧ (γ → δ))) ↔ (ε → φ)",
-            "((τ ∧ ω) → (λ ∨ μ)) ↔ (ρ ∧ σ)",
-            "(τ → (ρ ∧ (σ ∨ λ))) ↔ (μ → α)",
-            "(φ ∧ ψ) → ((λ → μ) ∧ (ρ ∨ σ))"
+            "∃x (φ2 ∧ φ3) ↔ ((φ4 ∨ φ5) → (φ6 ∧ φ7))",
+            "(α ∨ (β ∧ (γ → δ))) ↔ (φ1 → φ)",
+            "((φ6 ∧ φ7) → (φ2 ∨ φ3)) ↔ (φ4 ∧ φ5)",
+            "(φ6 → (φ4 ∧ (φ5 ∨ φ2))) ↔ (φ3 → α)",
+            "(φ ∧ ψ) → ((φ2 → φ3) ∧ (φ4 ∨ φ5))",
+            "(φ ∧ φ1) → ((φ2 → φ) ∧ (φ3 ∨ φ2))"
     })
     void testComplexGreekPredicatesFOLOperations(String expression) {
         assertDoesNotThrow(() -> LogicAPI.parseFOL(expression));
@@ -102,7 +103,7 @@ public class ExpsTest {
             "(Father(x, y) ∧ ¬L(y))", "(∃x Father(x, y) ∧ Height(x))",
             "(P(x) ∧ (Weight(x) ∧ Q(x)))", "(Father(x, y) ∧ (Height(x) → L(x)))",
             "P(x) ∧ ∀y (Q(y) → Father(x, y))", "(Height(x) → (Father(x, y) ∨ L(x)))",
-            "Father(x, z) → (L(y) ∨ ¬Height(x))", "(∃x (L(x) ∧ ∀y Father(x, y)))",
+            "Father(x, z) → (L(y) ∨ ¬Height(x))", "∃x (L(x) ∧ ∀y Father(x, y))",
             "∀x (Father(x, y) → (L(x) ∧ Weight(y)))", "(L(x) → ¬Height(x))",
             "(Father(x, y) ∧ (Height(x) → Weight(x)))", "(L(x) ∧ (Height(x) → Father(x, y)))",
             "(Height(x) ∧ ∀y (Father(x, y) → L(y)))", "∃x (L(x) ∧ Father(x, y))",
@@ -119,12 +120,12 @@ public class ExpsTest {
             "((P(x) ∧ Q(x)) ∧ ∀y Father(x, y))", "(L(x) ∧ (Father(x, y) → Weight(x)))",
             "(Father(x, y) ∧ ∃z (Height(z) ∧ L(z)))", "∀x (L(x) → (Father(x, y) ∧ ¬Weight(x)))",
             "(Height(x) → ∀y (L(y) → Father(x, y)))", "(∃x Father(x, y) ∧ (L(x) ∧ Height(x)))",
-            "(Father(x, y) ∧ (L(x) → Height(y)))", "(∃x (P(x) ∧ ∀y Father(x, y)))",
+            "(Father(x, y) ∧ (L(x) → Height(y)))", "∃x (P(x) ∧ ∀y Father(x, y))",
             "(Height(x) ∧ (Father(x, y) → Weight(x)))", "(Height(x) ∧ ¬L(x))",
             "(P(x) ∧ (Father(x, y) ∨ Weight(x)))", "∀x (Father(x, y) → ∃z (Height(z) ∧ L(x)))",
             "(Father(x, y) ∧ (P(x) → L(x)))", "(Father(x, y) → ¬Height(x))",
             "∀x (L(x) → (P(x) ∧ Q(y)))", "(Father(x, y) ∧ (L(x) ∧ ¬Weight(x)))",
-            "(∃x (Father(x, y) ∧ Height(x)))", "¬(Father(x, y) ∧ P(x))",
+            "∃x (Father(x, y) ∧ Height(x))", "¬(Father(x, y) ∧ P(x))",
             "(Father(x, y) ∧ (L(x) ∧ Weight(y)))", "(Height(x) ∨ ∃y Father(x, y))",
             "(Father(x, y) ∧ ∀z (L(z) ∧ P(z)))", "∃x (P(x) ∧ Weight(x))",
             "(Father(x, y) ∧ (L(x) ∨ ¬Weight(y)))",
@@ -137,4 +138,12 @@ public class ExpsTest {
         assertDoesNotThrow(() -> LogicAPI.parseFOL(expression));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "(P(x) ∧ Q(y))",
+            "Q(a1, a2)"
+    })
+    void testSimple(String expression) {
+        assertDoesNotThrow(() -> LogicAPI.parseFOL(expression));
+    }
 }

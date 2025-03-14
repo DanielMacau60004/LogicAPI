@@ -43,7 +43,7 @@ public class EquivalenceTest {
     @ValueSource(strings = {
             "a → b, ¬a ∨ b",
             "¬(a ∧ b), ¬a ∨ ¬b",
-            "¬(¬a), a",
+            "¬¬a, a",
             "a ∧ (b ∨ c), (a ∧ b) ∨ (a ∧ c)",
             "a ∨ (b ∧ c), (a ∨ b) ∧ (a ∨ c)",
             "a ∧ (a ∨ b), a",
