@@ -250,7 +250,8 @@ public class NDPLTest {
             "¬¬¬p → ¬p",
             "(a → ¬¬a) ∧ (¬¬a → a)",
             "⊥ → a",
-            "¬⊥"
+            "¬⊥",
+            "a ∧ b, a ∧ a"
     })
     void testSingle(String premissesAndExpression) throws ParseException {
         String[] parts = premissesAndExpression.split(",");
@@ -264,7 +265,7 @@ public class NDPLTest {
         TransitionGraph t = new TransitionGraph(createExpression(expression), premisses);
         StateGraph s = new ParallelStateGraph(t, 5, 300, 5);
 
-        Assertions.assertTrue(s.isSolvable());
+        Assertions.assertTrue(s.isSolvable(), "Not solvable!");
         Assertions.assertDoesNotThrow(() -> {
             INDProof proof = s.findSolution();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());

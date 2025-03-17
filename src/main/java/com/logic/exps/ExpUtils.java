@@ -1,6 +1,7 @@
 package com.logic.exps;
 
 import com.logic.exps.asts.IASTExp;
+import com.logic.exps.asts.others.ASTBottom;
 import com.logic.exps.asts.others.ASTLiteral;
 import com.logic.exps.asts.others.ASTPred;
 import com.logic.exps.asts.unary.ASTNot;
@@ -9,7 +10,7 @@ import com.logic.parser.Parser;
 
 public class ExpUtils {
 
-    public static final IASTExp BOT = new ASTLiteral(Parser.BOTTOM);
+    public static final IASTExp BOT = new ASTBottom();
 
     public static IASTExp negate(IASTExp exp) {
         if(exp instanceof ASTLiteral || exp instanceof ASTPred || exp instanceof ASTParenthesis || exp instanceof ASTNot)
