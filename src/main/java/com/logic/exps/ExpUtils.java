@@ -26,7 +26,7 @@ public class ExpUtils {
     }
 
     public static IASTExp removeParenthesis(IASTExp exp) {
-        while (exp instanceof ASTParenthesis par)
+        if (exp instanceof ASTParenthesis par)
             exp = par.getExp();
         return exp;
     }

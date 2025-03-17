@@ -1,15 +1,12 @@
 package com.logic;
 
 import com.logic.api.INDProof;
-import com.logic.api.LogicAPI;
 import com.logic.exps.asts.IASTExp;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.checkers.NDChecker;
-import com.logic.nd.interpreters.NDInterpreter;
 import com.logic.parser.Parser;
 
 import java.io.*;
-import java.util.Map;
 
 public class Main {
 
@@ -47,7 +44,7 @@ public class Main {
         NDChecker.checkPL(proof);
 
         System.out.println(proof);
-        INDProof proofObj =  NDInterpreter.interpret(proof);
+        INDProof proofObj =  NDChecker.checkPL(proof);
 
         System.out.println(proofObj.size()+" " + proofObj.height());
         System.out.println(proofObj);

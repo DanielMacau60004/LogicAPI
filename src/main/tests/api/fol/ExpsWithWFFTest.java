@@ -2,15 +2,16 @@ package api.fol;
 
 import com.logic.api.IFOLExp;
 import com.logic.api.LogicAPI;
+import com.logic.exps.asts.others.AASTTerm;
+import com.logic.exps.asts.others.ASTFun;
+import com.logic.exps.asts.others.ASTPred;
+import com.logic.exps.asts.others.ASTVariable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertEquals;
@@ -22,7 +23,7 @@ public class ExpsWithWFFTest {
     @ParameterizedTest
     @CsvSource({
             "'∀x (φ → (α ∨ β))', '', ''",
-            "'P(x) ∧ Father(x, y)', '', 'x,y'",
+            "'P(x) ∧ (Father(x, y) ∧ Q)', '', 'x,y'",
             "'P(x) ∧ Father(x, dani)', '', 'x'",
             "'∃x (P(x) ∧ ∀y Father(x, y))', 'x,y', ''",
             "'∀x (L(x) → (P(f(x)) ∧ Q(y)))', 'x', 'y'",
@@ -34,23 +35,44 @@ public class ExpsWithWFFTest {
 
         if (!boundedStr.isEmpty()) {
             Set<String> bounded = new HashSet<>(Arrays.asList(boundedStr.split(",")));
-            Iterator<String> it = exp.get().iterateBoundedVariables();
+            Iterator<ASTVariable> it = exp.get().iterateBoundedVariables();
             Set<String> iteratedBounded = new HashSet<>();
-            it.forEachRemaining(iteratedBounded::add);
+            it.forEachRemaining(i->iteratedBounded.add(i.toString()));
 
             Assertions.assertEquals(iteratedBounded, bounded);
         }
 
         if (!unboundedStr.isEmpty()) {
             Set<String> unbounded = new HashSet<>(Arrays.asList(unboundedStr.split(",")));
-            Iterator<String> it = exp.get().iterateUnboundedVariables();
+            Iterator<ASTVariable> it = exp.get().iterateUnboundedVariables();
             Set<String> iteratedUnbounded = new HashSet<>();
-            it.forEachRemaining(iteratedUnbounded::add);
+            it.forEachRemaining(i->iteratedUnbounded.add(i.toString()));
 
             Assertions.assertEquals(iteratedUnbounded, unbounded);
         }
 
-        System.out.println(exp.get());
+        IFOLExp fol = exp.get();
+        System.out.println(fol);
+
+        List<ASTFun> functions = new ArrayList<>();
+        fol.iterateFunctions().forEachRemaining(functions::add);
+        System.out.println("Functions: " + functions);
+
+        List<ASTPred> predicates = new ArrayList<>();
+        fol.iteratePredicates().forEachRemaining(predicates::add);
+        System.out.println("Predicates: " + predicates);
+
+        List<ASTVariable> bounded = new ArrayList<>();
+        fol.iterateBoundedVariables().forEachRemaining(bounded::add);
+        System.out.println("Bounded Variables: " + bounded);
+
+        List<ASTVariable> unbounded = new ArrayList<>();
+        fol.iterateUnboundedVariables().forEachRemaining(unbounded::add);
+        System.out.println("Unbounded Variables: " + unbounded);
+
+        List<AASTTerm> terms = new ArrayList<>();
+        fol.iterateTerms().forEachRemaining(terms::add);
+        System.out.println("Terms: " + terms);
     }
 
     @ParameterizedTest

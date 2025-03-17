@@ -17,16 +17,16 @@ public class PLInterpreter implements IExpsVisitor<Boolean, Void> {
     public static final String ERROR_MESSAGE_ARBITRARY = "Cannot evaluate an expression with arbitrary expressions!";
     public static final String ERROR_INTERPRETATION = "Missing literals %s in the interpretation!";
 
-    private final Map<String, Boolean> interpretation;
+    private final Map<ASTLiteral, Boolean> interpretation;
 
     private final Set<String> missing;
 
-    PLInterpreter(Map<String, Boolean> interpretation){
+    PLInterpreter(Map<ASTLiteral, Boolean> interpretation){
         this.interpretation = interpretation;
         this.missing = new HashSet<>();
     }
 
-    public static boolean interpret(IASTExp exp, Map<String, Boolean> interpretation) {
+    public static boolean interpret(IASTExp exp, Map<ASTLiteral, Boolean> interpretation) {
         PLInterpreter interpreter = new PLInterpreter(interpretation);
         Boolean result = exp.accept(interpreter, null);
         if(result == null)
@@ -51,7 +51,7 @@ public class PLInterpreter implements IExpsVisitor<Boolean, Void> {
 
     @Override
     public Boolean visit(ASTLiteral e, Void env) {
-        Boolean bool = interpretation.get(e.getName());
+        Boolean bool = interpretation.get(e);
         if(bool == null) {
             missing.add(e.getName());
             return null;

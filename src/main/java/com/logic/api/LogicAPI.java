@@ -4,7 +4,6 @@ import com.logic.exps.checkers.FOLWFFChecker;
 import com.logic.exps.checkers.PLWFFChecker;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.checkers.NDChecker;
-import com.logic.nd.interpreters.NDInterpreter;
 import com.logic.parser.Parser;
 
 import java.io.ByteArrayInputStream;
@@ -64,7 +63,7 @@ public class LogicAPI {
     public static INDProof parseNDPLProof(String expression) throws Exception {
         IASTND proof = new Parser(new ByteArrayInputStream((expression).getBytes())).parseNDPL();
         NDChecker.checkPL(proof);
-        return NDInterpreter.interpret(proof);
+        return NDChecker.checkPL(proof);
     }
 
 }

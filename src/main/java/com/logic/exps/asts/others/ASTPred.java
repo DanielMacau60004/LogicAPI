@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class ASTPred extends AASTExp {
 
-    private final String predicate;
+    protected final String predicate;
     private final List<IASTExp> terms;
 
     public ASTPred(String predicate) {
@@ -41,7 +41,8 @@ public class ASTPred extends AASTExp {
 
     @Override
     public String toString() {
-        return predicate + "(" + terms.stream().map(Object::toString).collect(Collectors.joining(",")) + ")";
+        return predicate + (terms.isEmpty() ? "" :
+                "(" + terms.stream().map(Object::toString).collect(Collectors.joining(",")) + ")");
     }
 }
 

@@ -36,7 +36,8 @@ public class ASTFun extends AASTTerm {
 
     @Override
     public String toString() {
-        return name + "(" + terms.stream().map(Object::toString).collect(Collectors.joining(",")) + ")";
+        return name + (terms.isEmpty() ? "" :
+                "(" + terms.stream().map(Object::toString).collect(Collectors.joining(",")) + ")");
     }
 }
 

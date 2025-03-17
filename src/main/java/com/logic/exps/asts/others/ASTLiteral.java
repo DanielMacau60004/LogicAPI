@@ -1,24 +1,13 @@
 package com.logic.exps.asts.others;
 
 
-import com.logic.exps.asts.AASTExp;
 import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.IExpsVisitor;
 
-public class ASTLiteral extends AASTExp implements IASTExp {
-
-    private final String name;
+public class ASTLiteral extends ASTPred implements IASTExp {
 
     public ASTLiteral(String name) {
-        this.name = name;
-    }
-
-    public ASTLiteral(int kind) {
-        this.name = getToken(kind);
-    }
-
-    public String getName() {
-        return name;
+        super(name);
     }
 
     @Override
@@ -28,7 +17,7 @@ public class ASTLiteral extends AASTExp implements IASTExp {
 
     @Override
     public String toString() {
-        return name;
+        return predicate;
     }
 
 }

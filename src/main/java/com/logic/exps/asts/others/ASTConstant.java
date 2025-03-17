@@ -3,7 +3,7 @@ package com.logic.exps.asts.others;
 
 import com.logic.exps.asts.IExpsVisitor;
 
-public class ASTConstant extends AASTTerm {
+public class ASTConstant extends ASTFun {
 
     public ASTConstant(String value) {
         super(value);

@@ -9,16 +9,17 @@ import com.logic.exps.asts.others.*;
 import com.logic.exps.asts.unary.ASTNot;
 import com.logic.exps.asts.unary.ASTParenthesis;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class PLWFFChecker implements IExpsVisitor<Void, Void> {
 
     public static final String ERROR_MESSAGE = "PL expressions only!";
-    final Set<String> literals;
+    final Set<ASTLiteral> literals;
 
     PLWFFChecker() {
-        literals = new TreeSet<>();
+        literals = new LinkedHashSet<>();
     }
 
     public static IPLExp check(IASTExp exp) {
@@ -45,7 +46,7 @@ public class PLWFFChecker implements IExpsVisitor<Void, Void> {
 
     @Override
     public Void visit(ASTLiteral e, Void env) {
-        literals.add(e.toString());
+        literals.add(e);
         return null;
     }
 

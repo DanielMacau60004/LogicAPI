@@ -1,5 +1,7 @@
 package com.logic.api;
 
+import com.logic.exps.asts.others.ASTLiteral;
+
 import java.util.Iterator;
 import java.util.Map;
 
@@ -23,11 +25,13 @@ import java.util.Map;
  *
  * @author Daniel Macau
  * @version 1.0
- * @since 08-03-2025
  * @see LogicAPI
  * @see Map
+ * @since 08-03-2025
  */
-public interface IPLExp {
+//TODO remake documentation
+//TODO create interfaces for exposed classes (ASTLiteral)
+public interface IPLExp extends IExp {
 
     /**
      * Iterates through all literals in the propositional logic expression.
@@ -35,7 +39,7 @@ public interface IPLExp {
      *
      * @return An iterator over the literals in this expression.
      */
-    Iterator<String> iterateLiterals();
+    Iterator<ASTLiteral> iterateLiterals();
 
     /**
      * Interprets the propositional expression based on a given interpretation of the literals.
@@ -49,7 +53,7 @@ public interface IPLExp {
      * @return {@code true} if the expression evaluates to true under the given interpretation, {@code false} otherwise.
      * @throws RuntimeException If a literal does not have a truth value in the interpretation or if the expression contains arbitrary expressions.
      */
-    boolean interpret(Map<String, Boolean> interpretation);
+    boolean interpret(Map<ASTLiteral, Boolean> interpretation);
 
     /**
      * Generates and returns the truth table for the propositional expression.
@@ -61,7 +65,7 @@ public interface IPLExp {
      *
      * @return A map where each key is an interpretation (a map of literal-to-truth-value), and the corresponding value is the truth value of the expression for that interpretation.
      */
-    Map<Map<String, Boolean>, Boolean> getTruthTable();
+    Map<Map<ASTLiteral, Boolean>, Boolean> getTruthTable();
 
     /**
      * Checks if this propositional expression is logically equivalent to another expression.

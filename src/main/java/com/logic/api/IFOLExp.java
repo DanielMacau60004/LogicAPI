@@ -1,5 +1,10 @@
 package com.logic.api;
 
+import com.logic.exps.asts.others.AASTTerm;
+import com.logic.exps.asts.others.ASTFun;
+import com.logic.exps.asts.others.ASTPred;
+import com.logic.exps.asts.others.ASTVariable;
+
 import java.util.Iterator;
 
 /**
@@ -27,7 +32,9 @@ import java.util.Iterator;
  * @since 08-03-2025
  * @see LogicAPI
  */
-public interface IFOLExp {
+//TODO remake documentation
+//TODO create interfaces for exposed classes (ASTLiteral)
+public interface IFOLExp extends IExp {
 
     /**
      * Iterates through all the function names used in the first-order logic expression.
@@ -35,7 +42,7 @@ public interface IFOLExp {
      *
      * @return An iterator over the functions in this expression.
      */
-    Iterator<String> iterateFunctions();
+    Iterator<ASTFun> iterateFunctions();
 
     /**
      * Iterates through all the predicate names used in the first-order logic expression.
@@ -43,7 +50,7 @@ public interface IFOLExp {
      *
      * @return An iterator over the predicates in this expression.
      */
-    Iterator<String> iteratePredicates();
+    Iterator<ASTPred> iteratePredicates();
 
     /**
      * Iterates through all the bounded variables in the first-order logic expression.
@@ -51,7 +58,9 @@ public interface IFOLExp {
      *
      * @return An iterator over the bounded variables in this expression.
      */
-    Iterator<String> iterateBoundedVariables();
+    Iterator<ASTVariable> iterateBoundedVariables();
+
+    Iterator<AASTTerm> iterateTerms();
 
     /**
      * Checks if a given variable is a bounded variable in this first-order logic expression.
@@ -60,7 +69,7 @@ public interface IFOLExp {
      * @param variable The variable to check.
      * @return {@code true} if the variable is bounded, {@code false} otherwise.
      */
-    boolean isABoundedVariable(String variable);
+    boolean isABoundedVariable(ASTVariable variable);
 
     /**
      * Iterates through all the unbounded variables in the first-order logic expression.
@@ -68,7 +77,7 @@ public interface IFOLExp {
      *
      * @return An iterator over the unbounded variables in this expression.
      */
-    Iterator<String> iterateUnboundedVariables();
+    Iterator<ASTVariable> iterateUnboundedVariables();
 
     /**
      * Checks if this first-order logic expression is a sentence.

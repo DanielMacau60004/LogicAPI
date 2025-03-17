@@ -20,16 +20,21 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
     public static final String ERROR_MESSAGE_FUNCTION = "Function %s was declared with different arities: %d and %d!";
     public static final String ERROR_MESSAGE_PREDICATE = "Predicate %s was declared with different arities: %d and %d!";
 
-    final Map<String, Integer> functions;
-    final Map<String, Integer> predicates;
+    final Map<String, Integer> functionsMap;
+    final Map<String, Integer> predicatesMap;
 
-    final Set<String> boundedVariables;
-    final Set<String> unboundedVariables;
+    final Set<ASTFun> functions;
+    final Set<ASTPred> predicates;
+
+    final Set<ASTVariable> boundedVariables;
+    final Set<ASTVariable> unboundedVariables;
 
     FOLWFFChecker() {
-        functions = new HashMap<>();
-        predicates = new HashMap<>();
+        functionsMap = new HashMap<>();
+        predicatesMap = new HashMap<>();
 
+        functions = new HashSet<>();
+        predicates = new HashSet<>();
         boundedVariables = new HashSet<>();
         unboundedVariables = new HashSet<>();
     }
@@ -40,7 +45,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
         exp.accept(checker, env);
 
         return new FOLExp(exp,
-                checker.functions.keySet(), checker.predicates.keySet(),
+                checker.functions, checker.predicates,
                 checker.boundedVariables, checker.unboundedVariables);
     }
 
@@ -56,10 +61,11 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
 
     @Override
     public Void visit(ASTConstant e, Env<String, IASTExp> env) {
-        Integer size = functions.get(e.getName());
+        Integer size = functionsMap.get(e.getName());
 
         if(size == null) {
-            functions.put(e.getName(), 0);
+            functionsMap.put(e.getName(), 0);
+            functions.add(e);
         } else if(size != 0)
             throw new RuntimeException(String.format(ERROR_MESSAGE_FUNCTION, e.getName(), size, 0));
 
@@ -68,10 +74,11 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
 
     @Override
     public Void visit(ASTLiteral e, Env<String, IASTExp> env) {
-        Integer size = predicates.get(e.getName());
+        Integer size = predicatesMap.get(e.getName());
 
         if(size == null) {
-            predicates.put(e.getName(), 0);
+            predicatesMap.put(e.getName(), 0);
+            predicates.add(e);
         } else if(size != 0)
             throw new RuntimeException(String.format(ERROR_MESSAGE_PREDICATE, e.getName(), size, 0));
 
@@ -86,8 +93,8 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
     @Override
     public Void visit(ASTVariable e, Env<String, IASTExp> env) {
         if(env.find(e.getName()) != null)
-            boundedVariables.add(e.getName());
-        else unboundedVariables.add(e.getName());
+            boundedVariables.add(e);
+        else unboundedVariables.add(e);
 
         return null;
     }
@@ -128,11 +135,12 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
 
     @Override
     public Void visit(ASTFun e, Env<String, IASTExp> env) {
-        Integer size = functions.get(e.getName());
+        Integer size = functionsMap.get(e.getName());
         int arity = e.getTerms().size();
 
         if(size == null) {
-            functions.put(e.getName(), arity);
+            functionsMap.put(e.getName(), arity);
+            functions.add(e);
         } else if(size != arity)
             throw new RuntimeException(String.format(ERROR_MESSAGE_FUNCTION, e.getName(), size, arity));
 
@@ -142,11 +150,12 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
 
     @Override
     public Void visit(ASTPred e, Env<String, IASTExp> env) {
-        Integer size = predicates.get(e.getName());
+        Integer size = predicatesMap.get(e.getName());
         int arity = e.getTerms().size();
 
         if(size == null) {
-            predicates.put(e.getName(), arity);
+            predicatesMap.put(e.getName(), arity);
+            predicates.add(e);
         } else if(size != arity)
             throw new RuntimeException(String.format(ERROR_MESSAGE_PREDICATE, e.getName(), size, arity));
 

@@ -14,7 +14,7 @@ import com.logic.nd.asts.others.ASTEDisjND;
 import com.logic.nd.asts.others.ASTHypothesisND;
 import com.logic.nd.asts.others.ASTPremiseND;
 import com.logic.nd.asts.unary.*;
-import com.logic.nd.interpreters.NDInterpreter;
+import com.logic.nd.checkers.NDChecker;
 
 import java.util.*;
 
@@ -142,7 +142,8 @@ public class StateGraph {
         for(IASTExp e : premisses) marks.put(e, mark++);
 
         IASTND proof = rule(new StateNode(exp, premisses, hypotheses.keySet()), marks, mark);
-        return NDInterpreter.interpret(proof);
+        //Change to handle fol
+        return NDChecker.checkPL(proof);
     }
 
     //TODO Store rule objects instead of states in the graph to avoid this crap
