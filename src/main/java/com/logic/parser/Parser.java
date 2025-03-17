@@ -9,7 +9,7 @@ import com.logic.exps.asts.others.*;
 import com.logic.nd.asts.*;
 import com.logic.nd.asts.binary.*;
 import com.logic.nd.asts.unary.*;
-import com.logic.nd.asts.others.*;import java.util.Stack;
+import com.logic.nd.asts.others.*;
 
 public class Parser implements ParserConstants {
 
@@ -418,7 +418,7 @@ public class Parser implements ParserConstants {
         exp = parsePL();
         n1 = proofNDPL();
         jj_consume_token(RRPAR);
-          {if (true) return new ASTINegND(n1, exp, Integer.valueOf(m.toString()));}
+          {if (true) return new ASTINegND(n1, exp, Integer.parseInt(m.toString()));}
         break;
       case ENEG:
         jj_consume_token(ENEG);
@@ -443,7 +443,7 @@ public class Parser implements ParserConstants {
         n2 = proofNDPL();
         n3 = proofNDPL();
         jj_consume_token(RRPAR);
-              {if (true) return new ASTEDisjND(n1, n2, n3, exp, Integer.valueOf(m.toString()), Integer.valueOf(n.toString()));}
+              {if (true) return new ASTEDisjND(n1, n2, n3, exp, Integer.parseInt(m.toString()), Integer.parseInt(n.toString()));}
         break;
       case ICOND:
         jj_consume_token(ICOND);
@@ -454,7 +454,7 @@ public class Parser implements ParserConstants {
         exp = parsePL();
         n1 = proofNDPL();
         jj_consume_token(RRPAR);
-         {if (true) return new ASTIImpND(n1, exp, Integer.valueOf(m.toString()));}
+         {if (true) return new ASTIImpND(n1, exp, Integer.parseInt(m.toString()));}
         break;
       case BOTTOM:
         jj_consume_token(BOTTOM);
@@ -465,7 +465,46 @@ public class Parser implements ParserConstants {
         exp = parsePL();
         n1 = proofNDPL();
         jj_consume_token(RRPAR);
-         {if (true) return new ASTAbsurdityND(n1, exp, Integer.valueOf(m.toString()));}
+         {if (true) return new ASTAbsurdityND(n1, exp, Integer.parseInt(m.toString()));}
+        break;
+      case EUNI:
+        jj_consume_token(EUNI);
+        jj_consume_token(RRPAR);
+        jj_consume_token(LRPAR);
+        exp = parsePL();
+        n1 = proofNDPL();
+        jj_consume_token(RRPAR);
+                                                                            {if (true) return new ASTEUniND(n1, exp);}
+        break;
+      case IEXIST:
+        jj_consume_token(IEXIST);
+        jj_consume_token(RRPAR);
+        jj_consume_token(LRPAR);
+        exp = parsePL();
+        n1 = proofNDPL();
+        jj_consume_token(RRPAR);
+                                                                              {if (true) return new ASTIExistND(n1, exp);}
+        break;
+      case IUNI:
+        jj_consume_token(IUNI);
+        jj_consume_token(RRPAR);
+        jj_consume_token(LRPAR);
+        exp = parsePL();
+        n1 = proofNDPL();
+        jj_consume_token(RRPAR);
+                                                                            {if (true) return new ASTIUniND(n1, exp);}
+        break;
+      case EEXIST:
+        jj_consume_token(EEXIST);
+        jj_consume_token(RRPAR);
+        jj_consume_token(LRPAR);
+        exp = parsePL();
+        n1 = proofNDPL();
+        n2 = proofNDPL();
+        jj_consume_token(COMMA);
+        m = jj_consume_token(NUMBER);
+        jj_consume_token(RRPAR);
+          {if (true) return new ASTEExistND(n1, n2, exp, Integer.parseInt(m.toString()));}
         break;
       case HYPOTHESIS:
         jj_consume_token(HYPOTHESIS);
@@ -475,7 +514,7 @@ public class Parser implements ParserConstants {
         jj_consume_token(LRPAR);
         exp = parsePL();
         jj_consume_token(RRPAR);
-         {if (true) return new ASTHypothesisND(exp, Integer.valueOf(m.toString()));}
+         {if (true) return new ASTHypothesisND(exp, Integer.parseInt(m.toString()));}
         break;
       case PREMISSE:
         jj_consume_token(PREMISSE);
@@ -485,7 +524,7 @@ public class Parser implements ParserConstants {
         jj_consume_token(LRPAR);
         exp = parsePL();
         jj_consume_token(RRPAR);
-         {if (true) return new ASTPremiseND(exp, Integer.valueOf(m.toString()));}
+         {if (true) return new ASTPremiseND(exp, Integer.parseInt(m.toString()));}
         break;
       default:
         jj_la1[13] = jj_gen;
@@ -520,7 +559,7 @@ public class Parser implements ParserConstants {
       jj_la1_0 = new int[] {0xf000,0x20001,0xf000,0x8010e80,0xf000,0x20001,0xf000,0x80,0xc0010e80,0x400000,0x80,0x30000000,0x400000,0x400,0x40000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1,0x0,0x0,0x0,0x0,0x187fe,0x0,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1,0x0,0x0,0x0,0x0,0x1fffe,0x0,};
    }
 
   /** Constructor with InputStream. */

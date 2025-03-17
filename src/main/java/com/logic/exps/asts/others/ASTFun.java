@@ -8,9 +8,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ASTFun extends AASTExp {
+public class ASTFun extends AASTTerm {
 
-    private final String fun;
     private final List<IASTExp> terms;
 
     public ASTFun(String fun) {
@@ -18,12 +17,8 @@ public class ASTFun extends AASTExp {
     }
 
     public ASTFun(String fun, List<IASTExp> terms) {
-        this.fun = fun;
+        super(fun);
         this.terms = terms;
-    }
-
-    public String getName() {
-        return fun;
     }
 
     public List<IASTExp> getTerms() {
@@ -41,7 +36,7 @@ public class ASTFun extends AASTExp {
 
     @Override
     public String toString() {
-        return fun + "(" + terms.stream().map(Object::toString).collect(Collectors.joining(",")) + ")";
+        return name + "(" + terms.stream().map(Object::toString).collect(Collectors.joining(",")) + ")";
     }
 }
 

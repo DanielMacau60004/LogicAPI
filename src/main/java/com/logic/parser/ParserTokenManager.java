@@ -8,7 +8,6 @@ import com.logic.nd.asts.*;
 import com.logic.nd.asts.binary.*;
 import com.logic.nd.asts.unary.*;
 import com.logic.nd.asts.others.*;
-import java.util.Stack;
 
 /** Token Manager. */
 public class ParserTokenManager implements ParserConstants

@@ -25,6 +25,10 @@ public enum ERule {
     ELIM_NEGATION(ParserConstants.ENEG),
     ELIM_DISJUNCTION(ParserConstants.EOR),
     INTRO_IMPLICATION(ParserConstants.ICOND),
+    INTRO_UNIVERSAL(ParserConstants.IUNI),
+    ELIM_UNIVERSAL(ParserConstants.EUNI),
+    INTRO_EXISTENTIAL(ParserConstants.IEXIST),
+    ELIM_EXISTENTIAL(ParserConstants.EEXIST),
     ABSURDITY(ParserConstants.BOTTOM);
 
     private final int kind;

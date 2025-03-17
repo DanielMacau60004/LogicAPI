@@ -10,6 +10,7 @@ import com.logic.exps.asts.unary.ASTNot;
 import com.logic.nd.NDProof;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
+import com.logic.nd.asts.binary.ASTEExistND;
 import com.logic.nd.asts.binary.ASTEImpND;
 import com.logic.nd.asts.binary.ASTENegND;
 import com.logic.nd.asts.binary.ASTIConjND;
@@ -18,7 +19,6 @@ import com.logic.nd.asts.others.ASTHypothesisND;
 import com.logic.nd.asts.others.ASTPremiseND;
 import com.logic.nd.asts.unary.*;
 import com.logic.others.Env;
-import com.logic.others.Utils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +33,7 @@ public class NDInterpreter implements INDVisitor<Integer, Env<Integer, IASTExp>>
         this.size = 0;
     }
 
+    //TODO Maybe it's not correct to compute the height and size of the solution in this interpreter
     public static INDProof interpret(IASTND nd) {
         NDInterpreter interpret = new NDInterpreter();
 
@@ -265,6 +266,26 @@ public class NDInterpreter implements INDVisitor<Integer, Env<Integer, IASTExp>>
 
         size++;
         return Math.max(depth1, depth2) + 1;
+    }
+
+    @Override
+    public Integer visit(ASTEUniND r, Env<Integer, IASTExp> env) {
+        return 0;
+    }
+
+    @Override
+    public Integer visit(ASTIExistND r, Env<Integer, IASTExp> env) {
+        return 0;
+    }
+
+    @Override
+    public Integer visit(ASTIUniND r, Env<Integer, IASTExp> env) {
+        return 0;
+    }
+
+    @Override
+    public Integer visit(ASTEExistND r, Env<Integer, IASTExp> env) {
+        return 0;
     }
 
 }

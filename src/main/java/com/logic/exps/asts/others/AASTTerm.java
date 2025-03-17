@@ -4,8 +4,7 @@ import com.logic.exps.asts.AASTExp;
 
 public abstract class AASTTerm extends AASTExp {
 
-    private final String name;
-    private boolean variable;
+    protected final String name;
 
     public AASTTerm(String value) {
         this.name = value;
@@ -15,13 +14,6 @@ public abstract class AASTTerm extends AASTExp {
         return name;
     }
 
-    public void setVariable(boolean variable) {
-        this.variable = variable;
-    }
-
-    public boolean isVariable() {
-        return variable;
-    }
 
     @Override
     public String toString() {

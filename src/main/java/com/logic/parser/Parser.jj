@@ -16,7 +16,7 @@ import com.logic.exps.asts.others.*;
 import com.logic.nd.asts.*;
 import com.logic.nd.asts.binary.*;
 import com.logic.nd.asts.unary.*;
-import com.logic.nd.asts.others.*;import java.util.Stack;
+import com.logic.nd.asts.others.*;
 
 public class Parser {
 }
@@ -209,18 +209,23 @@ private IASTND proofNDPL() : {
         | <ILOR> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTILDisND(n1, exp); }
         | <IROR> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTIRDisND(n1, exp); }
         | <INEG> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR>
-        { return new ASTINegND(n1, exp, Integer.valueOf(m.toString())); }
+        { return new ASTINegND(n1, exp, Integer.parseInt(m.toString())); }
         | <ENEG> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() n2 = proofNDPL() <RRPAR> { return new ASTENegND(n1, n2, exp); }
         | <EOR> <COMMA> m = <NUMBER> <COMMA> n = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() n2 = proofNDPL() n3 = proofNDPL() <RRPAR>
-            { return new ASTEDisjND(n1, n2, n3, exp, Integer.valueOf(m.toString()), Integer.valueOf(n.toString()));}
+            { return new ASTEDisjND(n1, n2, n3, exp, Integer.parseInt(m.toString()), Integer.parseInt(n.toString()));}
         | <ICOND> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR>
-        {return new ASTIImpND(n1, exp, Integer.valueOf(m.toString())); }
+        {return new ASTIImpND(n1, exp, Integer.parseInt(m.toString())); }
         | <BOTTOM> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR>
-        {return new ASTAbsurdityND(n1, exp, Integer.valueOf(m.toString())); }
+        {return new ASTAbsurdityND(n1, exp, Integer.parseInt(m.toString())); }
+        | <EUNI> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTEUniND(n1, exp); }
+        | <IEXIST> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTIExistND(n1, exp); }
+        | <IUNI> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTIUniND(n1, exp); }
+        | <EEXIST> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() n2 = proofNDPL() <COMMA> m = <NUMBER> <RRPAR>
+        { return new ASTEExistND(n1, n2, exp, Integer.parseInt(m.toString())); }
         | <HYPOTHESIS> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() <RRPAR>
-        {return new ASTHypothesisND(exp, Integer.valueOf(m.toString()));}
+        {return new ASTHypothesisND(exp, Integer.parseInt(m.toString()));}
         | <PREMISSE> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() <RRPAR>
-        {return new ASTPremiseND(exp, Integer.valueOf(m.toString()));}
+        {return new ASTPremiseND(exp, Integer.parseInt(m.toString()));}
     ) | {throw new RuntimeException("Incomplete proof!");}
 
 }

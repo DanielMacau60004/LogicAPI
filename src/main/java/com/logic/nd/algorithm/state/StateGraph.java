@@ -6,6 +6,7 @@ import com.logic.nd.algorithm.transition.TransitionEdge;
 import com.logic.nd.algorithm.transition.TransitionGraph;
 import com.logic.nd.algorithm.transition.TransitionNode;
 import com.logic.nd.asts.IASTND;
+import com.logic.nd.asts.binary.ASTEExistND;
 import com.logic.nd.asts.binary.ASTEImpND;
 import com.logic.nd.asts.binary.ASTENegND;
 import com.logic.nd.asts.binary.ASTIConjND;
@@ -144,6 +145,7 @@ public class StateGraph {
         return NDInterpreter.interpret(proof);
     }
 
+    //TODO Store rule objects instead of states in the graph to avoid this crap
     private IASTND rule(StateNode initState, Map<IASTExp, Integer> marks, int lastIndex) {
         StateEdge edge = tree.get(initState);
         IASTExp exp = initState.getExp();
@@ -177,6 +179,10 @@ public class StateGraph {
             case ELIM_IMPLICATION -> new ASTEImpND(first, second, exp);
             case ABSURDITY -> new ASTAbsurdityND(first, exp, marks.get(transitions.get(0).getProduces()));
             case ELIM_NEGATION -> new ASTENegND(first, second, exp);
+            case ELIM_UNIVERSAL -> new ASTEUniND(first, exp);
+            case INTRO_EXISTENTIAL -> new ASTIExistND(first, exp);
+            case INTRO_UNIVERSAL -> new ASTIUniND(first, exp);
+            case ELIM_EXISTENTIAL -> new ASTEExistND(first, second, exp, marks.get(transitions.get(1).getProduces()));
         };
 
     }

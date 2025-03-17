@@ -1,5 +1,6 @@
 package com.logic.nd.asts;
 
+import com.logic.nd.asts.binary.ASTEExistND;
 import com.logic.nd.asts.binary.ASTEImpND;
 import com.logic.nd.asts.binary.ASTENegND;
 import com.logic.nd.asts.binary.ASTIConjND;
@@ -37,4 +38,11 @@ public interface INDVisitor <T, E> {
 
     T visit(ASTENegND r, E env);
 
+    T visit(ASTEUniND r, E env);
+
+    T visit(ASTIExistND r, E env);
+
+    T visit(ASTIUniND r, E env);
+
+    T visit(ASTEExistND r, E env);
 }
