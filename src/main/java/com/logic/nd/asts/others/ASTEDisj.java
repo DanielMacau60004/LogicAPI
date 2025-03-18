@@ -5,9 +5,8 @@ import com.logic.nd.ERule;
 import com.logic.nd.asts.AASTND;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
-import com.logic.parser.ParserConstants;
 
-public class ASTEDisjND extends AASTND implements IASTND {
+public class ASTEDisj extends AASTND implements IASTND {
 
     private final IASTND hyp1;
     private final IASTND hyp2;
@@ -16,13 +15,32 @@ public class ASTEDisjND extends AASTND implements IASTND {
 
     private final int m, n;
 
-    public ASTEDisjND(IASTND hyp1, IASTND hyp2, IASTND hyp3, IASTExp conclusion, int m, int n) {
+    private IASTExp generatedHypothesisM;
+    private IASTExp generatedHypothesisN;
+
+    public ASTEDisj(IASTND hyp1, IASTND hyp2, IASTND hyp3, IASTExp conclusion, int m, int n) {
         this.hyp1 = hyp1;
         this.hyp2 = hyp2;
         this.hyp3 = hyp3;
         this.conclusion = conclusion;
         this.m = m;
         this.n = n;
+    }
+
+    public void setGeneratedHypothesisM(IASTExp generatedHypothesisM) {
+        this.generatedHypothesisM = generatedHypothesisM;
+    }
+
+    public void setGeneratedHypothesisN(IASTExp generatedHypothesisN) {
+        this.generatedHypothesisN = generatedHypothesisN;
+    }
+
+    public IASTExp getGeneratedHypothesisM() {
+        return generatedHypothesisM;
+    }
+
+    public IASTExp getGeneratedHypothesisN() {
+        return generatedHypothesisN;
     }
 
     public int getM() {

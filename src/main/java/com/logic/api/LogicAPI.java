@@ -3,7 +3,8 @@ package com.logic.api;
 import com.logic.exps.checkers.FOLWFFChecker;
 import com.logic.exps.checkers.PLWFFChecker;
 import com.logic.nd.asts.IASTND;
-import com.logic.nd.checkers.NDChecker;
+import com.logic.nd.checkers.NDWWFExpsChecker;
+import com.logic.nd.interpreters.NDInterpreter;
 import com.logic.parser.Parser;
 
 import java.io.ByteArrayInputStream;
@@ -36,7 +37,7 @@ public class LogicAPI {
      * @see Parser
      * @see PLWFFChecker
      */
-    public static IPLExp parsePL(String expression) throws Exception {
+    public static IPLFormula parsePL(String expression) throws Exception {
         Parser parser = new Parser(new ByteArrayInputStream((expression).getBytes()));
         return PLWFFChecker.check(parser.parsePL());
     }
@@ -53,7 +54,7 @@ public class LogicAPI {
      * @see Parser
      * @see FOLWFFChecker
      */
-    public static IFOLExp parseFOL(String expression) throws Exception {
+    public static IFOLFormula parseFOL(String expression) throws Exception {
         Parser parser = new Parser(new ByteArrayInputStream((expression).getBytes()));
         return FOLWFFChecker.check(parser.parseFOL());
     }
@@ -62,8 +63,8 @@ public class LogicAPI {
     //TODO add documentation
     public static INDProof parseNDPLProof(String expression) throws Exception {
         IASTND proof = new Parser(new ByteArrayInputStream((expression).getBytes())).parseNDPL();
-        NDChecker.checkPL(proof);
-        return NDChecker.checkPL(proof);
+        NDWWFExpsChecker.checkPL(proof);
+        return NDInterpreter.interpret(proof);
     }
 
 }

@@ -1,14 +1,27 @@
 package com.logic.nd.asts.unary;
 
 import com.logic.exps.asts.IASTExp;
+import com.logic.exps.asts.others.AASTTerm;
+import com.logic.exps.asts.others.ASTVariable;
 import com.logic.nd.ERule;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
 
-public class ASTIUniND extends AASTUnaryND {
+public class ASTIUni extends AASTUnaryND {
 
-    public ASTIUniND(IASTND hypothesis, IASTExp conclusion) {
+    private ASTVariable mapping;
+
+    public ASTIUni(IASTND hypothesis, IASTExp conclusion) {
         super(hypothesis, conclusion);
+    }
+
+
+    public void setMapping(ASTVariable mapping) {
+        this.mapping = mapping;
+    }
+
+    public ASTVariable getMapping() {
+        return mapping;
     }
 
     @Override

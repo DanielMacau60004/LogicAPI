@@ -3,7 +3,6 @@ package com.logic.nd.asts.binary;
 import com.logic.exps.asts.IASTExp;
 import com.logic.nd.asts.AASTND;
 import com.logic.nd.asts.IASTND;
-import com.logic.parser.ParserConstants;
 
 public abstract class AASTBinaryND extends AASTND implements IASTND {
 

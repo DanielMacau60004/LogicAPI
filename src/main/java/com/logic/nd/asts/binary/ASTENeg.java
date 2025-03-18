@@ -4,11 +4,10 @@ import com.logic.exps.asts.IASTExp;
 import com.logic.nd.ERule;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
-import com.logic.parser.ParserConstants;
 
-public class ASTENegND extends AASTBinaryND {
+public class ASTENeg extends AASTBinaryND {
 
-    public ASTENegND(IASTND hypothesis1, IASTND hypothesis2, IASTExp conclusion) {
+    public ASTENeg(IASTND hypothesis1, IASTND hypothesis2, IASTExp conclusion) {
         super(hypothesis1, hypothesis2, conclusion);
     }
 

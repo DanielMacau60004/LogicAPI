@@ -1,6 +1,6 @@
 package com.logic.exps.checkers;
 
-import com.logic.api.IPLExp;
+import com.logic.api.IPLFormula;
 import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.IExpsVisitor;
 import com.logic.exps.asts.PLExp;
@@ -11,7 +11,6 @@ import com.logic.exps.asts.unary.ASTParenthesis;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 public class PLWFFChecker implements IExpsVisitor<Void, Void> {
 
@@ -22,7 +21,7 @@ public class PLWFFChecker implements IExpsVisitor<Void, Void> {
         literals = new LinkedHashSet<>();
     }
 
-    public static IPLExp check(IASTExp exp) {
+    public static IPLFormula check(IASTExp exp) {
         PLWFFChecker checker = new PLWFFChecker();
         exp.accept(checker, null);
 

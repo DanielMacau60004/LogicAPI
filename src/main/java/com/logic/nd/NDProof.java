@@ -10,12 +10,12 @@ import java.util.Map;
 
 public class NDProof implements INDProof {
 
-    private final Map<Integer, IASTExp> premises;
+    private final Map<IASTExp, Integer> premises;
     private final IASTND proof;
     private final int height;
     private final int size;
 
-    public NDProof(Map<Integer, IASTExp> premises, IASTND proof, int height, int size) {
+    public NDProof(Map<IASTExp, Integer> premises, IASTND proof, int height, int size) {
         this.premises = premises;
         this.proof = proof;
         this.height = height;
@@ -24,7 +24,7 @@ public class NDProof implements INDProof {
 
     @Override
     public Iterator<IASTExp> getPremises() {
-        return premises.values().iterator();
+        return premises.keySet().iterator();
     }
 
     @Override

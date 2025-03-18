@@ -1,48 +1,45 @@
 package com.logic.nd.asts;
 
-import com.logic.nd.asts.binary.ASTEExistND;
-import com.logic.nd.asts.binary.ASTEImpND;
-import com.logic.nd.asts.binary.ASTENegND;
-import com.logic.nd.asts.binary.ASTIConjND;
-import com.logic.nd.asts.others.ASTEDisjND;
-import com.logic.nd.asts.others.ASTHypothesisND;
-import com.logic.nd.asts.others.ASTPremiseND;
+import com.logic.nd.asts.binary.ASTEExist;
+import com.logic.nd.asts.binary.ASTEImp;
+import com.logic.nd.asts.binary.ASTENeg;
+import com.logic.nd.asts.binary.ASTIConj;
+import com.logic.nd.asts.others.ASTEDisj;
+import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
 
 public interface INDVisitor <T, E> {
 
-    T visit(ASTPremiseND p, E env);
-
-    T visit(ASTHypothesisND h, E env);
+    T visit(ASTHypothesis h, E env);
 
 
-    T visit(ASTIImpND r, E env);
+    T visit(ASTIImp r, E env);
 
-    T visit(ASTINegND r, E env);
+    T visit(ASTINeg r, E env);
 
-    T visit(ASTERConjND r, E env);
+    T visit(ASTERConj r, E env);
 
-    T visit(ASTELConjND r, E env);
+    T visit(ASTELConj r, E env);
 
-    T visit(ASTIRDisND r, E env);
+    T visit(ASTIRDis r, E env);
 
-    T visit(ASTILDisND r, E env);
+    T visit(ASTILDis r, E env);
 
-    T visit(ASTAbsurdityND r, E env);
+    T visit(ASTAbsurdity r, E env);
 
-    T visit(ASTIConjND r, E env);
+    T visit(ASTIConj r, E env);
 
-    T visit(ASTEDisjND r, E env);
+    T visit(ASTEDisj r, E env);
 
-    T visit(ASTEImpND r, E env);
+    T visit(ASTEImp r, E env);
 
-    T visit(ASTENegND r, E env);
+    T visit(ASTENeg r, E env);
 
-    T visit(ASTEUniND r, E env);
+    T visit(ASTEUni r, E env);
 
-    T visit(ASTIExistND r, E env);
+    T visit(ASTIExist r, E env);
 
-    T visit(ASTIUniND r, E env);
+    T visit(ASTIUni r, E env);
 
-    T visit(ASTEExistND r, E env);
+    T visit(ASTEExist r, E env);
 }

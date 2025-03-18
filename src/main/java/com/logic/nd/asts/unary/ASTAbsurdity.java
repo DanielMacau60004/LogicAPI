@@ -4,19 +4,27 @@ import com.logic.exps.asts.IASTExp;
 import com.logic.nd.ERule;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
-import com.logic.parser.ParserConstants;
 
-public class ASTAbsurdityND extends AASTUnaryND {
+public class ASTAbsurdity extends AASTUnaryND {
 
     private final int m;
+    private IASTExp generatedHypothesis;
 
-    public ASTAbsurdityND(IASTND hypothesis, IASTExp conclusion, int m) {
+    public ASTAbsurdity(IASTND hypothesis, IASTExp conclusion, int m) {
         super(hypothesis, conclusion);
         this.m = m;
     }
 
     public int getM() {
         return m;
+    }
+
+    public void setGeneratedHypothesis(IASTExp generatedHypothesis) {
+        this.generatedHypothesis = generatedHypothesis;
+    }
+
+    public IASTExp getGeneratedHypothesis() {
+        return generatedHypothesis;
     }
 
     @Override

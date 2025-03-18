@@ -5,12 +5,12 @@ import com.logic.nd.asts.AASTND;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
 
-public class ASTHypothesisND extends AASTND implements IASTND {
+public class ASTHypothesis extends AASTND implements IASTND {
 
     private final IASTExp hyp;
     private final int m;
 
-    public ASTHypothesisND(IASTExp hyp, int m) {
+    public ASTHypothesis(IASTExp hyp, int m) {
         this.hyp = hyp;
         this.m = m;
     }

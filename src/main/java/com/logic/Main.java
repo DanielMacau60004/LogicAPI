@@ -3,7 +3,8 @@ package com.logic;
 import com.logic.api.INDProof;
 import com.logic.exps.asts.IASTExp;
 import com.logic.nd.asts.IASTND;
-import com.logic.nd.checkers.NDChecker;
+import com.logic.nd.checkers.NDWWFExpsChecker;
+import com.logic.nd.interpreters.NDInterpreter;
 import com.logic.parser.Parser;
 
 import java.io.*;
@@ -41,10 +42,10 @@ public class Main {
         //System.out.println(s.findSolution());
 
         IASTND proof = new Parser(readFile("src/main/java/com/logic/code.logic")).parseNDPL();
-        NDChecker.checkPL(proof);
+        NDWWFExpsChecker.checkPL(proof);
 
         System.out.println(proof);
-        INDProof proofObj =  NDChecker.checkPL(proof);
+        INDProof proofObj =  NDInterpreter.interpret(proof);
 
         System.out.println(proofObj.size()+" " + proofObj.height());
         System.out.println(proofObj);

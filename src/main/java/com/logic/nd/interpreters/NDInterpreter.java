@@ -1,82 +1,56 @@
-package com.logic.nd.checkers;
+package com.logic.nd.interpreters;
 
-import com.logic.api.IExp;
-import com.logic.api.IFOLExp;
+import com.logic.api.IFOLFormula;
 import com.logic.api.INDProof;
 import com.logic.exps.ExpUtils;
 import com.logic.exps.asts.IASTExp;
-import com.logic.exps.asts.binary.ASTAnd;
-import com.logic.exps.asts.binary.ASTConditional;
-import com.logic.exps.asts.binary.ASTOr;
-import com.logic.exps.asts.binary.ASTUniversal;
+import com.logic.exps.asts.binary.*;
+import com.logic.exps.asts.others.AASTTerm;
+import com.logic.exps.asts.others.ASTVariable;
 import com.logic.exps.asts.unary.ASTNot;
 import com.logic.exps.checkers.FOLWFFChecker;
-import com.logic.exps.checkers.PLWFFChecker;
 import com.logic.exps.interpreters.FOLReplaceExps;
 import com.logic.nd.NDProof;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
-import com.logic.nd.asts.binary.ASTEExistND;
-import com.logic.nd.asts.binary.ASTEImpND;
-import com.logic.nd.asts.binary.ASTENegND;
-import com.logic.nd.asts.binary.ASTIConjND;
-import com.logic.nd.asts.others.ASTEDisjND;
-import com.logic.nd.asts.others.ASTHypothesisND;
-import com.logic.nd.asts.others.ASTPremiseND;
+import com.logic.nd.asts.binary.ASTEExist;
+import com.logic.nd.asts.binary.ASTEImp;
+import com.logic.nd.asts.binary.ASTENeg;
+import com.logic.nd.asts.binary.ASTIConj;
+import com.logic.nd.asts.others.ASTEDisj;
+import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
 import com.logic.others.Env;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
-public class NDChecker implements INDVisitor<Integer, Env<Integer, IASTExp>> {
+public class NDInterpreter implements INDVisitor<Integer, Env<Integer, IASTExp>> {
 
-    private final boolean isFOL;
     private final Map<Integer, IASTExp> premises;
     private int size;
 
-    NDChecker(boolean isFOL) {
-        this.isFOL = isFOL;
+    NDInterpreter() {
         this.premises = new HashMap<>();
         this.size = 0;
     }
 
-    public static INDProof checkPL(IASTND nd) {
-        NDChecker interpret = new NDChecker(false);
+    //Split this into multi interpreters each one responsible to check a part of the proof
+
+    //1. Check WFF [DONE]
+    //2. Check if the expressions are correct (relation between hypotheses and conclusion), mappings [DONE]
+    //3. Check marks [DONE]
+    //4. Check side conditions (FOL)
+    public static INDProof interpret(IASTND nd) {
+        NDInterpreter interpret = new NDInterpreter();
 
         int height = nd.accept(interpret, new Env<>());
-        return new NDProof(interpret.premises, nd, height, interpret.size);
-    }
-
-    public static INDProof checkFOL(IASTND nd) {
-        NDChecker interpret = new NDChecker(true);
-
-        int height = nd.accept(interpret, new Env<>());
-        return new NDProof(interpret.premises, nd, height, interpret.size);
-    }
-
-    public IExp verifyConclusion(IASTND nd) {
-        return isFOL ? FOLWFFChecker.check(nd.getConclusion()) : PLWFFChecker.check(nd.getConclusion());
+        return new NDProof(null, nd, height, interpret.size);
     }
 
     @Override
-    public Integer visit(ASTPremiseND p, Env<Integer, IASTExp> env) {
-        verifyConclusion(p);
-
-        IASTExp mark = premises.get(p.getM());
-        if (mark != null && mark != p.getConclusion())
-            throw new RuntimeException("Invalid hypothesis!");
-
-        premises.put(p.getM(), p.getConclusion());
-
-        size++;
-        return 1;
-    }
-
-    @Override
-    public Integer visit(ASTHypothesisND h, Env<Integer, IASTExp> env) {
-        verifyConclusion(h);
-
+    public Integer visit(ASTHypothesis h, Env<Integer, IASTExp> env) {
         IASTExp existingMark = env.find(h.getM());
         if (existingMark == null)
             throw new RuntimeException("Mark not found");
@@ -89,8 +63,8 @@ public class NDChecker implements INDVisitor<Integer, Env<Integer, IASTExp>> {
     }
 
     @Override
-    public Integer visit(ASTIImpND r, Env<Integer, IASTExp> env) {
-        IASTExp exp = verifyConclusion(r).getExp();
+    public Integer visit(ASTIImp r, Env<Integer, IASTExp> env) {
+        IASTExp exp = r.getConclusion();
 
         if (!(exp instanceof ASTConditional cond))
             throw new RuntimeException("The introduction of the implication rule is incorrectly typed!");
@@ -111,8 +85,8 @@ public class NDChecker implements INDVisitor<Integer, Env<Integer, IASTExp>> {
     }
 
     @Override
-    public Integer visit(ASTINegND r, Env<Integer, IASTExp> env) {
-        IASTExp exp = verifyConclusion(r).getExp();
+    public Integer visit(ASTINeg r, Env<Integer, IASTExp> env) {
+        IASTExp exp = r.getConclusion();
 
         if (!(exp instanceof ASTNot neg))
             throw new RuntimeException("The introduction of the negation rule is incorrectly typed!");
@@ -130,8 +104,8 @@ public class NDChecker implements INDVisitor<Integer, Env<Integer, IASTExp>> {
     }
 
     @Override
-    public Integer visit(ASTERConjND r, Env<Integer, IASTExp> env) {
-        IASTExp exp = verifyConclusion(r).getExp();
+    public Integer visit(ASTERConj r, Env<Integer, IASTExp> env) {
+        IASTExp exp = r.getConclusion();
 
         if (!(r.getHyp().getConclusion() instanceof ASTAnd and))
             throw new RuntimeException("The elimination of the conjunction right rule is incorrectly typed!");
@@ -145,8 +119,8 @@ public class NDChecker implements INDVisitor<Integer, Env<Integer, IASTExp>> {
     }
 
     @Override
-    public Integer visit(ASTELConjND r, Env<Integer, IASTExp> env) {
-        IASTExp exp = verifyConclusion(r).getExp();
+    public Integer visit(ASTELConj r, Env<Integer, IASTExp> env) {
+        IASTExp exp = r.getConclusion();
 
         if (!(r.getHyp().getConclusion() instanceof ASTAnd and))
             throw new RuntimeException("The elimination of the conjunction left rule is incorrectly typed!");
@@ -160,8 +134,8 @@ public class NDChecker implements INDVisitor<Integer, Env<Integer, IASTExp>> {
     }
 
     @Override
-    public Integer visit(ASTIRDisND r, Env<Integer, IASTExp> env) {
-        IASTExp exp = verifyConclusion(r).getExp();
+    public Integer visit(ASTIRDis r, Env<Integer, IASTExp> env) {
+        IASTExp exp = r.getConclusion();
 
         if (!(exp instanceof ASTOr or))
             throw new RuntimeException("The introduction of the disjunction right rule is incorrectly typed!");
@@ -175,8 +149,8 @@ public class NDChecker implements INDVisitor<Integer, Env<Integer, IASTExp>> {
     }
 
     @Override
-    public Integer visit(ASTILDisND r, Env<Integer, IASTExp> env) {
-        IASTExp exp = verifyConclusion(r).getExp();
+    public Integer visit(ASTILDis r, Env<Integer, IASTExp> env) {
+        IASTExp exp = r.getConclusion();
 
         if (!(exp instanceof ASTOr or))
             throw new RuntimeException("The introduction of the disjunction left rule is incorrectly typed!");
@@ -190,8 +164,8 @@ public class NDChecker implements INDVisitor<Integer, Env<Integer, IASTExp>> {
     }
 
     @Override
-    public Integer visit(ASTAbsurdityND r, Env<Integer, IASTExp> env) {
-        IASTExp exp = verifyConclusion(r).getExp();
+    public Integer visit(ASTAbsurdity r, Env<Integer, IASTExp> env) {
+        IASTExp exp = r.getConclusion();
 
         if (!r.getHyp().getConclusion().equals(ExpUtils.BOT))
             throw new RuntimeException("The absurdity rule is incorrectly typed!");
@@ -206,8 +180,8 @@ public class NDChecker implements INDVisitor<Integer, Env<Integer, IASTExp>> {
     }
 
     @Override
-    public Integer visit(ASTIConjND r, Env<Integer, IASTExp> env) {
-        IASTExp exp = verifyConclusion(r).getExp();
+    public Integer visit(ASTIConj r, Env<Integer, IASTExp> env) {
+        IASTExp exp = r.getConclusion();
 
         if (!(exp instanceof ASTAnd and))
             throw new RuntimeException("The introduction of the conjunction rule is incorrectly typed!");
@@ -226,8 +200,8 @@ public class NDChecker implements INDVisitor<Integer, Env<Integer, IASTExp>> {
     }
 
     @Override
-    public Integer visit(ASTEDisjND r, Env<Integer, IASTExp> env) {
-        IASTExp exp = verifyConclusion(r).getExp();
+    public Integer visit(ASTEDisj r, Env<Integer, IASTExp> env) {
+        IASTExp exp = r.getConclusion();
 
         if (!(r.getHyp1().getConclusion() instanceof ASTOr or))
             throw new RuntimeException("The elimination of the conjunction rule is incorrectly typed!");
@@ -252,8 +226,8 @@ public class NDChecker implements INDVisitor<Integer, Env<Integer, IASTExp>> {
     }
 
     @Override
-    public Integer visit(ASTEImpND r, Env<Integer, IASTExp> env) {
-        IASTExp exp = verifyConclusion(r).getExp();
+    public Integer visit(ASTEImp r, Env<Integer, IASTExp> env) {
+        IASTExp exp = r.getConclusion();
 
         IASTExp other = r.getHyp1().getConclusion();
         if (!(r.getHyp2().getConclusion() instanceof ASTConditional imp))
@@ -272,8 +246,8 @@ public class NDChecker implements INDVisitor<Integer, Env<Integer, IASTExp>> {
     }
 
     @Override
-    public Integer visit(ASTENegND r, Env<Integer, IASTExp> env) {
-        IASTExp exp = verifyConclusion(r).getExp();
+    public Integer visit(ASTENeg r, Env<Integer, IASTExp> env) {
+        IASTExp exp = r.getConclusion();
 
         if (!exp.equals(ExpUtils.BOT))
             throw new RuntimeException("The elimination of the negation rule is incorrectly typed!");
@@ -290,33 +264,107 @@ public class NDChecker implements INDVisitor<Integer, Env<Integer, IASTExp>> {
     }
 
     @Override
-    public Integer visit(ASTEUniND r, Env<Integer, IASTExp> env) {
-        IExp exp = verifyConclusion(r);
-
-        if(!(exp instanceof IFOLExp fol))
-            throw new RuntimeException("Rule only valid in FOL");
+    public Integer visit(ASTEUni r, Env<Integer, IASTExp> env) {
+        IASTExp exp = r.getConclusion();
 
         if (!(exp instanceof ASTUniversal uni))
             throw new RuntimeException("The elimination of the universal rule is incorrectly typed!");
 
-        //FOLReplaceExps.replace(uni.getRight(), uni.getLeft(), ?)
+        IASTExp x = uni.getLeft();
+        IFOLFormula psi = FOLWFFChecker.check(uni.getRight());
+
+        IFOLFormula hyp = FOLWFFChecker.check(r.getHyp().getConclusion());
+        IASTExp psiXT = hyp.getFormula();
+
+        Iterator<AASTTerm> it = hyp.iterateTerms();
+        AASTTerm t = null;
+        while (it.hasNext()) {
+            t = it.next();
+            if (FOLReplaceExps.replace(psi.getFormula(), x, t).equals(psiXT))
+                break;
+            t = null;
+        }
+
+        if (t == null)
+            throw new RuntimeException("The elimination of the universal rule is incorrectly typed!");
+
+        if (t instanceof ASTVariable varT) {
+            if (psi.isABoundedVariable(varT))
+                throw new RuntimeException("The elimination of the universal rule is incorrectly typed!");
+        }
 
         size++;
         return r.getHyp().accept(this, env);
     }
 
     @Override
-    public Integer visit(ASTIExistND r, Env<Integer, IASTExp> env) {
-        return 0;
+    public Integer visit(ASTIExist r, Env<Integer, IASTExp> env) {
+        IASTExp exp = FOLWFFChecker.check(r.getHyp().getConclusion()).getFormula();
+
+        if (!(exp instanceof ASTExistential exi))
+            throw new RuntimeException("The introduction of the existential rule is incorrectly typed!");
+
+        IASTExp x = exi.getLeft();
+        IFOLFormula psi = FOLWFFChecker.check(exi.getRight());
+
+        IFOLFormula conclusion = FOLWFFChecker.check(r.getConclusion());
+        IASTExp psiXT = conclusion.getFormula();
+
+        Iterator<AASTTerm> it = conclusion.iterateTerms();
+        AASTTerm t = null;
+        while (it.hasNext()) {
+            t = it.next();
+            if (FOLReplaceExps.replace(psi.getFormula(), x, t).equals(psiXT))
+                break;
+            t = null;
+        }
+
+        if (t == null)
+            throw new RuntimeException("The introduction of the existential rule is incorrectly typed!");
+
+        if (t instanceof ASTVariable varT) {
+            if (psi.isABoundedVariable(varT))
+                throw new RuntimeException("The introduction of the existential rule is incorrectly typed!");
+        }
+
+        size++;
+        return r.getHyp().accept(this, env);
     }
 
     @Override
-    public Integer visit(ASTIUniND r, Env<Integer, IASTExp> env) {
-        return 0;
+    public Integer visit(ASTIUni r, Env<Integer, IASTExp> env) {
+        IASTExp exp = FOLWFFChecker.check(r.getHyp().getConclusion()).getFormula();
+
+        if (!(exp instanceof ASTUniversal uni))
+            throw new RuntimeException("The introduction of the universal rule is incorrectly typed!");
+
+        IASTExp x = uni.getLeft();
+        IFOLFormula psi = FOLWFFChecker.check(uni.getRight());
+
+        IFOLFormula conclusion = FOLWFFChecker.check(r.getConclusion());
+        IASTExp psiXY = conclusion.getFormula();
+
+        Iterator<ASTVariable> it = conclusion.iterateVariables();
+            ASTVariable y = null;
+        while (it.hasNext()) {
+            y = it.next();
+            if (FOLReplaceExps.replace(psi.getFormula(), x, y).equals(psiXY))
+                break;
+            y = null;
+        }
+
+        if (y == null)
+            throw new RuntimeException("The introduction of the universal rule is incorrectly typed!");
+
+        if (x.equals(y) && psi.isABoundedVariable(y))
+            throw new RuntimeException("The introduction of the universal rule is incorrectly typed!");
+
+        size++;
+        return r.getHyp().accept(this, env);
     }
 
     @Override
-    public Integer visit(ASTEExistND r, Env<Integer, IASTExp> env) {
+    public Integer visit(ASTEExist r, Env<Integer, IASTExp> env) {
         return 0;
     }
 

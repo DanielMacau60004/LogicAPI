@@ -1,6 +1,6 @@
 package api.pl;
 
-import com.logic.api.IPLExp;
+import com.logic.api.IPLFormula;
 import com.logic.api.LogicAPI;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,8 +10,8 @@ public class EquivalenceTest {
 
     // Helper method to parse and evaluate equivalences of expressions
     private boolean evaluateEquivalence(String exp1, String exp2) throws Exception {
-        IPLExp e1 = LogicAPI.parsePL(exp1);
-        IPLExp e2 = LogicAPI.parsePL(exp2);
+        IPLFormula e1 = LogicAPI.parsePL(exp1);
+        IPLFormula e2 = LogicAPI.parsePL(exp2);
         return e1.isEquivalentTo(e2);
     }
 

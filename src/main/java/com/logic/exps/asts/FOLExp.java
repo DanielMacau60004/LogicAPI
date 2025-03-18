@@ -1,6 +1,6 @@
 package com.logic.exps.asts;
 
-import com.logic.api.IFOLExp;
+import com.logic.api.IFOLFormula;
 import com.logic.exps.asts.others.AASTTerm;
 import com.logic.exps.asts.others.ASTFun;
 import com.logic.exps.asts.others.ASTPred;
@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public class FOLExp implements IFOLExp {
+public class FOLExp implements IFOLFormula {
 
     private final IASTExp exp;
 
@@ -20,8 +20,6 @@ public class FOLExp implements IFOLExp {
 
     private final Set<ASTVariable> boundedVariables;
     private final Set<ASTVariable> unboundedVariables;
-
-    private final Set<AASTTerm> terms;
 
     public FOLExp(IASTExp exp,
                   Set<ASTFun> functions, Set<ASTPred> predicates,
@@ -32,14 +30,10 @@ public class FOLExp implements IFOLExp {
         this.boundedVariables = boundedVariables;
         this.unboundedVariables = unboundedVariables;
 
-        this.terms = new HashSet<>();
-        terms.addAll(functions);
-        terms.addAll(boundedVariables);
-        terms.addAll(unboundedVariables);
     }
 
     @Override
-    public IASTExp getExp() {
+    public IASTExp getFormula() {
         return exp;
     }
 
@@ -59,11 +53,32 @@ public class FOLExp implements IFOLExp {
     }
 
     @Override
-    public Iterator<AASTTerm> iterateTerms() { return terms.iterator(); }
+    public Iterator<AASTTerm> iterateTerms() {
+        Set<AASTTerm> terms = new HashSet<>();
+        terms.addAll(functions);
+        terms.addAll(boundedVariables);
+        terms.addAll(unboundedVariables);
+
+        return terms.iterator();
+    }
+
+    @Override
+    public Iterator<ASTVariable> iterateVariables() {
+        Set<ASTVariable> variables = new HashSet<>();
+        variables.addAll(boundedVariables);
+        variables.addAll(unboundedVariables);
+
+        return variables.iterator();
+    }
 
     @Override
     public boolean isABoundedVariable(ASTVariable variable) {
         return boundedVariables.contains(variable);
+    }
+
+    @Override
+    public boolean isAnUnboundedVariable(ASTVariable variable) {
+        return unboundedVariables.contains(variable);
     }
 
     @Override

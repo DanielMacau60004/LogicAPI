@@ -1,17 +1,8 @@
 package com.logic.nd;
 
-import com.logic.exps.asts.IASTExp;
-import com.logic.nd.algorithm.state.StateNode;
-import com.logic.nd.asts.IASTND;
-import com.logic.nd.asts.binary.ASTEImpND;
-import com.logic.nd.asts.binary.ASTIConjND;
-import com.logic.nd.asts.others.ASTEDisjND;
-import com.logic.nd.asts.unary.*;
 import com.logic.others.Utils;
 import com.logic.parser.Parser;
 import com.logic.parser.ParserConstants;
-
-import java.util.Set;
 
 public enum ERule {
 

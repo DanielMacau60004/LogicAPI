@@ -1,6 +1,6 @@
 package api.fol;
 
-import com.logic.api.IFOLExp;
+import com.logic.api.IFOLFormula;
 import com.logic.api.LogicAPI;
 import com.logic.exps.asts.others.AASTTerm;
 import com.logic.exps.asts.others.ASTFun;
@@ -30,7 +30,7 @@ public class ExpsWithWFFTest {
             "'∀x (L(x) → (P(dani) ∧ Q(y))) ∧ ∀y (L(x) → (P(dani) ∧ Q(y)))','x,y', 'x,y'",
     })
     void test(String expression, String boundedStr, String unboundedStr) {
-        AtomicReference<IFOLExp> exp = new AtomicReference<>();
+        AtomicReference<IFOLFormula> exp = new AtomicReference<>();
         assertDoesNotThrow(() -> exp.set(LogicAPI.parseFOL(expression)));
 
         if (!boundedStr.isEmpty()) {
@@ -51,7 +51,7 @@ public class ExpsWithWFFTest {
             Assertions.assertEquals(iteratedUnbounded, unbounded);
         }
 
-        IFOLExp fol = exp.get();
+        IFOLFormula fol = exp.get();
         System.out.println(fol);
 
         List<ASTFun> functions = new ArrayList<>();

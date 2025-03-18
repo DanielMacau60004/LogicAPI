@@ -5,17 +5,10 @@ import com.logic.nd.ERule;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
 
-public class ASTEExistND extends AASTBinaryND  {
+public class ASTEImp extends AASTBinaryND {
 
-    private final int m;
-
-    public ASTEExistND(IASTND hypothesis1, IASTND hypothesis2, IASTExp conclusion, int m) {
+    public ASTEImp(IASTND hypothesis1, IASTND hypothesis2, IASTExp conclusion) {
         super(hypothesis1, hypothesis2, conclusion);
-        this.m = m;
-    }
-
-    public int getM() {
-        return m;
     }
 
     @Override
@@ -25,7 +18,7 @@ public class ASTEExistND extends AASTBinaryND  {
 
     @Override
     public String toString() {
-        return "[" + ERule.ELIM_EXISTENTIAL + ", " + m + "] " + super.toString();
+        return "[" + ERule.ELIM_IMPLICATION + "] " + super.toString();
     }
 
 }

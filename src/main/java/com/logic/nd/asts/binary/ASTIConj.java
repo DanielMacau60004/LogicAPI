@@ -1,14 +1,14 @@
-package com.logic.nd.asts.unary;
+package com.logic.nd.asts.binary;
 
 import com.logic.exps.asts.IASTExp;
 import com.logic.nd.ERule;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
 
-public class ASTIExistND extends AASTUnaryND {
+public class ASTIConj extends AASTBinaryND {
 
-    public ASTIExistND(IASTND hypothesis, IASTExp conclusion) {
-        super(hypothesis, conclusion);
+    public ASTIConj(IASTND hypothesis1, IASTND hypothesis2, IASTExp conclusion) {
+        super(hypothesis1, hypothesis2, conclusion);
     }
 
     @Override
@@ -18,7 +18,7 @@ public class ASTIExistND extends AASTUnaryND {
 
     @Override
     public String toString() {
-        return "[" + ERule.INTRO_EXISTENTIAL + "] " + super.toString();
+        return "[" + ERule.INTRO_CONJUNCTION + "] " + super.toString();
     }
 
 }

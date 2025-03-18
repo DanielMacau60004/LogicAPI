@@ -6,15 +6,17 @@ import com.logic.nd.algorithm.transition.TransitionEdge;
 import com.logic.nd.algorithm.transition.TransitionGraph;
 import com.logic.nd.algorithm.transition.TransitionNode;
 import com.logic.nd.asts.IASTND;
-import com.logic.nd.asts.binary.ASTEExistND;
-import com.logic.nd.asts.binary.ASTEImpND;
-import com.logic.nd.asts.binary.ASTENegND;
-import com.logic.nd.asts.binary.ASTIConjND;
-import com.logic.nd.asts.others.ASTEDisjND;
-import com.logic.nd.asts.others.ASTHypothesisND;
-import com.logic.nd.asts.others.ASTPremiseND;
+import com.logic.nd.asts.binary.ASTEExist;
+import com.logic.nd.asts.binary.ASTEImp;
+import com.logic.nd.asts.binary.ASTENeg;
+import com.logic.nd.asts.binary.ASTIConj;
+import com.logic.nd.asts.others.ASTEDisj;
+import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
-import com.logic.nd.checkers.NDChecker;
+import com.logic.nd.checkers.NDMarksChecker;
+import com.logic.nd.checkers.NDWWFChecker;
+import com.logic.nd.checkers.NDWWFExpsChecker;
+import com.logic.nd.interpreters.NDInterpreter;
 
 import java.util.*;
 
@@ -131,6 +133,9 @@ public class StateGraph {
         return findSolution(getInitState().getExp(), new HashMap<>());
     }
 
+    //TODO temporary
+    int mark;
+
     //Specify exp and mark in every hypothesis
     public INDProof findSolution(IASTExp exp, Map<IASTExp, Integer> hypotheses) {
         if (!isSolvable())
@@ -141,49 +146,49 @@ public class StateGraph {
         Map<IASTExp, Integer> marks = new HashMap<>(hypotheses);
         for(IASTExp e : premisses) marks.put(e, mark++);
 
-        IASTND proof = rule(new StateNode(exp, premisses, hypotheses.keySet()), marks, mark);
-        //Change to handle fol
-        return NDChecker.checkPL(proof);
+        this.mark = mark;
+        IASTND proof = rule(new StateNode(exp, premisses, hypotheses.keySet()), marks);
+        var formulas = NDWWFExpsChecker.checkPL(proof);
+        NDWWFChecker.check(proof, formulas);
+        return  NDMarksChecker.check(proof, formulas);
     }
 
     //TODO Store rule objects instead of states in the graph to avoid this crap
-    private IASTND rule(StateNode initState, Map<IASTExp, Integer> marks, int lastIndex) {
+    private IASTND rule(StateNode initState, Map<IASTExp, Integer> marks) {
         StateEdge edge = tree.get(initState);
         IASTExp exp = initState.getExp();
 
         marks = new HashMap<>(marks);
 
         if(edge == null)
-            return initState.hasHypothesis(exp)
-                    ? new ASTHypothesisND(exp, marks.get(exp))
-                    : new ASTPremiseND(exp, marks.get(exp));
+            return new ASTHypothesis(exp, marks.get(exp));
 
         List<StateTransitionEdge> transitions = edge.getTransitions();
         
         for(StateTransitionEdge e : transitions) 
-            if(e.getProduces() != null) marks.put(e.getProduces(), lastIndex++);
+            if(e.getProduces() != null) marks.put(e.getProduces(), mark++);
 
-        IASTND first = !transitions.isEmpty() ? rule(transitions.get(0).getTransition(), marks, lastIndex) : null;
-        IASTND second = transitions.size() > 1 ? rule(transitions.get(1).getTransition(), marks, lastIndex) : null;
-        IASTND third = transitions.size() > 2 ? rule(transitions.get(2).getTransition(), marks, lastIndex) : null;
+        IASTND first = !transitions.isEmpty() ? rule(transitions.get(0).getTransition(), marks) : null;
+        IASTND second = transitions.size() > 1 ? rule(transitions.get(1).getTransition(), marks) : null;
+        IASTND third = transitions.size() > 2 ? rule(transitions.get(2).getTransition(), marks) : null;
 
         return switch (edge.getRule()) {
-            case INTRO_CONJUNCTION  -> new ASTIConjND(first, second, exp);
-            case ELIM_CONJUNCTION_LEFT  -> new ASTELConjND(first, exp);
-            case ELIM_CONJUNCTION_RIGHT -> new ASTERConjND(first, exp);
-            case INTRO_DISJUNCTION_LEFT -> new ASTILDisND(first, exp);
-            case INTRO_DISJUNCTION_RIGHT -> new ASTIRDisND(first, exp);
-            case ELIM_DISJUNCTION -> new ASTEDisjND(first, second, third, exp,
+            case INTRO_CONJUNCTION  -> new ASTIConj(first, second, exp);
+            case ELIM_CONJUNCTION_LEFT  -> new ASTELConj(first, exp);
+            case ELIM_CONJUNCTION_RIGHT -> new ASTERConj(first, exp);
+            case INTRO_DISJUNCTION_LEFT -> new ASTILDis(first, exp);
+            case INTRO_DISJUNCTION_RIGHT -> new ASTIRDis(first, exp);
+            case ELIM_DISJUNCTION -> new ASTEDisj(first, second, third, exp,
                     marks.get(transitions.get(1).getProduces()), marks.get(transitions.get(2).getProduces()));
-            case INTRO_IMPLICATION -> new ASTIImpND(first, exp, marks.get(transitions.get(0).getProduces()));
-            case INTRO_NEGATION -> new ASTINegND(first, exp, marks.get(transitions.get(0).getProduces()));
-            case ELIM_IMPLICATION -> new ASTEImpND(first, second, exp);
-            case ABSURDITY -> new ASTAbsurdityND(first, exp, marks.get(transitions.get(0).getProduces()));
-            case ELIM_NEGATION -> new ASTENegND(first, second, exp);
-            case ELIM_UNIVERSAL -> new ASTEUniND(first, exp);
-            case INTRO_EXISTENTIAL -> new ASTIExistND(first, exp);
-            case INTRO_UNIVERSAL -> new ASTIUniND(first, exp);
-            case ELIM_EXISTENTIAL -> new ASTEExistND(first, second, exp, marks.get(transitions.get(1).getProduces()));
+            case INTRO_IMPLICATION -> new ASTIImp(first, exp, marks.get(transitions.get(0).getProduces()));
+            case INTRO_NEGATION -> new ASTINeg(first, exp, marks.get(transitions.get(0).getProduces()));
+            case ELIM_IMPLICATION -> new ASTEImp(first, second, exp);
+            case ABSURDITY -> new ASTAbsurdity(first, exp, marks.get(transitions.get(0).getProduces()));
+            case ELIM_NEGATION -> new ASTENeg(first, second, exp);
+            case ELIM_UNIVERSAL -> new ASTEUni(first, exp);
+            case INTRO_EXISTENTIAL -> new ASTIExist(first, exp);
+            case INTRO_UNIVERSAL -> new ASTIUni(first, exp);
+            case ELIM_EXISTENTIAL -> new ASTEExist(first, second, exp, marks.get(transitions.get(1).getProduces()));
         };
 
     }

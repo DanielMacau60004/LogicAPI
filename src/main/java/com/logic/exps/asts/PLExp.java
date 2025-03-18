@@ -1,13 +1,13 @@
 package com.logic.exps.asts;
 
-import com.logic.api.IPLExp;
+import com.logic.api.IPLFormula;
 import com.logic.exps.asts.others.ASTLiteral;
 import com.logic.exps.interpreters.PLInterpreter;
 import com.logic.others.Utils;
 
 import java.util.*;
 
-public class PLExp implements IPLExp {
+public class PLExp implements IPLFormula {
 
     private final IASTExp exp;
     private final Set<ASTLiteral> literals;
@@ -18,7 +18,7 @@ public class PLExp implements IPLExp {
     }
 
     @Override
-    public IASTExp getExp() {
+    public IASTExp getFormula() {
         return exp;
     }
 
@@ -72,7 +72,7 @@ public class PLExp implements IPLExp {
     }
 
     @Override
-    public boolean isEquivalentTo(IPLExp other) {
+    public boolean isEquivalentTo(IPLFormula other) {
         Set<ASTLiteral> intersection = new LinkedHashSet<>(literals);
         Iterator<ASTLiteral> it = other.iterateLiterals();
 

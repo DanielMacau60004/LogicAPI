@@ -202,30 +202,28 @@ private IASTND proofNDPL() : {
 } {
 
     <LRPAR>(
-        <IAND> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() n2 = proofNDPL() <RRPAR>{ return new ASTIConjND(n1, n2, exp); }
-        | <ELAND> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTELConjND(n1, exp); }
-        | <ERAND> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTERConjND(n1, exp); }
-        | <ECOND> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() n2 = proofNDPL() <RRPAR> { return new ASTEImpND(n1, n2, exp); }
-        | <ILOR> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTILDisND(n1, exp); }
-        | <IROR> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTIRDisND(n1, exp); }
+        <IAND> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() n2 = proofNDPL() <RRPAR>{ return new ASTIConj(n1, n2, exp); }
+        | <ELAND> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTELConj(n1, exp); }
+        | <ERAND> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTERConj(n1, exp); }
+        | <ECOND> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() n2 = proofNDPL() <RRPAR> { return new ASTEImp(n1, n2, exp); }
+        | <ILOR> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTILDis(n1, exp); }
+        | <IROR> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTIRDis(n1, exp); }
         | <INEG> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR>
-        { return new ASTINegND(n1, exp, Integer.parseInt(m.toString())); }
-        | <ENEG> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() n2 = proofNDPL() <RRPAR> { return new ASTENegND(n1, n2, exp); }
+        { return new ASTINeg(n1, exp, Integer.parseInt(m.toString())); }
+        | <ENEG> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() n2 = proofNDPL() <RRPAR> { return new ASTENeg(n1, n2, exp); }
         | <EOR> <COMMA> m = <NUMBER> <COMMA> n = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() n2 = proofNDPL() n3 = proofNDPL() <RRPAR>
-            { return new ASTEDisjND(n1, n2, n3, exp, Integer.parseInt(m.toString()), Integer.parseInt(n.toString()));}
+            { return new ASTEDisj(n1, n2, n3, exp, Integer.parseInt(m.toString()), Integer.parseInt(n.toString()));}
         | <ICOND> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR>
-        {return new ASTIImpND(n1, exp, Integer.parseInt(m.toString())); }
+        {return new ASTIImp(n1, exp, Integer.parseInt(m.toString())); }
         | <BOTTOM> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR>
-        {return new ASTAbsurdityND(n1, exp, Integer.parseInt(m.toString())); }
-        | <EUNI> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTEUniND(n1, exp); }
-        | <IEXIST> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTIExistND(n1, exp); }
-        | <IUNI> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTIUniND(n1, exp); }
+        {return new ASTAbsurdity(n1, exp, Integer.parseInt(m.toString())); }
+        | <EUNI> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTEUni(n1, exp); }
+        | <IEXIST> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTIExist(n1, exp); }
+        | <IUNI> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTIUni(n1, exp); }
         | <EEXIST> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() n2 = proofNDPL() <COMMA> m = <NUMBER> <RRPAR>
-        { return new ASTEExistND(n1, n2, exp, Integer.parseInt(m.toString())); }
+        { return new ASTEExist(n1, n2, exp, Integer.parseInt(m.toString())); }
         | <HYPOTHESIS> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() <RRPAR>
-        {return new ASTHypothesisND(exp, Integer.parseInt(m.toString()));}
-        | <PREMISSE> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() <RRPAR>
-        {return new ASTPremiseND(exp, Integer.parseInt(m.toString()));}
+        {return new ASTHypothesis(exp, Integer.parseInt(m.toString()));}
     ) | {throw new RuntimeException("Incomplete proof!");}
 
 }

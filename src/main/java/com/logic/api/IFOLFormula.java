@@ -34,7 +34,7 @@ import java.util.Iterator;
  */
 //TODO remake documentation
 //TODO create interfaces for exposed classes (ASTLiteral)
-public interface IFOLExp extends IExp {
+public interface IFOLFormula extends IFormula {
 
     /**
      * Iterates through all the function names used in the first-order logic expression.
@@ -62,6 +62,8 @@ public interface IFOLExp extends IExp {
 
     Iterator<AASTTerm> iterateTerms();
 
+    Iterator<ASTVariable> iterateVariables();
+
     /**
      * Checks if a given variable is a bounded variable in this first-order logic expression.
      * A bounded variable is one that is part of a quantifier's scope.
@@ -70,6 +72,8 @@ public interface IFOLExp extends IExp {
      * @return {@code true} if the variable is bounded, {@code false} otherwise.
      */
     boolean isABoundedVariable(ASTVariable variable);
+
+    boolean isAnUnboundedVariable(ASTVariable variable);
 
     /**
      * Iterates through all the unbounded variables in the first-order logic expression.

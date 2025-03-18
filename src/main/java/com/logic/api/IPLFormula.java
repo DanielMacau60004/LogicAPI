@@ -31,7 +31,7 @@ import java.util.Map;
  */
 //TODO remake documentation
 //TODO create interfaces for exposed classes (ASTLiteral)
-public interface IPLExp extends IExp {
+public interface IPLFormula extends IFormula {
 
     /**
      * Iterates through all literals in the propositional logic expression.
@@ -86,5 +86,5 @@ public interface IPLExp extends IExp {
      * @return {@code true} if the two expressions are logically equivalent, {@code false} otherwise.
      * @throws RuntimeException If any of the expressions contain arbitrary expressions.
      */
-    boolean isEquivalentTo(IPLExp other);
+    boolean isEquivalentTo(IPLFormula other);
 }

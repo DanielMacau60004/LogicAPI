@@ -4,19 +4,27 @@ import com.logic.exps.asts.IASTExp;
 import com.logic.nd.ERule;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
-import com.logic.parser.ParserConstants;
 
-public class ASTINegND extends AASTUnaryND {
+public class ASTIImp extends AASTUnaryND {
 
     private final int m;
+    private IASTExp generatedHypothesis;
 
-    public ASTINegND(IASTND hypothesis, IASTExp conclusion, int m) {
+    public ASTIImp(IASTND hypothesis, IASTExp conclusion, int m) {
         super(hypothesis, conclusion);
         this.m = m;
     }
 
     public int getM() {
         return m;
+    }
+
+    public void setGeneratedHypothesis(IASTExp generatedHypothesis) {
+        this.generatedHypothesis = generatedHypothesis;
+    }
+
+    public IASTExp getGeneratedHypothesis() {
+        return generatedHypothesis;
     }
 
     @Override
@@ -26,7 +34,7 @@ public class ASTINegND extends AASTUnaryND {
 
     @Override
     public String toString() {
-        return "[" + ERule.INTRO_NEGATION + ", " + m + "] " + super.toString();
+        return "[" + ERule.INTRO_IMPLICATION + ", " + m + "] " + super.toString();
     }
 
 }

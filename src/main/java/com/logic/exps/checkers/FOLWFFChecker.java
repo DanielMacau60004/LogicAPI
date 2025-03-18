@@ -1,6 +1,6 @@
 package com.logic.exps.checkers;
 
-import com.logic.api.IFOLExp;
+import com.logic.api.IFOLFormula;
 import com.logic.exps.asts.FOLExp;
 import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.IExpsVisitor;
@@ -39,7 +39,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
         unboundedVariables = new HashSet<>();
     }
 
-    public static IFOLExp check(IASTExp exp) {
+    public static IFOLFormula check(IASTExp exp) {
         FOLWFFChecker checker = new FOLWFFChecker();
         Env<String, IASTExp> env = new Env<>();
         exp.accept(checker, env);

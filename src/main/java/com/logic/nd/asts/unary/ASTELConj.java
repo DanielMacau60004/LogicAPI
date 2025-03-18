@@ -5,9 +5,9 @@ import com.logic.nd.ERule;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
 
-public class ASTIRDisND extends AASTUnaryND {
+public class ASTELConj extends AASTUnaryND {
 
-    public ASTIRDisND(IASTND hypothesis, IASTExp conclusion) {
+    public ASTELConj(IASTND hypothesis, IASTExp conclusion) {
         super(hypothesis, conclusion);
     }
 
@@ -18,7 +18,7 @@ public class ASTIRDisND extends AASTUnaryND {
 
     @Override
     public String toString() {
-        return "[" + ERule.INTRO_DISJUNCTION_RIGHT + "] " + super.toString();
+        return "[" + ERule.ELIM_CONJUNCTION_LEFT + "] " + super.toString();
     }
 
 }
