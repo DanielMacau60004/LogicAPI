@@ -467,45 +467,6 @@ public class Parser implements ParserConstants {
         jj_consume_token(RRPAR);
          {if (true) return new ASTAbsurdity(n1, exp, Integer.parseInt(m.toString()));}
         break;
-      case EUNI:
-        jj_consume_token(EUNI);
-        jj_consume_token(RRPAR);
-        jj_consume_token(LRPAR);
-        exp = parsePL();
-        n1 = proofNDPL();
-        jj_consume_token(RRPAR);
-                                                                            {if (true) return new ASTEUni(n1, exp);}
-        break;
-      case IEXIST:
-        jj_consume_token(IEXIST);
-        jj_consume_token(RRPAR);
-        jj_consume_token(LRPAR);
-        exp = parsePL();
-        n1 = proofNDPL();
-        jj_consume_token(RRPAR);
-                                                                              {if (true) return new ASTIExist(n1, exp);}
-        break;
-      case IUNI:
-        jj_consume_token(IUNI);
-        jj_consume_token(RRPAR);
-        jj_consume_token(LRPAR);
-        exp = parsePL();
-        n1 = proofNDPL();
-        jj_consume_token(RRPAR);
-                                                                            {if (true) return new ASTIUni(n1, exp);}
-        break;
-      case EEXIST:
-        jj_consume_token(EEXIST);
-        jj_consume_token(RRPAR);
-        jj_consume_token(LRPAR);
-        exp = parsePL();
-        n1 = proofNDPL();
-        n2 = proofNDPL();
-        jj_consume_token(COMMA);
-        m = jj_consume_token(NUMBER);
-        jj_consume_token(RRPAR);
-          {if (true) return new ASTEExist(n1, n2, exp, Integer.parseInt(m.toString()));}
-        break;
       case HYPOTHESIS:
         jj_consume_token(HYPOTHESIS);
         jj_consume_token(COMMA);
@@ -529,6 +490,203 @@ public class Parser implements ParserConstants {
     throw new Error("Missing return statement in function");
   }
 
+/*
+* Parser for first-order logic natural deduction proofs
+*/
+  final public IASTND parseNDFOL() throws ParseException {
+    IASTND e;
+     token_source.curLexState = FOL;
+    e = proofNDFOL();
+    jj_consume_token(0);
+                             {if (true) return e;}
+    throw new Error("Missing return statement in function");
+  }
+
+  final private IASTND proofNDFOL() throws ParseException {
+     IASTExp exp;
+     IASTND n1, n2, n3;
+     Token m, n;
+     token_source.curLexState = ND;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case LRPAR:
+      jj_consume_token(LRPAR);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case IAND:
+        jj_consume_token(IAND);
+        jj_consume_token(RRPAR);
+        jj_consume_token(LRPAR);
+        exp = parseFOL();
+        n1 = proofNDFOL();
+        n2 = proofNDFOL();
+        jj_consume_token(RRPAR);
+                                                                                             {if (true) return new ASTIConj(n1, n2, exp);}
+        break;
+      case ELAND:
+        jj_consume_token(ELAND);
+        jj_consume_token(RRPAR);
+        jj_consume_token(LRPAR);
+        exp = parseFOL();
+        n1 = proofNDFOL();
+        jj_consume_token(RRPAR);
+                                                                               {if (true) return new ASTELConj(n1, exp);}
+        break;
+      case ERAND:
+        jj_consume_token(ERAND);
+        jj_consume_token(RRPAR);
+        jj_consume_token(LRPAR);
+        exp = parseFOL();
+        n1 = proofNDFOL();
+        jj_consume_token(RRPAR);
+                                                                               {if (true) return new ASTERConj(n1, exp);}
+        break;
+      case ECOND:
+        jj_consume_token(ECOND);
+        jj_consume_token(RRPAR);
+        jj_consume_token(LRPAR);
+        exp = parseFOL();
+        n1 = proofNDFOL();
+        n2 = proofNDFOL();
+        jj_consume_token(RRPAR);
+                                                                                                 {if (true) return new ASTEImp(n1, n2, exp);}
+        break;
+      case ILOR:
+        jj_consume_token(ILOR);
+        jj_consume_token(RRPAR);
+        jj_consume_token(LRPAR);
+        exp = parseFOL();
+        n1 = proofNDFOL();
+        jj_consume_token(RRPAR);
+                                                                              {if (true) return new ASTILDis(n1, exp);}
+        break;
+      case IROR:
+        jj_consume_token(IROR);
+        jj_consume_token(RRPAR);
+        jj_consume_token(LRPAR);
+        exp = parseFOL();
+        n1 = proofNDFOL();
+        jj_consume_token(RRPAR);
+                                                                              {if (true) return new ASTIRDis(n1, exp);}
+        break;
+      case INEG:
+        jj_consume_token(INEG);
+        jj_consume_token(COMMA);
+        m = jj_consume_token(NUMBER);
+        jj_consume_token(RRPAR);
+        jj_consume_token(LRPAR);
+        exp = parseFOL();
+        n1 = proofNDFOL();
+        jj_consume_token(RRPAR);
+          {if (true) return new ASTINeg(n1, exp, Integer.parseInt(m.toString()));}
+        break;
+      case ENEG:
+        jj_consume_token(ENEG);
+        jj_consume_token(RRPAR);
+        jj_consume_token(LRPAR);
+        exp = parseFOL();
+        n1 = proofNDFOL();
+        n2 = proofNDFOL();
+        jj_consume_token(RRPAR);
+                                                                                                {if (true) return new ASTENeg(n1, n2, exp);}
+        break;
+      case EOR:
+        jj_consume_token(EOR);
+        jj_consume_token(COMMA);
+        m = jj_consume_token(NUMBER);
+        jj_consume_token(COMMA);
+        n = jj_consume_token(NUMBER);
+        jj_consume_token(RRPAR);
+        jj_consume_token(LRPAR);
+        exp = parseFOL();
+        n1 = proofNDFOL();
+        n2 = proofNDFOL();
+        n3 = proofNDFOL();
+        jj_consume_token(RRPAR);
+              {if (true) return new ASTEDisj(n1, n2, n3, exp, Integer.parseInt(m.toString()), Integer.parseInt(n.toString()));}
+        break;
+      case ICOND:
+        jj_consume_token(ICOND);
+        jj_consume_token(COMMA);
+        m = jj_consume_token(NUMBER);
+        jj_consume_token(RRPAR);
+        jj_consume_token(LRPAR);
+        exp = parseFOL();
+        n1 = proofNDFOL();
+        jj_consume_token(RRPAR);
+         {if (true) return new ASTIImp(n1, exp, Integer.parseInt(m.toString()));}
+        break;
+      case BOTTOM:
+        jj_consume_token(BOTTOM);
+        jj_consume_token(COMMA);
+        m = jj_consume_token(NUMBER);
+        jj_consume_token(RRPAR);
+        jj_consume_token(LRPAR);
+        exp = parseFOL();
+        n1 = proofNDFOL();
+        jj_consume_token(RRPAR);
+         {if (true) return new ASTAbsurdity(n1, exp, Integer.parseInt(m.toString()));}
+        break;
+      case EUNI:
+        jj_consume_token(EUNI);
+        jj_consume_token(RRPAR);
+        jj_consume_token(LRPAR);
+        exp = parseFOL();
+        n1 = proofNDFOL();
+        jj_consume_token(RRPAR);
+                                                                              {if (true) return new ASTEUni(n1, exp);}
+        break;
+      case IEXIST:
+        jj_consume_token(IEXIST);
+        jj_consume_token(RRPAR);
+        jj_consume_token(LRPAR);
+        exp = parseFOL();
+        n1 = proofNDFOL();
+        jj_consume_token(RRPAR);
+                                                                                {if (true) return new ASTIExist(n1, exp);}
+        break;
+      case IUNI:
+        jj_consume_token(IUNI);
+        jj_consume_token(RRPAR);
+        jj_consume_token(LRPAR);
+        exp = parseFOL();
+        n1 = proofNDFOL();
+        jj_consume_token(RRPAR);
+                                                                              {if (true) return new ASTIUni(n1, exp);}
+        break;
+      case EEXIST:
+        jj_consume_token(EEXIST);
+        jj_consume_token(RRPAR);
+        jj_consume_token(LRPAR);
+        exp = parseFOL();
+        n1 = proofNDFOL();
+        n2 = proofNDFOL();
+        jj_consume_token(COMMA);
+        m = jj_consume_token(NUMBER);
+        jj_consume_token(RRPAR);
+          {if (true) return new ASTEExist(n1, n2, exp, Integer.parseInt(m.toString()));}
+        break;
+      case HYPOTHESIS:
+        jj_consume_token(HYPOTHESIS);
+        jj_consume_token(COMMA);
+        m = jj_consume_token(NUMBER);
+        jj_consume_token(RRPAR);
+        jj_consume_token(LRPAR);
+        exp = parseFOL();
+        jj_consume_token(RRPAR);
+         {if (true) return new ASTHypothesis(exp, Integer.parseInt(m.toString()));}
+        break;
+      default:
+        jj_la1[15] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+      break;
+    default:
+      jj_la1[16] = jj_gen;
+         {if (true) throw new RuntimeException("Incomplete proof!");}
+    }
+    throw new Error("Missing return statement in function");
+  }
+
   /** Generated Token Manager. */
   public ParserTokenManager token_source;
   JavaCharStream jj_input_stream;
@@ -538,7 +696,7 @@ public class Parser implements ParserConstants {
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[15];
+  final private int[] jj_la1 = new int[17];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -546,10 +704,10 @@ public class Parser implements ParserConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0xf000,0x20001,0xf000,0x8010e80,0xf000,0x20001,0xf000,0x80,0xc0010e80,0x400000,0x80,0x30000000,0x400000,0x400,0x40000,};
+      jj_la1_0 = new int[] {0xf000,0x20001,0xf000,0x8010e80,0xf000,0x20001,0xf000,0x80,0xc0010e80,0x400000,0x80,0x30000000,0x400000,0x400,0x40000,0x400,0x40000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1,0x0,0x0,0x0,0x0,0xfffe,0x0,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1,0x0,0x0,0x0,0x0,0x87fe,0x0,0xfffe,0x0,};
    }
 
   /** Constructor with InputStream. */
@@ -563,7 +721,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -577,7 +735,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -587,7 +745,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -597,7 +755,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -606,7 +764,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -615,7 +773,7 @@ public class Parser implements ParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -671,7 +829,7 @@ public class Parser implements ParserConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 15; i++) {
+    for (int i = 0; i < 17; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

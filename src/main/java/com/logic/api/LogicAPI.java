@@ -1,13 +1,18 @@
 package com.logic.api;
 
+import com.logic.exps.asts.IASTExp;
 import com.logic.exps.checkers.FOLWFFChecker;
 import com.logic.exps.checkers.PLWFFChecker;
 import com.logic.nd.asts.IASTND;
+import com.logic.nd.checkers.NDMarksChecker;
+import com.logic.nd.checkers.NDSideCondChecker;
+import com.logic.nd.checkers.NDWWFChecker;
 import com.logic.nd.checkers.NDWWFExpsChecker;
 import com.logic.nd.interpreters.NDInterpreter;
 import com.logic.parser.Parser;
 
 import java.io.ByteArrayInputStream;
+import java.util.Map;
 
 /**
  * The {@code LogicAPI} class provides utility methods for the API.
@@ -23,7 +28,8 @@ public class LogicAPI {
     /**
      * Private constructor to prevent instantiation of the {@code LogicAPI} class.
      */
-    private LogicAPI() {}
+    private LogicAPI() {
+    }
 
     /**
      * Parses a propositional logic (PL) expression and checks its well-formedness.
@@ -63,8 +69,22 @@ public class LogicAPI {
     //TODO add documentation
     public static INDProof parseNDPLProof(String expression) throws Exception {
         IASTND proof = new Parser(new ByteArrayInputStream((expression).getBytes())).parseNDPL();
-        NDWWFExpsChecker.checkPL(proof);
-        return NDInterpreter.interpret(proof);
+
+        Map<IASTExp, IFormula> formulas = NDWWFExpsChecker.checkPL(proof);
+        NDWWFChecker.check(proof, formulas);
+        Map<IASTExp, Integer> premises = NDMarksChecker.check(proof, formulas);
+        return NDInterpreter.interpret(proof, premises);
+    }
+
+    //TODO add documentation
+    public static INDProof parseNDFOLProof(String expression) throws Exception {
+        IASTND proof = new Parser(new ByteArrayInputStream((expression).getBytes())).parseNDFOL();
+
+        Map<IASTExp, IFormula> formulas = NDWWFExpsChecker.checkFOL(proof);
+        NDWWFChecker.check(proof, formulas);
+        Map<IASTExp, Integer> premises = NDMarksChecker.check(proof, formulas);
+        NDSideCondChecker.check(proof, formulas);
+        return NDInterpreter.interpret(proof, premises);
     }
 
 }

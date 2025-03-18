@@ -217,12 +217,52 @@ private IASTND proofNDPL() : {
         {return new ASTIImp(n1, exp, Integer.parseInt(m.toString())); }
         | <BOTTOM> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR>
         {return new ASTAbsurdity(n1, exp, Integer.parseInt(m.toString())); }
-        | <EUNI> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTEUni(n1, exp); }
-        | <IEXIST> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTIExist(n1, exp); }
-        | <IUNI> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTIUni(n1, exp); }
-        | <EEXIST> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() n2 = proofNDPL() <COMMA> m = <NUMBER> <RRPAR>
-        { return new ASTEExist(n1, n2, exp, Integer.parseInt(m.toString())); }
         | <HYPOTHESIS> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() <RRPAR>
+        {return new ASTHypothesis(exp, Integer.parseInt(m.toString()));}
+    ) | {throw new RuntimeException("Incomplete proof!");}
+
+}
+
+/*
+* Parser for first-order logic natural deduction proofs
+*/
+
+IASTND parseNDFOL() : {
+    IASTND e;
+} {
+    {token_source.curLexState = FOL;}
+    e = proofNDFOL() <EOF> { return e; }
+}
+
+private IASTND proofNDFOL() : {
+     IASTExp exp;
+     IASTND n1, n2, n3;
+     Token m, n;
+     token_source.curLexState = ND;
+} {
+
+    <LRPAR>(
+        <IAND> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() n2 = proofNDFOL() <RRPAR>{ return new ASTIConj(n1, n2, exp); }
+        | <ELAND> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR> { return new ASTELConj(n1, exp); }
+        | <ERAND> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR> { return new ASTERConj(n1, exp); }
+        | <ECOND> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() n2 = proofNDFOL() <RRPAR> { return new ASTEImp(n1, n2, exp); }
+        | <ILOR> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR> { return new ASTILDis(n1, exp); }
+        | <IROR> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR> { return new ASTIRDis(n1, exp); }
+        | <INEG> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR>
+        { return new ASTINeg(n1, exp, Integer.parseInt(m.toString())); }
+        | <ENEG> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() n2 = proofNDFOL() <RRPAR> { return new ASTENeg(n1, n2, exp); }
+        | <EOR> <COMMA> m = <NUMBER> <COMMA> n = <NUMBER> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() n2 = proofNDFOL() n3 = proofNDFOL() <RRPAR>
+            { return new ASTEDisj(n1, n2, n3, exp, Integer.parseInt(m.toString()), Integer.parseInt(n.toString()));}
+        | <ICOND> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR>
+        {return new ASTIImp(n1, exp, Integer.parseInt(m.toString())); }
+        | <BOTTOM> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR>
+        {return new ASTAbsurdity(n1, exp, Integer.parseInt(m.toString())); }
+        | <EUNI> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR> { return new ASTEUni(n1, exp); }
+        | <IEXIST> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR> { return new ASTIExist(n1, exp); }
+        | <IUNI> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR> { return new ASTIUni(n1, exp); }
+        | <EEXIST> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() n2 = proofNDFOL() <COMMA> m = <NUMBER> <RRPAR>
+        { return new ASTEExist(n1, n2, exp, Integer.parseInt(m.toString())); }
+        | <HYPOTHESIS> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parseFOL() <RRPAR>
         {return new ASTHypothesis(exp, Integer.parseInt(m.toString()));}
     ) | {throw new RuntimeException("Incomplete proof!");}
 

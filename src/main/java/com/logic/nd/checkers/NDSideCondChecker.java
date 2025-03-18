@@ -2,6 +2,7 @@ package com.logic.nd.checkers;
 
 import com.logic.api.IFOLFormula;
 import com.logic.api.IFormula;
+import com.logic.exps.ExpUtils;
 import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.binary.ASTExistential;
 import com.logic.exps.asts.binary.ASTUniversal;
@@ -108,7 +109,7 @@ public class NDSideCondChecker implements INDVisitor<Set<IASTExp>, Void> {
     @Override
     public Set<IASTExp> visit(ASTEUni r, Void env) {
         ASTUniversal uni = (ASTUniversal) r.getHyp().getConclusion();
-        IFOLFormula psi = (IFOLFormula) formulas.get(uni.getRight());
+        IFOLFormula psi = (IFOLFormula) formulas.get(ExpUtils.removeParenthesis(uni.getRight()));
 
         if (r.getMapping() instanceof ASTVariable x && psi.isABoundedVariable(x))
             throw new RuntimeException("The elimination of the universal rule is incorrectly typed!\n" +
@@ -120,7 +121,7 @@ public class NDSideCondChecker implements INDVisitor<Set<IASTExp>, Void> {
     @Override
     public Set<IASTExp> visit(ASTIExist r, Void env) {
         ASTExistential exi = (ASTExistential) r.getConclusion();
-        IFOLFormula psi = (IFOLFormula) formulas.get(exi.getRight());
+        IFOLFormula psi = (IFOLFormula) formulas.get(ExpUtils.removeParenthesis(exi.getRight()));
 
         if (r.getMapping() instanceof ASTVariable x && psi.isABoundedVariable(x))
             throw new RuntimeException("The introduction of the existential rule is incorrectly typed!\n" +
@@ -132,7 +133,7 @@ public class NDSideCondChecker implements INDVisitor<Set<IASTExp>, Void> {
     @Override
     public Set<IASTExp> visit(ASTIUni r, Void env) {
         ASTUniversal uni = (ASTUniversal) r.getConclusion();
-        IFOLFormula psi = (IFOLFormula) formulas.get(uni.getRight());
+        IFOLFormula psi = (IFOLFormula) formulas.get(ExpUtils.removeParenthesis(uni.getRight()));
 
         if (uni.getLeft().equals(r.getMapping()) && !psi.isABoundedVariable(r.getMapping()))
             throw new RuntimeException("The introduction of the universal rule is incorrectly typed!\n" +
@@ -152,11 +153,16 @@ public class NDSideCondChecker implements INDVisitor<Set<IASTExp>, Void> {
     @Override
     public Set<IASTExp> visit(ASTEExist r, Void env) {
         ASTExistential exi = (ASTExistential) r.getHyp1().getConclusion();
-        IFOLFormula psi = (IFOLFormula) formulas.get(exi.getRight());
+        IFOLFormula psi = (IFOLFormula) formulas.get(ExpUtils.removeParenthesis(exi.getRight()));
+        IFOLFormula exp = (IFOLFormula) formulas.get(r.getConclusion());
 
         if (exi.getLeft().equals(r.getMapping()) && !psi.isABoundedVariable(r.getMapping()))
             throw new RuntimeException("The elimination of the existential rule is incorrectly typed!\n" +
                     "Variable " + r.getMapping() + " appears free in " + psi + "!");
+
+        if(!exp.isABoundedVariable(r.getMapping()))
+            throw new RuntimeException("The elimination of the existential rule is incorrectly typed!\n" +
+                    "Variable " + r.getMapping() + " appears free in " + exp + "!");
 
         Set<IASTExp> result = r.getHyp2().accept(this, env);
         for (IASTExp e : result) {

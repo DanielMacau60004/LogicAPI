@@ -1,5 +1,6 @@
 package com.logic.nd.algorithm.state;
 
+import com.logic.api.IFormula;
 import com.logic.exps.asts.IASTExp;
 import com.logic.api.INDProof;
 import com.logic.nd.algorithm.transition.TransitionEdge;
@@ -14,6 +15,7 @@ import com.logic.nd.asts.others.ASTEDisj;
 import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
 import com.logic.nd.checkers.NDMarksChecker;
+import com.logic.nd.checkers.NDSideCondChecker;
 import com.logic.nd.checkers.NDWWFChecker;
 import com.logic.nd.checkers.NDWWFExpsChecker;
 import com.logic.nd.interpreters.NDInterpreter;
@@ -148,9 +150,13 @@ public class StateGraph {
 
         this.mark = mark;
         IASTND proof = rule(new StateNode(exp, premisses, hypotheses.keySet()), marks);
-        var formulas = NDWWFExpsChecker.checkPL(proof);
+
+        //TODO....
+        Map<IASTExp, IFormula> formulas = NDWWFExpsChecker.checkPL(proof);
         NDWWFChecker.check(proof, formulas);
-        return  NDMarksChecker.check(proof, formulas);
+        Map<IASTExp, Integer> premises = NDMarksChecker.check(proof, formulas);
+        NDSideCondChecker.check(proof, formulas);
+        return NDInterpreter.interpret(proof, premises);
     }
 
     //TODO Store rule objects instead of states in the graph to avoid this crap

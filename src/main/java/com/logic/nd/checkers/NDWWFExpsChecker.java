@@ -34,13 +34,14 @@ public class NDWWFExpsChecker implements INDVisitor<Void, Void> {
         return checker.formulas;
     }
 
-    public static void checkFOL(IASTND nd) {
+    public static Map<IASTExp, IFormula> checkFOL(IASTND nd) {
         NDWWFExpsChecker checker = new NDWWFExpsChecker(true);
         nd.accept(checker, null);
+        return checker.formulas;
     }
 
     private IFormula verifyAndCreateFormula(IASTExp exp) {
-        return fol ?  FOLWFFChecker.check(exp)
+        return fol ? FOLWFFChecker.check(exp)
              : PLWFFChecker.check(exp);
     }
 

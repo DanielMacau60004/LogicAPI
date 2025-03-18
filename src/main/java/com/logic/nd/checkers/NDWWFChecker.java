@@ -234,18 +234,19 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
     @Override
     public Void visit(ASTEUni r, Void env) {
-        if (!(r.getHyp() instanceof ASTUniversal uni))
+        if (!(r.getHyp().getConclusion() instanceof ASTUniversal uni))
             throw new RuntimeException("The elimination of the universal rule is incorrectly typed!\n" +
                     "The hypothesis should be an universal, but you provided: " + r.getHyp() + "!");
 
         //Find mapping
         IASTExp x = uni.getLeft();
+        IASTExp psi = ExpUtils.removeParenthesis(uni.getRight());
         IFOLFormula psiXT = (IFOLFormula) formulas.get(r.getConclusion());
 
         Iterator<AASTTerm> it = psiXT.iterateTerms();
         while (it.hasNext()) {
             AASTTerm t = it.next();
-            if (FOLReplaceExps.replace(uni.getRight(), x, t).equals(psiXT.getFormula())) {
+            if (FOLReplaceExps.replace(psi, x, t).equals(psiXT.getFormula())) {
                 r.setMapping(t);
                 break;
             }
@@ -253,7 +254,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
         if (r.getMapping() == null)
             throw new RuntimeException("The elimination of the universal rule is incorrectly typed!\n" +
-                    "There is no mapping of " + x + " in " + uni.getRight() + " that can produce " + psiXT + "!");
+                    "There is no mapping of " + x + " in " + psi + " that can produce " + psiXT + "!");
 
         return r.getHyp().accept(this, env);
     }
@@ -266,12 +267,13 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
         //Find mapping
         IASTExp x = exi.getLeft();
+        IASTExp psi = ExpUtils.removeParenthesis(exi.getRight());
         IFOLFormula psiXT = (IFOLFormula) formulas.get(r.getHyp().getConclusion());
 
         Iterator<AASTTerm> it = psiXT.iterateTerms();
         while (it.hasNext()) {
             AASTTerm t = it.next();
-            if (FOLReplaceExps.replace(exi.getRight(), x, t).equals(psiXT.getFormula())) {
+            if (FOLReplaceExps.replace(psi, x, t).equals(psiXT.getFormula())) {
                 r.setMapping(t);
                 break;
             }
@@ -279,7 +281,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
         if (r.getMapping() == null)
             throw new RuntimeException("The introduction of the existential rule is incorrectly typed!\n" +
-                    "There is no mapping of " + x + " in " + exi.getRight() + " that can produce " + psiXT + "!");
+                    "There is no mapping of " + x + " in " + psi + " that can produce " + psiXT + "!");
 
         return r.getHyp().accept(this, env);
     }
@@ -292,12 +294,13 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
         //Find mapping
         IASTExp x = uni.getLeft();
+        IASTExp psi = ExpUtils.removeParenthesis(uni.getRight());
         IFOLFormula psiXT = (IFOLFormula) formulas.get(r.getHyp().getConclusion());
 
         Iterator<ASTVariable> it = psiXT.iterateVariables();
         while (it.hasNext()) {
             ASTVariable t = it.next();
-            if (FOLReplaceExps.replace(uni.getRight(), x, t).equals(psiXT.getFormula())) {
+            if (FOLReplaceExps.replace(psi, x, t).equals(psiXT.getFormula())) {
                 r.setMapping(t);
                 break;
             }
@@ -305,15 +308,14 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
         if (r.getMapping() == null)
             throw new RuntimeException("The introduction of the universal rule is incorrectly typed!\n" +
-                    "There is no mapping of " + x + " in " + uni.getRight() + " that can produce " + psiXT + "!");
+                    "There is no mapping of " + x + " in " + psi + " that can produce " + psiXT + "!");
 
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTEExist r, Void env) {
-
-        if (!(r.getHyp1() instanceof ASTExistential exi))
+        if (!(r.getHyp1().getConclusion() instanceof ASTExistential))
             throw new RuntimeException("The elimination of the existential rule is incorrectly typed!\n" +
                     "The first hypothesis should be an existential, but you provided: " + r.getConclusion() + "!");
 

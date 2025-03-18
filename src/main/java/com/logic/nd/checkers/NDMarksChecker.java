@@ -36,11 +36,11 @@ public class NDMarksChecker implements INDVisitor<Void, Env<Integer, IASTExp>> {
         this.formulas = formulas;
     }
 
-    public static INDProof check(IASTND nd, Map<IASTExp, IFormula> formulas) {
+    public static Map<IASTExp, Integer> check(IASTND nd, Map<IASTExp, IFormula> formulas) {
         NDMarksChecker checker = new NDMarksChecker(formulas);
 
         nd.accept(checker, new Env<>());
-        return new NDProof(checker.premises, nd, 0, 0);
+        return checker.premises;
     }
 
     @Override
@@ -221,19 +221,24 @@ public class NDMarksChecker implements INDVisitor<Void, Env<Integer, IASTExp>> {
         if(exp == null) return null;
 
         IASTExp x = exi.getLeft();
+        IASTExp psi = ExpUtils.removeParenthesis(exi.getRight());
         IFOLFormula psiXT = (IFOLFormula) formulas.get(exp);
 
         Iterator<ASTVariable> it = psiXT.iterateVariables();
         while (it.hasNext()) {
             ASTVariable t = it.next();
-            if (FOLReplaceExps.replace(exi.getRight(), x, t).equals(psiXT.getFormula())) {
+            if (FOLReplaceExps.replace(psi, x, t).equals(psiXT.getFormula())) {
                 r.setMapping(t);
                 break;
             }
         }
 
         if (r.getMapping() == null)
-            throw new RuntimeException("The absurdity rule cannot close mark " + r.getM() + "!");
+            throw new RuntimeException("The elimination of the existential rule is incorrectly typed!\n" +
+                    "There is no mapping of " + x + " in " + psi + " that can produce " + psiXT + "!");
+
+        if (hypotheses.containsKey(r.getM()) && !exp.equals(hypotheses.get(r.getM())))
+            throw new RuntimeException("The elimination of the existential rule cannot close mark " + r.getM() + "!");
 
         r.setGeneratedHypothesis(exp);
         return null;

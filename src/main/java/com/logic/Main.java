@@ -1,6 +1,7 @@
 package com.logic;
 
 import com.logic.api.INDProof;
+import com.logic.api.LogicAPI;
 import com.logic.exps.asts.IASTExp;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.checkers.NDWWFExpsChecker;
@@ -8,6 +9,7 @@ import com.logic.nd.interpreters.NDInterpreter;
 import com.logic.parser.Parser;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 public class Main {
 
@@ -41,11 +43,10 @@ public class Main {
 
         //System.out.println(s.findSolution());
 
-        IASTND proof = new Parser(readFile("src/main/java/com/logic/code.logic")).parseNDPL();
-        NDWWFExpsChecker.checkPL(proof);
+        ByteArrayInputStream stream = readFile("src/main/java/com/logic/code.logic");
+        String result = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
 
-        System.out.println(proof);
-        INDProof proofObj =  NDInterpreter.interpret(proof);
+        INDProof proofObj = LogicAPI.parseNDFOLProof(result);
 
         System.out.println(proofObj.size()+" " + proofObj.height());
         System.out.println(proofObj);
