@@ -73,7 +73,7 @@ public class LogicAPI {
         Map<IASTExp, IFormula> formulas = NDWWFExpsChecker.checkPL(proof);
         NDWWFChecker.check(proof, formulas);
         Map<IASTExp, Integer> premises = NDMarksChecker.check(proof, formulas);
-        return NDInterpreter.interpret(proof, premises);
+        return NDInterpreter.interpret(proof, formulas, premises);
     }
 
     //TODO add documentation
@@ -83,8 +83,8 @@ public class LogicAPI {
         Map<IASTExp, IFormula> formulas = NDWWFExpsChecker.checkFOL(proof);
         NDWWFChecker.check(proof, formulas);
         Map<IASTExp, Integer> premises = NDMarksChecker.check(proof, formulas);
-        NDSideCondChecker.check(proof, formulas);
-        return NDInterpreter.interpret(proof, premises);
+        NDSideCondChecker.check(proof, formulas, premises);
+        return NDInterpreter.interpret(proof, formulas, premises);
     }
 
 }

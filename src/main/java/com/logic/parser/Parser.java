@@ -654,13 +654,13 @@ public class Parser implements ParserConstants {
         break;
       case EEXIST:
         jj_consume_token(EEXIST);
+        jj_consume_token(COMMA);
+        m = jj_consume_token(NUMBER);
         jj_consume_token(RRPAR);
         jj_consume_token(LRPAR);
         exp = parseFOL();
         n1 = proofNDFOL();
         n2 = proofNDFOL();
-        jj_consume_token(COMMA);
-        m = jj_consume_token(NUMBER);
         jj_consume_token(RRPAR);
           {if (true) return new ASTEExist(n1, n2, exp, Integer.parseInt(m.toString()));}
         break;

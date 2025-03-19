@@ -20,15 +20,15 @@ public class Env<K, T> {
         table.put(id, val);
     }
 
-    public List<T> list() {
-        return list(new LinkedList<>());
+    public Map<K, T> map() {
+        return map(new LinkedHashMap<>());
     }
 
-    private List<T> list(List<T> list) {
+    private Map<K, T> map(Map<K, T> map) {
         if (prev != null)
-            list = prev.list(list);
-        list.addAll(table.values());
-        return list;
+            map = prev.map(map);
+        map.putAll(table); // Merge current table values
+        return map;
     }
 
     public T find(K id) {

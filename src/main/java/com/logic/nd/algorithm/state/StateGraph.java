@@ -155,8 +155,8 @@ public class StateGraph {
         Map<IASTExp, IFormula> formulas = NDWWFExpsChecker.checkPL(proof);
         NDWWFChecker.check(proof, formulas);
         Map<IASTExp, Integer> premises = NDMarksChecker.check(proof, formulas);
-        NDSideCondChecker.check(proof, formulas);
-        return NDInterpreter.interpret(proof, premises);
+        NDSideCondChecker.check(proof, formulas, premises);
+        return NDInterpreter.interpret(proof, formulas, premises);
     }
 
     //TODO Store rule objects instead of states in the graph to avoid this crap

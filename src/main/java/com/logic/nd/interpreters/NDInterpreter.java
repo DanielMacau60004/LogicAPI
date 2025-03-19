@@ -1,5 +1,6 @@
 package com.logic.nd.interpreters;
 
+import com.logic.api.IFormula;
 import com.logic.api.INDProof;
 import com.logic.exps.asts.IASTExp;
 import com.logic.nd.NDProof;
@@ -27,10 +28,10 @@ public class NDInterpreter implements INDVisitor<Integer, Env<Integer, IASTExp>>
         this.size = 0;
     }
 
-    public static INDProof interpret(IASTND nd, Map<IASTExp, Integer> premises) {
+    public static INDProof interpret(IASTND nd, Map<IASTExp, IFormula> formulas, Map<IASTExp, Integer> premises) {
         NDInterpreter interpret = new NDInterpreter();
         int height = nd.accept(interpret, new Env<>());
-        return new NDProof(premises, nd, height, interpret.size);
+        return new NDProof(formulas.get(nd.getConclusion()), premises, nd, height, interpret.size);
     }
 
     @Override

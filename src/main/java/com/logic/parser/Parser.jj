@@ -260,7 +260,7 @@ private IASTND proofNDFOL() : {
         | <EUNI> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR> { return new ASTEUni(n1, exp); }
         | <IEXIST> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR> { return new ASTIExist(n1, exp); }
         | <IUNI> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR> { return new ASTIUni(n1, exp); }
-        | <EEXIST> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() n2 = proofNDFOL() <COMMA> m = <NUMBER> <RRPAR>
+        | <EEXIST> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() n2 = proofNDFOL() <RRPAR>
         { return new ASTEExist(n1, n2, exp, Integer.parseInt(m.toString())); }
         | <HYPOTHESIS> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parseFOL() <RRPAR>
         {return new ASTHypothesis(exp, Integer.parseInt(m.toString()));}

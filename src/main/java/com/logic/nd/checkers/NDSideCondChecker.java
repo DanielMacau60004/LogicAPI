@@ -7,6 +7,7 @@ import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.binary.ASTExistential;
 import com.logic.exps.asts.binary.ASTUniversal;
 import com.logic.exps.asts.others.ASTVariable;
+import com.logic.exps.checkers.FOLWFFChecker;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
 import com.logic.nd.asts.binary.ASTEExist;
@@ -16,12 +17,14 @@ import com.logic.nd.asts.binary.ASTIConj;
 import com.logic.nd.asts.others.ASTEDisj;
 import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
+import com.logic.others.Env;
+import com.logic.others.Utils;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class NDSideCondChecker implements INDVisitor<Set<IASTExp>, Void> {
+public class NDSideCondChecker implements INDVisitor<Void, Env<Integer, IASTExp>> {
 
     private final Map<IASTExp, IFormula> formulas;
 
@@ -29,85 +32,105 @@ public class NDSideCondChecker implements INDVisitor<Set<IASTExp>, Void> {
         this.formulas = formulas;
     }
 
-    public static Map<IASTExp, IFormula> check(IASTND nd, Map<IASTExp, IFormula> formulas) {
+    public static Map<IASTExp, IFormula> check(IASTND nd, Map<IASTExp, IFormula> formulas, Map<IASTExp, Integer> premises) {
         NDSideCondChecker checker = new NDSideCondChecker(formulas);
-        nd.accept(checker, null);
+        Env<Integer, IASTExp> env = new Env<>();
+        premises.forEach((p,m) -> env.bind(m, p));
+        nd.accept(checker, env);
         return checker.formulas;
     }
 
     @Override
-    public Set<IASTExp> visit(ASTHypothesis h, Void env) {
-        HashSet<IASTExp> result = new HashSet<>();
-        result.add(h.getConclusion());
-        return result;
+    public Void visit(ASTHypothesis h, Env<Integer, IASTExp> env) {
+        return null;
     }
 
     @Override
-    public Set<IASTExp> visit(ASTIImp r, Void env) {
+    public Void visit(ASTIImp r, Env<Integer, IASTExp> env) {
+        env = env.beginScope();
+        env.bind(r.getM(), r.getGeneratedHypothesis());
+        r.getHyp().accept(this, env);
+        env.endScope();
+        return null;
+    }
+
+    @Override
+    public Void visit(ASTINeg r, Env<Integer, IASTExp> env) {
+        env = env.beginScope();
+        env.bind(r.getM(), r.getGeneratedHypothesis());
+        r.getHyp().accept(this, env);
+        env.endScope();
+        return null;
+    }
+
+    @Override
+    public Void visit(ASTERConj r, Env<Integer, IASTExp> env) {
         return r.getHyp().accept(this, env);
     }
 
     @Override
-    public Set<IASTExp> visit(ASTINeg r, Void env) {
+    public Void visit(ASTELConj r, Env<Integer, IASTExp> env) {
         return r.getHyp().accept(this, env);
     }
 
     @Override
-    public Set<IASTExp> visit(ASTERConj r, Void env) {
+    public Void visit(ASTIRDis r, Env<Integer, IASTExp> env) {
         return r.getHyp().accept(this, env);
     }
 
     @Override
-    public Set<IASTExp> visit(ASTELConj r, Void env) {
+    public Void visit(ASTILDis r, Env<Integer, IASTExp> env) {
         return r.getHyp().accept(this, env);
     }
 
     @Override
-    public Set<IASTExp> visit(ASTIRDis r, Void env) {
-        return r.getHyp().accept(this, env);
+    public Void visit(ASTAbsurdity r, Env<Integer, IASTExp> env) {
+        env = env.beginScope();
+        env.bind(r.getM(), r.getGeneratedHypothesis());
+        r.getHyp().accept(this, env);
+        env.endScope();
+        return null;
     }
 
     @Override
-    public Set<IASTExp> visit(ASTILDis r, Void env) {
-        return r.getHyp().accept(this, env);
+    public Void visit(ASTIConj r, Env<Integer, IASTExp> env) {
+        r.getHyp1().accept(this, env);
+        r.getHyp2().accept(this, env);
+        return null;
     }
 
     @Override
-    public Set<IASTExp> visit(ASTAbsurdity r, Void env) {
-        return r.getHyp().accept(this, env);
+    public Void visit(ASTEDisj r, Env<Integer, IASTExp> env) {
+        r.getHyp1().accept(this, env);
+
+        env = env.beginScope();
+        env.bind(r.getM(), r.getGeneratedHypothesisM());
+        r.getHyp2().accept(this, env);
+        env.endScope();
+
+        env = env.beginScope();
+        env.bind(r.getN(), r.getGeneratedHypothesisN());
+        r.getHyp3().accept(this, env);
+        env.endScope();
+        return null;
     }
 
     @Override
-    public Set<IASTExp> visit(ASTIConj r, Void env) {
-        Set<IASTExp> result = r.getHyp1().accept(this, env);
-        result.addAll(r.getHyp2().accept(this, env));
-        return result;
+    public Void visit(ASTEImp r, Env<Integer, IASTExp> env) {
+        r.getHyp1().accept(this, env);
+        r.getHyp2().accept(this, env);
+        return null;
     }
 
     @Override
-    public Set<IASTExp> visit(ASTEDisj r, Void env) {
-        Set<IASTExp> result = r.getHyp1().accept(this, env);
-        result.addAll(r.getHyp2().accept(this, env));
-        result.addAll(r.getHyp3().accept(this, env));
-        return result;
+    public Void visit(ASTENeg r, Env<Integer, IASTExp> env) {
+        r.getHyp1().accept(this, env);
+        r.getHyp2().accept(this, env);
+        return null;
     }
 
     @Override
-    public Set<IASTExp> visit(ASTEImp r, Void env) {
-        Set<IASTExp> result = r.getHyp1().accept(this, env);
-        result.addAll(r.getHyp2().accept(this, env));
-        return result;
-    }
-
-    @Override
-    public Set<IASTExp> visit(ASTENeg r, Void env) {
-        Set<IASTExp> result = r.getHyp1().accept(this, env);
-        result.addAll(r.getHyp2().accept(this, env));
-        return result;
-    }
-
-    @Override
-    public Set<IASTExp> visit(ASTEUni r, Void env) {
+    public Void visit(ASTEUni r, Env<Integer, IASTExp> env) {
         ASTUniversal uni = (ASTUniversal) r.getHyp().getConclusion();
         IFOLFormula psi = (IFOLFormula) formulas.get(ExpUtils.removeParenthesis(uni.getRight()));
 
@@ -119,7 +142,7 @@ public class NDSideCondChecker implements INDVisitor<Set<IASTExp>, Void> {
     }
 
     @Override
-    public Set<IASTExp> visit(ASTIExist r, Void env) {
+    public Void visit(ASTIExist r, Env<Integer, IASTExp> env) {
         ASTExistential exi = (ASTExistential) r.getConclusion();
         IFOLFormula psi = (IFOLFormula) formulas.get(ExpUtils.removeParenthesis(exi.getRight()));
 
@@ -131,49 +154,53 @@ public class NDSideCondChecker implements INDVisitor<Set<IASTExp>, Void> {
     }
 
     @Override
-    public Set<IASTExp> visit(ASTIUni r, Void env) {
+    public Void visit(ASTIUni r, Env<Integer, IASTExp> env) {
         ASTUniversal uni = (ASTUniversal) r.getConclusion();
         IFOLFormula psi = (IFOLFormula) formulas.get(ExpUtils.removeParenthesis(uni.getRight()));
 
-        if (uni.getLeft().equals(r.getMapping()) && !psi.isABoundedVariable(r.getMapping()))
+        if (!uni.getLeft().equals(r.getMapping()) && psi.isAnUnboundedVariable(r.getMapping()))
             throw new RuntimeException("The introduction of the universal rule is incorrectly typed!\n" +
                     "Variable " + r.getMapping() + " appears free in " + psi + "!");
 
-        Set<IASTExp> result = r.getHyp().accept(this, env);
-        for (IASTExp e : result) {
-            IFOLFormula formula = (IFOLFormula) formulas.get(e);
-            if (!formula.isABoundedVariable(r.getMapping()))
+        for (Map.Entry<Integer, IASTExp> e : env.map().entrySet()) {
+            IFOLFormula formula = (IFOLFormula) formulas.get(e.getValue());
+            if (formula.isAnUnboundedVariable(r.getMapping()))
                 throw new RuntimeException("The introduction of the universal rule is incorrectly typed!\n" +
-                        "Variable " + r.getMapping() + " appears free in " + e + "!");
+                        "Variable " + r.getMapping() + " appears free in mark" + e.getKey() + "!");
         }
 
-        return result;
+        return r.getHyp().accept(this, env);
     }
 
     @Override
-    public Set<IASTExp> visit(ASTEExist r, Void env) {
+    public Void visit(ASTEExist r, Env<Integer, IASTExp> env) {
         ASTExistential exi = (ASTExistential) r.getHyp1().getConclusion();
         IFOLFormula psi = (IFOLFormula) formulas.get(ExpUtils.removeParenthesis(exi.getRight()));
         IFOLFormula exp = (IFOLFormula) formulas.get(r.getConclusion());
 
-        if (exi.getLeft().equals(r.getMapping()) && !psi.isABoundedVariable(r.getMapping()))
+        if (!exi.getLeft().equals(r.getMapping()) && psi.isAnUnboundedVariable(r.getMapping()))
             throw new RuntimeException("The elimination of the existential rule is incorrectly typed!\n" +
                     "Variable " + r.getMapping() + " appears free in " + psi + "!");
 
-        if(!exp.isABoundedVariable(r.getMapping()))
+        if (!exp.isABoundedVariable(r.getMapping()))
             throw new RuntimeException("The elimination of the existential rule is incorrectly typed!\n" +
                     "Variable " + r.getMapping() + " appears free in " + exp + "!");
 
-        Set<IASTExp> result = r.getHyp2().accept(this, env);
-        for (IASTExp e : result) {
-            IFOLFormula formula = (IFOLFormula) formulas.get(e);
-            if (!e.equals(r.getGeneratedHypothesis()) && !formula.isABoundedVariable(r.getMapping()))
+        for (Map.Entry<Integer, IASTExp> e : env.map().entrySet()) {
+            IFOLFormula formula = (IFOLFormula) formulas.get(e.getValue());
+            if (!e.equals(r.getGeneratedHypothesis()) && formula.isAnUnboundedVariable(r.getMapping()))
                 throw new RuntimeException("The elimination of the existential rule is incorrectly typed!\n" +
-                        "Variable " + r.getMapping() + " appears free in " + e + "!");
+                        "Variable " + r.getMapping() + " appears free in mark " + e.getKey() + "!");
         }
 
-        result.addAll(r.getHyp1().accept(this, env));
-        return result;
+        r.getHyp1().accept(this, env);
+
+        env = env.beginScope();
+        env.bind(r.getM(), r.getGeneratedHypothesis());
+        r.getHyp2().accept(this, env);
+        env.endScope();
+
+        return null;
     }
 
 }

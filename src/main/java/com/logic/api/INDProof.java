@@ -7,6 +7,8 @@ import java.util.Iterator;
 //TODO add documentation
 public interface INDProof {
 
+    IFormula getConclusion();
+
     Iterator<IASTExp> getPremises();
 
     int height();

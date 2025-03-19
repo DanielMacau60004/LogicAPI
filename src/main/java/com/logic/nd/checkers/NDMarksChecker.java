@@ -209,7 +209,7 @@ public class NDMarksChecker implements INDVisitor<Void, Env<Integer, IASTExp>> {
 
     @Override
     public Void visit(ASTEExist r, Env<Integer, IASTExp> env) {
-        ASTExistential exi = (ASTExistential) r.getConclusion();
+        ASTExistential exi = (ASTExistential) r.getHyp1().getConclusion();
         r.getHyp1().accept(this, env);
 
         env = env.beginScope();

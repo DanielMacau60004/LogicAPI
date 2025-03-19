@@ -1,5 +1,7 @@
 package com.logic.nd;
 
+import com.logic.api.IFOLFormula;
+import com.logic.api.IFormula;
 import com.logic.api.INDProof;
 import com.logic.exps.asts.IASTExp;
 import com.logic.nd.asts.IASTND;
@@ -10,16 +12,23 @@ import java.util.Map;
 
 public class NDProof implements INDProof {
 
+    private final IFormula conclusion;
     private final Map<IASTExp, Integer> premises;
     private final IASTND proof;
     private final int height;
     private final int size;
 
-    public NDProof(Map<IASTExp, Integer> premises, IASTND proof, int height, int size) {
+    public NDProof(IFormula conclusion, Map<IASTExp, Integer> premises, IASTND proof, int height, int size) {
+        this.conclusion = conclusion;
         this.premises = premises;
         this.proof = proof;
         this.height = height;
         this.size = size;
+    }
+
+    @Override
+    public IFormula getConclusion() {
+        return conclusion;
     }
 
     @Override
