@@ -21,7 +21,9 @@ import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
 import com.logic.others.Utils;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 public class NDWWFChecker implements INDVisitor<Void, Void> {
@@ -241,15 +243,17 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
                     "The hypothesis should be an universal, but you provided: " + r.getHyp() + "!");
 
         //Find mapping
-        IASTExp x = uni.getLeft();
+        ASTVariable x =  (ASTVariable) uni.getLeft();
         IASTExp psi = ExpUtils.removeParenthesis(uni.getRight());
         IFOLFormula psiXT = (IFOLFormula) formulas.get(r.getConclusion());
 
-        Iterator<AASTTerm> it = psiXT.iterateTerms();
-        while (it.hasNext()) {
-            AASTTerm t = it.next();
-            if (FOLReplaceExps.replace(psi, x, t).equals(psiXT.getFormula())) {
-                r.setMapping(t);
+        List<AASTTerm> terms = new ArrayList<>();
+        psiXT.iterateTerms().forEachRemaining(terms::add);
+        terms.add(x);
+
+        for(AASTTerm term : terms) {
+            if (FOLReplaceExps.replace(psi, x, term).equals(psiXT.getFormula())) {
+                r.setMapping(term);
                 break;
             }
         }
@@ -270,15 +274,17 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
                     "The conclusion should be an existential, but you provided: " + r.getConclusion() + "!");
 
         //Find mapping
-        IASTExp x = exi.getLeft();
+        ASTVariable x =  (ASTVariable) exi.getLeft();
         IASTExp psi = ExpUtils.removeParenthesis(exi.getRight());
         IFOLFormula psiXT = (IFOLFormula) formulas.get(r.getHyp().getConclusion());
 
-        Iterator<AASTTerm> it = psiXT.iterateTerms();
-        while (it.hasNext()) {
-            AASTTerm t = it.next();
-            if (FOLReplaceExps.replace(psi, x, t).equals(psiXT.getFormula())) {
-                r.setMapping(t);
+        List<AASTTerm> terms = new ArrayList<>();
+        psiXT.iterateTerms().forEachRemaining(terms::add);
+        terms.add(x);
+
+        for(AASTTerm term : terms) {
+            if (FOLReplaceExps.replace(psi, x, term).equals(psiXT.getFormula())) {
+                r.setMapping(term);
                 break;
             }
         }
@@ -299,22 +305,24 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
                     "The conclusion should be an universal, but you provided: " + r.getConclusion() + "!");
 
         //Find mapping
-        IASTExp x = uni.getLeft();
+        ASTVariable x =  (ASTVariable) uni.getLeft();
         IASTExp psi = ExpUtils.removeParenthesis(uni.getRight());
-        IFOLFormula psiXT = (IFOLFormula) formulas.get(r.getHyp().getConclusion());
+        IFOLFormula psiXY = (IFOLFormula) formulas.get(r.getHyp().getConclusion());
 
-        Iterator<ASTVariable> it = psiXT.iterateVariables();
-        while (it.hasNext()) {
-            ASTVariable t = it.next();
-            if (FOLReplaceExps.replace(psi, x, t).equals(psiXT.getFormula())) {
-                r.setMapping(t);
+        List<ASTVariable> variables = new ArrayList<>();
+        variables.add(x); //It can be itself
+        psiXY.iterateVariables().forEachRemaining(variables::add);
+
+        for(ASTVariable var : variables) {
+            if (FOLReplaceExps.replace(psi, x, var).equals(psiXY.getFormula())) {
+                r.setMapping(var);
                 break;
             }
         }
 
         if (r.getMapping() == null)
             throw new RuntimeException("The introduction of the universal rule is incorrectly typed!\n" +
-                    "There is no mapping of " + x + " in " + psi + " that can produce " + psiXT + "!");
+                    "There is no mapping of " + x + " in " + psi + " that can produce " + psiXY + "!");
 
         formulas.put(psi, FOLWFFChecker.check(psi));
 

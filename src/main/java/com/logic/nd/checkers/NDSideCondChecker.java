@@ -166,7 +166,7 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<Integer, IASTExp>
             IFOLFormula formula = (IFOLFormula) formulas.get(e.getValue());
             if (formula.isAnUnboundedVariable(r.getMapping()))
                 throw new RuntimeException("The introduction of the universal rule is incorrectly typed!\n" +
-                        "Variable " + r.getMapping() + " appears free in mark" + e.getKey() + "!");
+                        "Variable " + r.getMapping() + " appears free in " + e.getKey() + "!");
         }
 
         return r.getHyp().accept(this, env);
@@ -182,7 +182,7 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<Integer, IASTExp>
             throw new RuntimeException("The elimination of the existential rule is incorrectly typed!\n" +
                     "Variable " + r.getMapping() + " appears free in " + psi + "!");
 
-        if (!exp.isABoundedVariable(r.getMapping()))
+        if (!r.getConclusion().equals(ExpUtils.BOT) && !exp.isABoundedVariable(r.getMapping()))
             throw new RuntimeException("The elimination of the existential rule is incorrectly typed!\n" +
                     "Variable " + r.getMapping() + " appears free in " + exp + "!");
 

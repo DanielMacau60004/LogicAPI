@@ -209,6 +209,7 @@ public class NDMarksChecker implements INDVisitor<Void, Env<Integer, IASTExp>> {
 
     @Override
     public Void visit(ASTEExist r, Env<Integer, IASTExp> env) {
+
         ASTExistential exi = (ASTExistential) r.getHyp1().getConclusion();
         r.getHyp1().accept(this, env);
 
@@ -220,22 +221,24 @@ public class NDMarksChecker implements INDVisitor<Void, Env<Integer, IASTExp>> {
         IASTExp exp = hypotheses.get(r.getM());
         if(exp == null) return null;
 
-        IASTExp x = exi.getLeft();
+        ASTVariable x =  (ASTVariable) exi.getLeft();
         IASTExp psi = ExpUtils.removeParenthesis(exi.getRight());
-        IFOLFormula psiXT = (IFOLFormula) formulas.get(exp);
+        IFOLFormula psiXY = (IFOLFormula) formulas.get(exp);
 
-        Iterator<ASTVariable> it = psiXT.iterateVariables();
-        while (it.hasNext()) {
-            ASTVariable t = it.next();
-            if (FOLReplaceExps.replace(psi, x, t).equals(psiXT.getFormula())) {
-                r.setMapping(t);
+        List<ASTVariable> variables = new ArrayList<>();
+        variables.add(x); //It can be itself
+        psiXY.iterateVariables().forEachRemaining(variables::add);
+
+        for(ASTVariable var : variables) {
+            if (FOLReplaceExps.replace(psi, x, var).equals(psiXY.getFormula())) {
+                r.setMapping(var);
                 break;
             }
         }
 
         if (r.getMapping() == null)
             throw new RuntimeException("The elimination of the existential rule is incorrectly typed!\n" +
-                    "There is no mapping of " + x + " in " + psi + " that can produce " + psiXT + "!");
+                    "There is no mapping of " + x + " in " + psi + " that can produce " + psiXY + "!");
 
         if (hypotheses.containsKey(r.getM()) && !exp.equals(hypotheses.get(r.getM())))
             throw new RuntimeException("The elimination of the existential rule cannot close mark " + r.getM() + "!");

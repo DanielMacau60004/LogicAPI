@@ -4,6 +4,7 @@ import com.logic.api.INDProof;
 import com.logic.exps.asts.IASTExp;
 import com.logic.nd.algorithm.state.ParallelStateGraph;
 import com.logic.nd.algorithm.state.StateGraph;
+import com.logic.nd.algorithm.state.StateSolution;
 import com.logic.nd.algorithm.transition.TransitionGraph;
 import com.logic.parser.ParseException;
 import com.logic.parser.Parser;
@@ -125,7 +126,7 @@ public class NDPLTest {
 
         Assertions.assertTrue(s.isSolvable());
         Assertions.assertDoesNotThrow(() -> {
-            INDProof proof = s.findSolution();
+            INDProof proof = new StateSolution(s).findSolution();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
         });
@@ -183,7 +184,7 @@ public class NDPLTest {
 
         Assertions.assertTrue(s.isSolvable());
         Assertions.assertDoesNotThrow(() -> {
-            INDProof proof = s.findSolution();
+            INDProof proof = new StateSolution(s).findSolution();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
         });
@@ -238,7 +239,7 @@ public class NDPLTest {
 
         Assertions.assertTrue(s.isSolvable());
         Assertions.assertDoesNotThrow(() -> {
-            INDProof proof = s.findSolution();
+            INDProof proof = new StateSolution(s).findSolution();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
         });
@@ -267,7 +268,7 @@ public class NDPLTest {
 
         Assertions.assertTrue(s.isSolvable(), "Not solvable!");
         Assertions.assertDoesNotThrow(() -> {
-            INDProof proof = s.findSolution();
+            INDProof proof = new StateSolution(s).findSolution();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
         });

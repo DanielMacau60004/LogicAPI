@@ -6,6 +6,7 @@ import com.logic.exps.asts.IASTExp;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.checkers.NDWWFExpsChecker;
 import com.logic.nd.interpreters.NDInterpreter;
+import com.logic.others.Utils;
 import com.logic.parser.Parser;
 
 import java.io.*;
@@ -48,8 +49,10 @@ public class Main {
 
         INDProof proofObj = LogicAPI.parseNDFOLProof(result);
 
-        System.out.println(proofObj.size()+" " + proofObj.height());
-        System.out.println(proofObj);
+        System.out.print("{");
+        proofObj.getPremises().forEachRemaining(i-> System.out.print(Utils.getToken(i+".")));
+        System.out.println("} |= " + proofObj.getConclusion());
+        System.out.println(Utils.getToken(proofObj+""));
 
         //ByteArrayInputStream stream = new ByteArrayInputStream((proof).getBytes());
         //System.out.println(new Parser(stream).parseNDPL());

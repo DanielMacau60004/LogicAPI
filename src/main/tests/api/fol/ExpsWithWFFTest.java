@@ -28,6 +28,7 @@ public class ExpsWithWFFTest {
             "'∃x (P(x) ∧ ∀y Father(x, y))', 'x,y', ''",
             "'∀x (L(x) → (P(f(x)) ∧ Q(y)))', 'x', 'y'",
             "'∀x (L(x) → (P(dani) ∧ Q(y))) ∧ ∀y (L(x) → (P(dani) ∧ Q(y)))','x,y', 'x,y'",
+            "'∀x ∃y φ', 'x,y', ''"
     })
     void test(String expression, String boundedStr, String unboundedStr) {
         AtomicReference<IFOLFormula> exp = new AtomicReference<>();

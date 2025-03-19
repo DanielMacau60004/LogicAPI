@@ -1,6 +1,7 @@
 package com.logic.nd.algorithm.transition;
 
 import com.logic.exps.asts.IASTExp;
+import com.logic.exps.asts.others.ASTVariable;
 import com.logic.nd.ERule;
 
 import java.util.LinkedList;
@@ -27,13 +28,18 @@ public class TransitionEdge {
         this.transitions = new LinkedList<>();
     }
 
+    public TransitionEdge addTransition(IASTExp to, IASTExp produces, ASTVariable free) {
+        transitions.add(new TransitionNode(to, produces, free));
+        return this;
+    }
+
     public TransitionEdge addTransition(IASTExp to, IASTExp produces) {
-        transitions.add(new TransitionNode(to, produces));
+        transitions.add(new TransitionNode(to, produces, null));
         return this;
     }
 
     public TransitionEdge addTransition(IASTExp to) {
-        transitions.add(new TransitionNode(to, null));
+        transitions.add(new TransitionNode(to, null, null));
         return this;
     }
 

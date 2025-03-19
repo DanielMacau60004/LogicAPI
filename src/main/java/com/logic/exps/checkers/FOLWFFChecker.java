@@ -169,6 +169,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
 
         ASTVariable variable = ((ASTVariable)e.getLeft());
         env.bind(variable.getName(), variable);
+        boundedVariables.add(variable);
         e.getRight().accept(this, env);
         env.endScope();
         return null;
@@ -180,6 +181,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
 
         ASTVariable variable = ((ASTVariable)e.getLeft());
         env.bind(variable.getName(), variable);
+        boundedVariables.add(variable);
         e.getRight().accept(this, env);
         env.endScope();
         return null;

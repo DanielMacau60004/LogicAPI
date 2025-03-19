@@ -6,7 +6,6 @@ import com.logic.exps.asts.binary.ASTAnd;
 import com.logic.exps.asts.binary.ASTBiconditional;
 import com.logic.exps.asts.binary.ASTConditional;
 import com.logic.exps.asts.binary.ASTOr;
-import com.logic.exps.asts.others.ASTLiteral;
 import com.logic.exps.asts.unary.ASTNot;
 import com.logic.exps.asts.unary.ASTParenthesis;
 import com.logic.nd.ERule;
@@ -146,21 +145,6 @@ public class TransitionGraph {
                 ,true);
     }
 
-    private void biconditionalIRule(IASTExp exp, ASTBiconditional eq) {
-        addEdge(exp, new TransitionEdge(ERule.INTRO_CONJUNCTION)
-                        .addTransition(new ASTConditional(eq.getRight(), eq.getLeft()))
-                        .addTransition(new ASTConditional(eq.getLeft(), eq.getRight()))
-                ,true);
-    }
-
-    private void biconditionalERule(IASTExp exp, ASTBiconditional eq) {
-        addEdge(new ASTAnd(
-                new ASTParenthesis(new ASTConditional(eq.getLeft(), eq.getRight())),
-                new ASTParenthesis(new ASTConditional(eq.getRight(), eq.getLeft()))),
-                new TransitionEdge(ERule.INTRO_CONJUNCTION)
-                        .addTransition(exp),true);
-    }
-
     private void genBottomUp(IASTExp exp) {
         exp = ExpUtils.removeParenthesis(exp);
         absurdityRule(exp);
@@ -181,11 +165,7 @@ public class TransitionGraph {
             conjunctionIRule(exp, and);
         } else if (exp instanceof ASTOr or)
             disjunctionIRule(exp, or);
-        //Uncomment to allow biconditional
-        /*else if(exp instanceof ASTBiconditional eq) {
-            biconditionalIRule(exp, eq);
-            biconditionalERule(exp, eq);
-        }*/
+
     }
 
     public Set<TransitionEdge> getEdges(IASTExp exp) {
