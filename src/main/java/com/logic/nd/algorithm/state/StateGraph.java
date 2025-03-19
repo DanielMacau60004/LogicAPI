@@ -2,7 +2,7 @@ package com.logic.nd.algorithm.state;
 
 import com.logic.exps.asts.IASTExp;
 import com.logic.nd.algorithm.transition.TransitionEdge;
-import com.logic.nd.algorithm.transition.TransitionGraph;
+import com.logic.nd.algorithm.transition.TransitionGraphPL;
 import com.logic.nd.algorithm.transition.TransitionNode;
 
 import java.util.*;
@@ -17,7 +17,7 @@ public class StateGraph {
     protected final IASTExp conclusion;
     protected final Set<IASTExp> premisses;
 
-    public StateGraph(TransitionGraph transitionGraph, int heightLimit, int nodesLimit, int hypothesisLimit) {
+    public StateGraph(TransitionGraphPL transitionGraph, int heightLimit, int nodesLimit, int hypothesisLimit) {
         this.nodes = new HashMap<>();
         this.tree = new HashMap<>();
 
@@ -31,7 +31,7 @@ public class StateGraph {
         return new StateNode(conclusion, premisses);
     }
 
-    void build(TransitionGraph transitionGraph, int heightLimit, int nodesLimit, int hypothesisLimit) {
+    void build(TransitionGraphPL transitionGraph, int heightLimit, int nodesLimit, int hypothesisLimit) {
         Map<StateNode, Set<StateEdge>> graph = new HashMap<>();
         Queue<StateNode> closed = new LinkedList<>();
         Queue<StateNode> explore = new LinkedList<>();
@@ -60,7 +60,8 @@ public class StateGraph {
             for (TransitionEdge edge : transitionGraph.getEdges(state.getExp())) {
                 StateEdge e = new StateEdge(edge.getRule());
                 for (TransitionNode transition : edge.getTransitions()) {
-                    StateNode newState = state.transit(transition.getTo(), transition.getProduces());
+                    StateNode newState = state.transit(transition.getTo(), transition.getProduces(),
+                            transition.getFree());
 
                     StateNode finalNewState = newState;
                     newState = nodes.computeIfAbsent(newState, k -> finalNewState);

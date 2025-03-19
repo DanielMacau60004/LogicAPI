@@ -16,6 +16,7 @@ import com.logic.nd.checkers.NDSideCondChecker;
 import com.logic.nd.checkers.NDWWFChecker;
 import com.logic.nd.checkers.NDWWFExpsChecker;
 import com.logic.nd.interpreters.NDInterpreter;
+import com.logic.others.Utils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,8 +27,11 @@ public class StateSolution {
     private final StateGraph graph;
     private int mark;
 
-    public StateSolution(StateGraph graph) {
+    private boolean isFOL;
+
+    public StateSolution(StateGraph graph, boolean isFOL) {
         this.graph = graph;
+        this.isFOL = isFOL;
     }
 
     public INDProof findSolution() {
@@ -46,8 +50,11 @@ public class StateSolution {
         this.mark = mark;
         IASTND proof = rule(new StateNode(exp, graph.premisses, hypotheses.keySet()), marks);
 
+
+        System.out.println(Utils.getToken(proof.toString()));
         //TODO....
-        Map<IASTExp, IFormula> formulas = NDWWFExpsChecker.checkPL(proof);
+        Map<IASTExp, IFormula> formulas = isFOL ? NDWWFExpsChecker.checkFOL(proof)
+                : NDWWFExpsChecker.checkPL(proof);
         NDWWFChecker.check(proof, formulas);
         Map<IASTExp, Integer> premises = NDMarksChecker.check(proof, formulas);
         NDSideCondChecker.check(proof, formulas, premises);

@@ -1,7 +1,7 @@
 package com.logic.nd.algorithm.state;
 
 import com.logic.nd.algorithm.transition.TransitionEdge;
-import com.logic.nd.algorithm.transition.TransitionGraph;
+import com.logic.nd.algorithm.transition.TransitionGraphPL;
 import com.logic.nd.algorithm.transition.TransitionNode;
 
 import java.util.*;
@@ -14,12 +14,12 @@ public class ParallelStateGraph extends StateGraph {
 
     private static final int MAX_BATCH = 5000;
 
-    public ParallelStateGraph(TransitionGraph transitionGraph, int heightLimit, int nodesLimit , int hypothesisLimit) {
+    public ParallelStateGraph(TransitionGraphPL transitionGraph, int heightLimit, int nodesLimit , int hypothesisLimit) {
         super(transitionGraph, heightLimit, nodesLimit, hypothesisLimit);
     }
 
     @Override
-    void build(TransitionGraph transitionGraph, int heightLimit, int nodesLimit, int hypothesisLimit) {
+    void build(TransitionGraphPL transitionGraph, int heightLimit, int nodesLimit, int hypothesisLimit) {
         nodes = new ConcurrentHashMap<>();
 
         ConcurrentMap<StateNode, Set<StateEdge>> graph = new ConcurrentHashMap<>();
@@ -50,7 +50,7 @@ public class ParallelStateGraph extends StateGraph {
         trim(closed, inverted, graph);
     }
 
-    private void processNode(StateNode state, TransitionGraph transitionGraph, int heightLimit, int nodesLimit , int hypothesisLimit,
+    private void processNode(StateNode state, TransitionGraphPL transitionGraph, int heightLimit, int nodesLimit , int hypothesisLimit,
                              Queue<StateNode> closed, Queue<StateNode> explore,
                              ConcurrentMap<StateNode, Set<StateEdge>> inverted, ConcurrentMap<StateNode, Set<StateEdge>> graph) {
 
@@ -72,7 +72,8 @@ public class ParallelStateGraph extends StateGraph {
             StateEdge e = new StateEdge(edge.getRule());
 
             for (TransitionNode transition : edge.getTransitions()) {
-                StateNode newState = state.transit(transition.getTo(), transition.getProduces());
+                StateNode newState = state.transit(transition.getTo(), transition.getProduces(),
+                        transition.getFree());
 
                 StateNode existingState = nodes.putIfAbsent(newState, newState);
                 if (existingState != null)

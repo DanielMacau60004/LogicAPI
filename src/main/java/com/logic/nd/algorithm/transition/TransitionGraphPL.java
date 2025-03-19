@@ -2,43 +2,39 @@ package com.logic.nd.algorithm.transition;
 
 import com.logic.exps.ExpUtils;
 import com.logic.exps.asts.IASTExp;
-import com.logic.exps.asts.binary.ASTAnd;
-import com.logic.exps.asts.binary.ASTBiconditional;
-import com.logic.exps.asts.binary.ASTConditional;
-import com.logic.exps.asts.binary.ASTOr;
+import com.logic.exps.asts.binary.*;
 import com.logic.exps.asts.unary.ASTNot;
-import com.logic.exps.asts.unary.ASTParenthesis;
 import com.logic.nd.ERule;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-public class TransitionGraph {
+public class TransitionGraphPL {
 
-    private final IASTExp conclusion;
-    private final Map<IASTExp, Set<TransitionEdge>> transitions;
-    private final Map<IASTExp, Boolean> explored;
+    protected final IASTExp conclusion;
+    protected final Map<IASTExp, Set<TransitionEdge>> transitions;
+    protected final Map<IASTExp, Boolean> explored;
 
-    private final Set<ASTOr> disjunctions;
-    private final Set<IASTExp> premisses;
+    protected final Set<ASTOr> disjunctions;
+    protected final Set<IASTExp> premisses;
 
-    public TransitionGraph(IASTExp conclusion, Set<IASTExp> premisses) {
+    //TODO manipulate the rules that can be used to generate
+    public TransitionGraphPL(IASTExp conclusion, Set<IASTExp> premisses) {
         this.conclusion = conclusion;
         this.premisses = premisses;
         this.explored = new HashMap<>();
 
         transitions = new HashMap<>();
         disjunctions = new HashSet<>();
+    }
 
+    public void build() {
         //Add all nodes necessary to generate the sub nodes
         addNode(ExpUtils.BOT, true);
         addNode(conclusion, true);
         premisses.forEach(p -> addNode(p, true));
 
         //Add the disjunction rules to each node
-        transitions.forEach((e,ts)-> ts.addAll(disjunctions.stream().map(or -> disjunctionERule(e, or)).toList()));
+        transitions.forEach((e, ts) -> ts.addAll(disjunctions.stream().map(or -> disjunctionERule(e, or)).toList()));
     }
 
     public IASTExp getConclusion() {
@@ -49,7 +45,7 @@ public class TransitionGraph {
         return premisses;
     }
 
-    private void addNode(IASTExp node, boolean canGen) {
+    protected void addNode(IASTExp node, boolean canGen) {
         if (explored.containsKey(node) && explored.get(node))
             return;
 
@@ -64,7 +60,7 @@ public class TransitionGraph {
         }
     }
 
-    private void addEdge(IASTExp from, TransitionEdge edge, boolean canGen) {
+    protected void addEdge(IASTExp from, TransitionEdge edge, boolean canGen) {
         addNode(from, true);
         edge.getTransitions().forEach(t -> addNode(t.getTo(), canGen));
         transitions.get(from).add(edge);
@@ -145,7 +141,7 @@ public class TransitionGraph {
                 ,true);
     }
 
-    private void genBottomUp(IASTExp exp) {
+    protected void genBottomUp(IASTExp exp) {
         exp = ExpUtils.removeParenthesis(exp);
         absurdityRule(exp);
 
@@ -155,7 +151,7 @@ public class TransitionGraph {
             negationIRule(exp, not);
     }
 
-    private void genTopDown(IASTExp exp) {
+    protected void genTopDown(IASTExp exp) {
         exp = ExpUtils.removeParenthesis(exp);
 
         if (exp instanceof ASTConditional imp)

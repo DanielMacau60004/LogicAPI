@@ -5,7 +5,7 @@ import com.logic.exps.asts.IASTExp;
 import com.logic.nd.algorithm.state.ParallelStateGraph;
 import com.logic.nd.algorithm.state.StateGraph;
 import com.logic.nd.algorithm.state.StateSolution;
-import com.logic.nd.algorithm.transition.TransitionGraph;
+import com.logic.nd.algorithm.transition.TransitionGraphPL;
 import com.logic.parser.ParseException;
 import com.logic.parser.Parser;
 import org.junit.jupiter.api.Assertions;
@@ -121,12 +121,13 @@ public class NDPLTest {
             premisses.add(createExpression(parts[i].trim()));
         }
 
-        TransitionGraph t = new TransitionGraph(createExpression(expression), premisses);
+        TransitionGraphPL t = new TransitionGraphPL(createExpression(expression), premisses);
+        t.build();
         StateGraph s = new ParallelStateGraph(t, 20, 2000, 5);
 
         Assertions.assertTrue(s.isSolvable());
         Assertions.assertDoesNotThrow(() -> {
-            INDProof proof = new StateSolution(s).findSolution();
+            INDProof proof = new StateSolution(s, false).findSolution();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
         });
@@ -179,12 +180,13 @@ public class NDPLTest {
             premisses.add(createExpression(parts[i].trim()));
         }
 
-        TransitionGraph t = new TransitionGraph(createExpression(expression), premisses);
+        TransitionGraphPL t = new TransitionGraphPL(createExpression(expression), premisses);
+        t.build();
         StateGraph s = new ParallelStateGraph(t, 20, 2000, 5);
 
         Assertions.assertTrue(s.isSolvable());
         Assertions.assertDoesNotThrow(() -> {
-            INDProof proof = new StateSolution(s).findSolution();
+            INDProof proof = new StateSolution(s, false).findSolution();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
         });
@@ -234,12 +236,13 @@ public class NDPLTest {
             premisses.add(createExpression(parts[i].trim()));
         }
 
-        TransitionGraph t = new TransitionGraph(createExpression(expression), premisses);
+        TransitionGraphPL t = new TransitionGraphPL(createExpression(expression), premisses);
+        t.build();
         StateGraph s = new ParallelStateGraph(t, 20, 2000, 5);
 
         Assertions.assertTrue(s.isSolvable());
         Assertions.assertDoesNotThrow(() -> {
-            INDProof proof = new StateSolution(s).findSolution();
+            INDProof proof = new StateSolution(s, false).findSolution();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
         });
@@ -263,12 +266,13 @@ public class NDPLTest {
             premisses.add(createExpression(parts[i].trim()));
         }
 
-        TransitionGraph t = new TransitionGraph(createExpression(expression), premisses);
+        TransitionGraphPL t = new TransitionGraphPL(createExpression(expression), premisses);
+        t.build();
         StateGraph s = new ParallelStateGraph(t, 5, 300, 5);
 
         Assertions.assertTrue(s.isSolvable(), "Not solvable!");
         Assertions.assertDoesNotThrow(() -> {
-            INDProof proof = new StateSolution(s).findSolution();
+            INDProof proof = new StateSolution(s, false).findSolution();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
         });

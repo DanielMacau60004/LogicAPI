@@ -5,7 +5,9 @@ import com.logic.api.LogicAPI;
 import com.logic.exps.asts.IASTExp;
 import com.logic.nd.algorithm.state.ParallelStateGraph;
 import com.logic.nd.algorithm.state.StateGraph;
-import com.logic.nd.algorithm.transition.TransitionGraph;
+import com.logic.nd.algorithm.state.StateSolution;
+import com.logic.nd.algorithm.transition.TransitionGraphFOL;
+import com.logic.nd.algorithm.transition.TransitionGraphPL;
 import com.logic.others.Utils;
 import com.logic.parser.ParseException;
 import com.logic.parser.Parser;
@@ -18,6 +20,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class NDFOLTest {
+
+    public static IASTExp createExpression(String expression) throws ParseException {
+        Parser parser = new Parser(new ByteArrayInputStream((expression + ".").getBytes()));
+        return parser.parseFOL();
+    }
+
 
     @ParameterizedTest
     @ValueSource(strings = {
@@ -57,8 +65,57 @@ public class NDFOLTest {
             INDProof ndProof = LogicAPI.parseNDFOLProof(proof);
 
             System.out.print("{");
-            ndProof.getPremises().forEachRemaining(i-> System.out.print(Utils.getToken(i+".")));
+            ndProof.getPremises().forEachRemaining(i -> System.out.print(Utils.getToken(i + ".")));
             System.out.println("} |= " + ndProof.getConclusion());
+        });
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            /*1*/"∀x P(x) ∨ ∀x Q(x). ∀x (P(x) ∨ Q(x))",
+            /*2*/"∀x (P(x) ∧ Q(x)). ∀x P(x) ∧ ∀x Q(x)",
+            /*3*/"(∀x P(x) ∧ ∀x Q(x)) → ∀x (P(x) ∧ Q(x))",
+            /*4*/"∃x (P(x) ∧ Q(x)). ∃x P(x) ∧ ∃x Q(x)",
+            /*5*/"(∃x P(x) ∨ ∃x Q(x)) → ∃x (P(x) ∨ Q(x))",
+            /*6*/"∃x (P(x) ∨ Q(x)). ∃x P(x) ∨ ∃x Q(x)",
+            /*7*/"∀x (P(x) → Q(x)). ∀x P(x) → ∀x Q(x)",
+            /*8*/"∃y∀x φ. ∀x∃y φ",
+            /*9*/"∃x ¬P(x) → ¬∀x P(x)",
+            /*10*/"¬∀x P(x) → ∃x ¬P(x)",
+            /*11*/"∀x ¬P(x) → ¬∃x P(x)",
+            /*12*/"¬∃x P(x) → ∀x ¬P(x)",
+            /*13*/"∃x φ → ¬∀x ¬φ",
+            /*14*/"¬∀x ¬φ. ∃x φ",
+            /*15*/"∀x φ → ¬∃x ¬φ",
+            /*17*///"((∀x φ ∧ ψ) → ∀x (φ ∧ ψ)) ∧ (∀x (φ ∧ ψ) → (∀x φ ∧ ψ))", //Only works if we add x in the set of notfree
+            /*23*///"(∀x (φ → ψ) → (∃x φ → ψ)) ∧ ((∃x φ → ψ) → ∀x (φ → ψ))", //Only works if we add x in the set of notfree
+
+            /*2*/"∀y(C(y) ∨ D(y)). ∀x(C(x) → L(x)). ∃x¬L(x). ∃x D(x)",
+            /*3*/"∀x(C(x) → S(x)). ∀x(¬A(x,b) → ¬S(x)). ∀x((C(x)∨S(x)) → A(x,b))",
+            /*4*///"L(a,b). ∀x(∃y(L(y,x) ∨ L(x,y)) → L(x,x)). ∃x L(x,a)", //Is not computable
+            /*5*/"∀x ∀y (L(x,y) → L(y,x)). ∃x ∀y L(x,y). ∀x ∃y L(x,y)", //Require aux variables but is computable
+    })
+    void testAlgorithm(String premissesAndExpression) throws ParseException {
+        String[] parts = premissesAndExpression.split("\\.");
+        String expression = parts[parts.length - 1].trim();
+
+        Set<IASTExp> premisses = new HashSet<>();
+        for (int i = 0; i < parts.length - 1; i++) {
+            premisses.add(createExpression(parts[i].trim()));
+        }
+
+        TransitionGraphFOL t = new TransitionGraphFOL(createExpression(expression), premisses);
+        t.build();
+        StateGraph s = new ParallelStateGraph(t, 10, 2000, 5);
+
+        System.out.println(Utils.getToken(t+""));
+
+        Assertions.assertTrue(s.isSolvable(), "Not solvable!");
+        Assertions.assertDoesNotThrow(() -> {
+            INDProof proof = new StateSolution(s, true).findSolution();
+            System.out.println("Size: " + proof.size() + " Height: " + proof.height());
+            System.out.println(proof);
         });
     }
 
