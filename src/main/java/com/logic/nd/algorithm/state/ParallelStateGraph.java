@@ -1,5 +1,6 @@
 package com.logic.nd.algorithm.state;
 
+import com.logic.nd.algorithm.transition.ITransitionGraph;
 import com.logic.nd.algorithm.transition.TransitionEdge;
 import com.logic.nd.algorithm.transition.TransitionGraphPL;
 import com.logic.nd.algorithm.transition.TransitionNode;
@@ -14,12 +15,13 @@ public class ParallelStateGraph extends StateGraph {
 
     private static final int MAX_BATCH = 5000;
 
-    public ParallelStateGraph(TransitionGraphPL transitionGraph, int heightLimit, int nodesLimit , int hypothesisLimit) {
-        super(transitionGraph, heightLimit, nodesLimit, hypothesisLimit);
+    public ParallelStateGraph(ITransitionGraph transitionGraph, StateNode initialState
+            , int heightLimit, int totalClosedNodesLimit, int hypothesesPerStateLimit) {
+        super(transitionGraph, initialState, heightLimit, totalClosedNodesLimit, hypothesesPerStateLimit);
     }
 
     @Override
-    void build(TransitionGraphPL transitionGraph, int heightLimit, int nodesLimit, int hypothesisLimit) {
+    void build() {
         nodes = new ConcurrentHashMap<>();
 
         ConcurrentMap<StateNode, Set<StateEdge>> graph = new ConcurrentHashMap<>();
@@ -27,7 +29,7 @@ public class ParallelStateGraph extends StateGraph {
         Queue<StateNode> explore = new ConcurrentLinkedQueue<>();
         ConcurrentMap<StateNode, Set<StateEdge>> inverted = new ConcurrentHashMap<>();
 
-        explore.add(getInitState());
+        explore.add(initialState);
 
         ForkJoinPool pool = new ForkJoinPool(); // Uses all available CPU cores
 
@@ -42,7 +44,7 @@ public class ParallelStateGraph extends StateGraph {
 
             pool.submit(() ->
                     batch.parallelStream().forEach(state ->
-                            processNode(state, transitionGraph, heightLimit, nodesLimit, hypothesisLimit, closed, explore, inverted, graph)
+                            processNode(state, closed, explore, inverted, graph)
                     )
             ).join();
         }
@@ -50,12 +52,12 @@ public class ParallelStateGraph extends StateGraph {
         trim(closed, inverted, graph);
     }
 
-    private void processNode(StateNode state, TransitionGraphPL transitionGraph, int heightLimit, int nodesLimit , int hypothesisLimit,
+    private void processNode(StateNode state,
                              Queue<StateNode> closed, Queue<StateNode> explore,
                              ConcurrentMap<StateNode, Set<StateEdge>> inverted, ConcurrentMap<StateNode, Set<StateEdge>> graph) {
 
-        if (graph.containsKey(state) || state.getHeight() > heightLimit || closed.size() >= nodesLimit
-            || state.getHypotheses().size() > hypothesisLimit) return;
+        if (graph.containsKey(state) || state.getHeight() > heightLimit || closed.size() >= totalClosedNodesLimit
+            || state.getHypotheses().size() > hypothesesPerStateLimit) return;
 
         Set<StateEdge> edges = ConcurrentHashMap.newKeySet();
         Set<StateEdge> existingEdges = graph.putIfAbsent(state, edges);

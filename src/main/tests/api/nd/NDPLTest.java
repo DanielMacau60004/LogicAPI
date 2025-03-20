@@ -1,27 +1,15 @@
 package api.nd;
 
-import com.logic.api.INDProof;
-import com.logic.exps.asts.IASTExp;
-import com.logic.nd.algorithm.state.ParallelStateGraph;
-import com.logic.nd.algorithm.state.StateGraph;
-import com.logic.nd.algorithm.state.StateSolution;
-import com.logic.nd.algorithm.transition.TransitionGraphPL;
-import com.logic.parser.ParseException;
-import com.logic.parser.Parser;
+import com.logic.api.*;
+import com.logic.nd.algorithm.AlgoProofPLBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.io.ByteArrayInputStream;
 import java.util.HashSet;
 import java.util.Set;
 
 public class NDPLTest {
-
-    public static IASTExp createExpression(String expression) throws ParseException {
-        Parser parser = new Parser(new ByteArrayInputStream((expression + ".").getBytes()));
-        return parser.parsePL();
-    }
 
     @ParameterizedTest
     @ValueSource(strings = {
@@ -112,22 +100,19 @@ public class NDPLTest {
             "¬p → q, r ∨ ¬q, p → (a ∨ b), ¬r ∧ ¬b, a",
             "p → (q ∨ r), (p → q) ∨ (p → r)"
     })
-    void testAlgorithmWithParser(String premissesAndExpression) throws ParseException {
+    void testAlgorithmWithParser(String premissesAndExpression) throws Exception {
         String[] parts = premissesAndExpression.split(",");
         String expression = parts[parts.length - 1].trim();
 
-        Set<IASTExp> premisses = new HashSet<>();
+        Set<IPLFormula> premisses = new HashSet<>();
         for (int i = 0; i < parts.length - 1; i++) {
-            premisses.add(createExpression(parts[i].trim()));
+            premisses.add(LogicAPI.parsePL(parts[i].trim()));
         }
 
-        TransitionGraphPL t = new TransitionGraphPL(createExpression(expression), premisses);
-        t.build();
-        StateGraph s = new ParallelStateGraph(t, 20, 2000, 5);
-
-        Assertions.assertTrue(s.isSolvable());
         Assertions.assertDoesNotThrow(() -> {
-            INDProof proof = new StateSolution(s, false).findSolution();
+            INDProof proof = new AlgoProofPLBuilder(LogicAPI.parsePL(expression))
+                    .addPremises(premisses)
+                    .build();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
         });
@@ -171,22 +156,19 @@ public class NDPLTest {
             "(a → b) ∧ (b → a), ((a ∧ c) → (b ∧ c)) ∧ ((b ∧ c) → (a ∧ c))",
             "¬(¬a ∨ ¬b), a ∧ b"
     })
-    void testBig(String premissesAndExpression) throws ParseException {
+    void testBig(String premissesAndExpression) throws Exception {
         String[] parts = premissesAndExpression.split(",");
         String expression = parts[parts.length - 1].trim();
 
-        Set<IASTExp> premisses = new HashSet<>();
+        Set<IPLFormula> premisses = new HashSet<>();
         for (int i = 0; i < parts.length - 1; i++) {
-            premisses.add(createExpression(parts[i].trim()));
+            premisses.add(LogicAPI.parsePL(parts[i].trim()));
         }
 
-        TransitionGraphPL t = new TransitionGraphPL(createExpression(expression), premisses);
-        t.build();
-        StateGraph s = new ParallelStateGraph(t, 20, 2000, 5);
-
-        Assertions.assertTrue(s.isSolvable());
         Assertions.assertDoesNotThrow(() -> {
-            INDProof proof = new StateSolution(s, false).findSolution();
+            INDProof proof = new AlgoProofPLBuilder(LogicAPI.parsePL(expression))
+                    .addPremises(premisses)
+                    .build();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
         });
@@ -227,22 +209,19 @@ public class NDPLTest {
             "(a ∨ a) → a",
             "(a → ¬¬a) ∧ (¬¬a → a)",
     })
-    void testMore(String premissesAndExpression) throws ParseException {
+    void testMore(String premissesAndExpression) throws Exception {
         String[] parts = premissesAndExpression.split(",");
         String expression = parts[parts.length - 1].trim();
 
-        Set<IASTExp> premisses = new HashSet<>();
+        Set<IPLFormula> premisses = new HashSet<>();
         for (int i = 0; i < parts.length - 1; i++) {
-            premisses.add(createExpression(parts[i].trim()));
+            premisses.add(LogicAPI.parsePL(parts[i].trim()));
         }
 
-        TransitionGraphPL t = new TransitionGraphPL(createExpression(expression), premisses);
-        t.build();
-        StateGraph s = new ParallelStateGraph(t, 20, 2000, 5);
-
-        Assertions.assertTrue(s.isSolvable());
         Assertions.assertDoesNotThrow(() -> {
-            INDProof proof = new StateSolution(s, false).findSolution();
+            INDProof proof = new AlgoProofPLBuilder(LogicAPI.parsePL(expression))
+                    .addPremises(premisses)
+                    .build();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
         });
@@ -257,22 +236,19 @@ public class NDPLTest {
             "¬⊥",
             "a ∧ b, a ∧ a"
     })
-    void testSingle(String premissesAndExpression) throws ParseException {
+    void testSingle(String premissesAndExpression) throws Exception {
         String[] parts = premissesAndExpression.split(",");
         String expression = parts[parts.length - 1].trim();
 
-        Set<IASTExp> premisses = new HashSet<>();
+        Set<IPLFormula> premisses = new HashSet<>();
         for (int i = 0; i < parts.length - 1; i++) {
-            premisses.add(createExpression(parts[i].trim()));
+            premisses.add(LogicAPI.parsePL(parts[i].trim()));
         }
 
-        TransitionGraphPL t = new TransitionGraphPL(createExpression(expression), premisses);
-        t.build();
-        StateGraph s = new ParallelStateGraph(t, 5, 300, 5);
-
-        Assertions.assertTrue(s.isSolvable(), "Not solvable!");
         Assertions.assertDoesNotThrow(() -> {
-            INDProof proof = new StateSolution(s, false).findSolution();
+            INDProof proof = new AlgoProofPLBuilder(LogicAPI.parsePL(expression))
+                    .addPremises(premisses)
+                    .build();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
         });

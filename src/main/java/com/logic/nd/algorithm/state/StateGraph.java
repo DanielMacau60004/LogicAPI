@@ -1,8 +1,7 @@
 package com.logic.nd.algorithm.state;
 
-import com.logic.exps.asts.IASTExp;
+import com.logic.nd.algorithm.transition.ITransitionGraph;
 import com.logic.nd.algorithm.transition.TransitionEdge;
-import com.logic.nd.algorithm.transition.TransitionGraphPL;
 import com.logic.nd.algorithm.transition.TransitionNode;
 
 import java.util.*;
@@ -11,33 +10,37 @@ public class StateGraph {
 
     //Necessary to keep the refs of the nodes
     protected Map<StateNode, StateNode> nodes;
-
     protected Map<StateNode, StateEdge> tree;
 
-    protected final IASTExp conclusion;
-    protected final Set<IASTExp> premisses;
+    protected final ITransitionGraph transitionGraph;
 
-    public StateGraph(TransitionGraphPL transitionGraph, int heightLimit, int nodesLimit, int hypothesisLimit) {
+    protected final int heightLimit;
+    protected final int totalClosedNodesLimit;
+    protected final int hypothesesPerStateLimit;
+
+    protected StateNode initialState;
+
+    public StateGraph(ITransitionGraph transitionGraph, StateNode initialState
+            , int heightLimit, int totalClosedNodesLimit, int hypothesesPerStateLimit) {
+        this.transitionGraph = transitionGraph;
+        this.heightLimit = heightLimit;
+        this.totalClosedNodesLimit = totalClosedNodesLimit;
+        this.hypothesesPerStateLimit = hypothesesPerStateLimit;
+        this.initialState = initialState;
+
         this.nodes = new HashMap<>();
         this.tree = new HashMap<>();
 
-        this.conclusion = transitionGraph.getConclusion();
-        this.premisses = transitionGraph.getPremisses();
-
-        build(transitionGraph, heightLimit, nodesLimit, hypothesisLimit);
+        build();
     }
 
-    StateNode getInitState() {
-        return new StateNode(conclusion, premisses);
-    }
-
-    void build(TransitionGraphPL transitionGraph, int heightLimit, int nodesLimit, int hypothesisLimit) {
+    void build() {
         Map<StateNode, Set<StateEdge>> graph = new HashMap<>();
         Queue<StateNode> closed = new LinkedList<>();
         Queue<StateNode> explore = new LinkedList<>();
         Map<StateNode, Set<StateEdge>> inverted = new HashMap<>();
 
-        explore.add(getInitState());
+        explore.add(initialState);
 
         while (!explore.isEmpty()) {
             StateNode state = explore.poll();
@@ -45,8 +48,8 @@ public class StateGraph {
             if (graph.containsKey(state))
                 continue;
 
-            if (state.getHeight() > heightLimit || closed.size() == nodesLimit
-                    || state.getHypotheses().size()> hypothesisLimit)
+            if (state.getHeight() > heightLimit || closed.size() == totalClosedNodesLimit
+                    || state.getHypotheses().size()> hypothesesPerStateLimit)
                 break;
 
             Set<StateEdge> edges = new HashSet<>();
@@ -114,7 +117,7 @@ public class StateGraph {
     }
 
     public boolean isSolvable() {
-        return tree.containsKey(getInitState());
+        return tree.containsKey(initialState);
     }
 
 

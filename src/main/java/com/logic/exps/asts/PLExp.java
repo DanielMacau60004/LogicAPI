@@ -95,4 +95,17 @@ public class PLExp implements IPLFormula {
     public String toString() {
         return Utils.getToken(exp.toString());
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PLExp plExp = (PLExp) o;
+        return Objects.equals(exp, plExp.exp);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(exp);
+    }
 }

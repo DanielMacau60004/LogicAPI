@@ -4,9 +4,7 @@ import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.others.ASTVariable;
 import com.logic.nd.ERule;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class TransitionEdge {
 
@@ -53,10 +51,11 @@ public class TransitionEdge {
 
     @Override
     public String toString() {
-        String str = rule.name() + " ";
+        StringBuilder str = new StringBuilder(rule.name() + " ");
         for (TransitionNode transition : transitions)
-            str += "[" + transition.getTo() + "," + transition.getProduces() + "] ";
-        return str;
+            str.append("[").append(transition.getTo()).append(",")
+                    .append(transition.getProduces()).append(",").append(transition.getFree()).append("] ");
+        return str.toString();
     }
 
     @Override

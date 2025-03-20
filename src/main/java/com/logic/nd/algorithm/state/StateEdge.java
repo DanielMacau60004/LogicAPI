@@ -22,9 +22,8 @@ public class StateEdge {
         this.transitions = new LinkedList<>();
     }
 
-    public StateEdge addTransition(StateNode to, IASTExp produces) {
+    public void addTransition(StateNode to, IASTExp produces) {
         transitions.add(new StateTransitionEdge(to, produces));
-        return this;
     }
 
     public List<StateTransitionEdge> getTransitions() {return transitions;}

@@ -1,8 +1,11 @@
 package com.logic.nd.algorithm.state;
 
+import com.logic.api.IFOLFormula;
+import com.logic.api.IFormula;
 import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.others.ASTVariable;
 import com.logic.exps.checkers.FOLWFFChecker;
+import com.logic.others.Utils;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -11,34 +14,34 @@ import java.util.Set;
 public class StateNode {
 
     private final IASTExp exp;
-    private final Set<IASTExp> premisses;
+    private final Set<IFormula> premisses;
     private final Set<IASTExp> hypotheses;
     private boolean isClosed;
     private final int height;
 
     private final Set<IASTExp> noFree;
 
-    public StateNode(IASTExp exp, Set<IASTExp> premisses) {
+    public StateNode(IASTExp exp, Set<IFormula> premisses) {
         this(exp, premisses, new HashSet<>(),null, 0, new HashSet<>());
     }
 
-    public StateNode(IASTExp exp, Set<IASTExp> premisses, Set<IASTExp> hypotheses) {
+    public StateNode(IASTExp exp, Set<IFormula> premisses, Set<IASTExp> hypotheses) {
         this(exp, premisses, hypotheses, null, 0, new HashSet<>());
     }
 
-    public StateNode(IASTExp exp, Set<IASTExp> premisses, Set<IASTExp> hypotheses, Set<IASTExp> noFree) {
+    public StateNode(IASTExp exp, Set<IFormula> premisses, Set<IASTExp> hypotheses, Set<IASTExp> noFree) {
         this(exp, premisses, hypotheses, null, 0, noFree);
     }
 
-    public StateNode(IASTExp exp, Set<IASTExp> premisses, Set<IASTExp> hypotheses, int height) {
+    public StateNode(IASTExp exp, Set<IFormula> premisses, Set<IASTExp> hypotheses, int height) {
         this(exp, premisses, hypotheses, null, height, new HashSet<>());
     }
 
-    public StateNode(IASTExp exp, Set<IASTExp> premisses, Set<IASTExp> hypotheses, int height, Set<IASTExp> noFree) {
+    public StateNode(IASTExp exp, Set<IFormula> premisses, Set<IASTExp> hypotheses, int height, Set<IASTExp> noFree) {
         this(exp, premisses, hypotheses, null, height, noFree);
     }
 
-    StateNode(IASTExp exp, Set<IASTExp> premisses, Set<IASTExp> hypotheses, IASTExp hypothesis, int height
+    StateNode(IASTExp exp, Set<IFormula> premisses, Set<IASTExp> hypotheses, IASTExp hypothesis, int height
             , Set<IASTExp> noFree) {
         this.exp = exp;
         this.hypotheses = hypotheses;
@@ -69,11 +72,16 @@ public class StateNode {
     }
 
     public void resetClose() {
-        isClosed = (hypotheses.contains(exp) || premisses.contains(exp)) && !noFree.contains(exp);
+        //TODO performance
+        isClosed = (hypotheses.contains(exp) || premisses.stream().anyMatch(i->i.getFormula().equals(exp))) && !noFree.contains(exp);
     }
 
     public Set<IASTExp> getHypotheses() {
         return hypotheses;
+    }
+
+    public Set<IFormula> getPremisses() {
+        return premisses;
     }
 
     public StateNode transit(IASTExp exp, IASTExp hypothesis, ASTVariable notFree) {
@@ -83,9 +91,13 @@ public class StateNode {
         //TODO performance, we can store formulas
         if(notFree != null) {
             noFree.addAll(hypotheses.stream()
-                    .filter(h-> !FOLWFFChecker.check(h).isABoundedVariable(notFree)).toList());
+                    .filter(h-> {
+                        IFOLFormula formula = FOLWFFChecker.check(h);
+                        return formula.isAVariable(notFree) && !formula.isABoundedVariable(notFree);
+                    }).toList());
             noFree.addAll(premisses.stream()
-                    .filter(p-> !FOLWFFChecker.check(p).isABoundedVariable(notFree)).toList());
+                    .filter(p-> ((IFOLFormula)p).isAVariable(notFree) && !((IFOLFormula)p).isABoundedVariable(notFree)
+                    ).map(IFormula::getFormula).toList());
         }
 
         if (hypothesis != null)

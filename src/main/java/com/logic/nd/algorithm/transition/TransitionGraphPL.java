@@ -1,5 +1,6 @@
 package com.logic.nd.algorithm.transition;
 
+import com.logic.api.IFormula;
 import com.logic.exps.ExpUtils;
 import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.binary.*;
@@ -8,41 +9,38 @@ import com.logic.nd.ERule;
 
 import java.util.*;
 
-public class TransitionGraphPL {
+public class TransitionGraphPL implements ITransitionGraph {
 
-    protected final IASTExp conclusion;
-    protected final Map<IASTExp, Set<TransitionEdge>> transitions;
+    protected final IFormula conclusion;
+    protected final Set<IFormula> premisses;
+    protected final Set<ERule> forbiddenRules;
+
+    protected final Map<IASTExp, Set<TransitionEdge>> graph;
     protected final Map<IASTExp, Boolean> explored;
 
     protected final Set<ASTOr> disjunctions;
-    protected final Set<IASTExp> premisses;
 
-    //TODO manipulate the rules that can be used to generate
-    public TransitionGraphPL(IASTExp conclusion, Set<IASTExp> premisses) {
+    public TransitionGraphPL(IFormula conclusion, Set<IFormula> premisses, Set<ERule> forbiddenRules) {
         this.conclusion = conclusion;
         this.premisses = premisses;
+        this.forbiddenRules = forbiddenRules;
+
         this.explored = new HashMap<>();
 
-        transitions = new HashMap<>();
+        graph = new HashMap<>();
         disjunctions = new HashSet<>();
     }
 
+    @Override
     public void build() {
         //Add all nodes necessary to generate the sub nodes
         addNode(ExpUtils.BOT, true);
-        addNode(conclusion, true);
-        premisses.forEach(p -> addNode(p, true));
+        addNode(conclusion.getFormula(), true);
+        premisses.forEach(p -> addNode(p.getFormula(), true));
 
         //Add the disjunction rules to each node
-        transitions.forEach((e, ts) -> ts.addAll(disjunctions.stream().map(or -> disjunctionERule(e, or)).toList()));
-    }
-
-    public IASTExp getConclusion() {
-        return conclusion;
-    }
-
-    public Set<IASTExp> getPremisses() {
-        return premisses;
+        if (!forbiddenRules.contains(ERule.ELIM_DISJUNCTION))
+            graph.forEach((e, ts) -> ts.addAll(disjunctions.stream().map(or -> disjunctionERule(e, or)).toList()));
     }
 
     protected void addNode(IASTExp node, boolean canGen) {
@@ -50,7 +48,7 @@ public class TransitionGraphPL {
             return;
 
         explored.put(node, canGen);
-        transitions.put(node, new HashSet<>());
+        graph.put(node, new HashSet<>());
         if (!node.equals(conclusion) && node instanceof ASTOr or)
             disjunctions.add(or);
 
@@ -61,9 +59,11 @@ public class TransitionGraphPL {
     }
 
     protected void addEdge(IASTExp from, TransitionEdge edge, boolean canGen) {
+        if (forbiddenRules.contains(edge.getRule())) return;
+
         addNode(from, true);
         edge.getTransitions().forEach(t -> addNode(t.getTo(), canGen));
-        transitions.get(from).add(edge);
+        graph.get(from).add(edge);
     }
 
     private void absurdityRule(IASTExp exp) {
@@ -76,7 +76,7 @@ public class TransitionGraphPL {
         addEdge(ExpUtils.BOT, new TransitionEdge(ERule.ELIM_NEGATION)
                         .addTransition(exp)
                         .addTransition(neg)
-                ,false);
+                , false);
     }
 
     private void implicationIRule(IASTExp exp, ASTConditional imp) {
@@ -138,7 +138,7 @@ public class TransitionGraphPL {
         addEdge(exp, new TransitionEdge(ERule.INTRO_CONJUNCTION)
                         .addTransition(left)
                         .addTransition(right)
-                ,true);
+                , true);
     }
 
     protected void genBottomUp(IASTExp exp) {
@@ -164,20 +164,21 @@ public class TransitionGraphPL {
 
     }
 
+    @Override
     public Set<TransitionEdge> getEdges(IASTExp exp) {
-        return transitions.get(exp);
+        return graph.get(exp);
     }
 
     @Override
     public String toString() {
         String str = "";
-        str += "Total nodes: " + transitions.size() + "\n";
-        str += "Total edges: " + transitions.values().stream().mapToInt(Set::size).sum() + "\n";
+        str += "Total nodes: " + graph.size() + "\n";
+        str += "Total edges: " + graph.values().stream().mapToInt(Set::size).sum() + "\n";
         str += "Disjunctions: " + disjunctions + "\n";
-        for (Map.Entry<IASTExp, Set<TransitionEdge>> entry : transitions.entrySet()) {
+        for (Map.Entry<IASTExp, Set<TransitionEdge>> entry : graph.entrySet()) {
             str += entry.getKey() + ":  \n";
             for (TransitionEdge transition : entry.getValue())
-                str += "\t" + transition+ "\n";
+                str += "\t" + transition + "\n";
         }
         return str;
     }

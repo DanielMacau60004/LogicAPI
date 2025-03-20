@@ -9,6 +9,7 @@ import com.logic.others.Utils;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 
 public class FOLExp implements IFOLFormula {
@@ -82,6 +83,11 @@ public class FOLExp implements IFOLFormula {
     }
 
     @Override
+    public boolean isAVariable(ASTVariable variable) {
+        return boundedVariables.contains(variable) || unboundedVariables.contains(variable);
+    }
+
+    @Override
     public Iterator<ASTVariable> iterateUnboundedVariables() {
         return unboundedVariables.iterator();
     }
@@ -94,5 +100,18 @@ public class FOLExp implements IFOLFormula {
     @Override
     public String toString() {
         return Utils.getToken(exp.toString());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FOLExp folExp = (FOLExp) o;
+        return Objects.equals(exp, folExp.exp);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(exp);
     }
 }

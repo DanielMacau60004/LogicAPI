@@ -3,6 +3,7 @@ package com.logic.nd.algorithm.state;
 import com.logic.api.IFormula;
 import com.logic.api.INDProof;
 import com.logic.exps.asts.IASTExp;
+import com.logic.exps.asts.others.ASTVariable;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.binary.ASTEExist;
 import com.logic.nd.asts.binary.ASTEImp;
@@ -35,9 +36,10 @@ public class StateSolution {
     }
 
     public INDProof findSolution() {
-        return findSolution(graph.getInitState().getExp(), new HashMap<>());
+        return findSolution(graph.initialState.getExp(), new HashMap<>());
     }
 
+    //Specify which hypothesis cannot be closed
     public INDProof findSolution(IASTExp exp, Map<IASTExp, Integer> hypotheses) {
         if (!graph.isSolvable())
             return null;
@@ -45,11 +47,10 @@ public class StateSolution {
         //TODO will cause conflict with premises marks, they might not start with 1
         int mark = 1;
         Map<IASTExp, Integer> marks = new HashMap<>(hypotheses);
-        for(IASTExp e : graph.premisses) marks.put(e, mark++);
+        for(IFormula e : graph.initialState.getPremisses()) marks.put(e.getFormula(), mark++);
 
         this.mark = mark;
-        IASTND proof = rule(new StateNode(exp, graph.premisses, hypotheses.keySet()), marks);
-
+        IASTND proof = rule(new StateNode(exp, graph.initialState.getPremisses(), hypotheses.keySet(), 0), marks);
 
         System.out.println(Utils.getToken(proof.toString()));
         //TODO....
@@ -64,7 +65,6 @@ public class StateSolution {
     private IASTND rule(StateNode initState, Map<IASTExp, Integer> marks) {
         StateEdge edge = graph.tree.get(initState);
         IASTExp exp = initState.getExp();
-
         marks = new HashMap<>(marks);
 
         if(edge == null)

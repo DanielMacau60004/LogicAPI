@@ -7,37 +7,31 @@ import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.binary.*;
 import com.logic.exps.asts.others.AASTTerm;
 import com.logic.exps.asts.others.ASTVariable;
-import com.logic.exps.asts.unary.ASTNot;
 import com.logic.exps.checkers.FOLWFFChecker;
 import com.logic.exps.interpreters.FOLReplaceExps;
 import com.logic.nd.ERule;
-import com.logic.others.Utils;
 
 import java.util.*;
 
-public class TransitionGraphFOL extends TransitionGraphPL {
+public class TransitionGraphFOL extends TransitionGraphPL implements ITransitionGraph {
 
     private final Set<ASTExistential> existentials;
     private final Set<AASTTerm> terms;
 
-    //TODO ALLOW ADDING MORE TERMS TO THE SYSTEM
-    //TODO ADD A CAP TO FIND A SOLUTION
     //TODO SPECIFY GENERICS FREE VARIABLES
-    public TransitionGraphFOL(IASTExp conclusion, Set<IASTExp> premisses) {
-        super(conclusion, premisses);
-
+    public TransitionGraphFOL(IFOLFormula conclusion, Set<IFormula> premisses, Set<ERule> forbiddenRules,
+                              Set<AASTTerm> terms) {
+        super(conclusion, premisses, forbiddenRules);
+        this.terms = terms;
         existentials = new HashSet<>();
-        terms = new HashSet<>();
-
-        FOLWFFChecker.check(conclusion).iterateTerms().forEachRemaining(terms::add);
-        premisses.forEach(p -> FOLWFFChecker.check(p).iterateTerms().forEachRemaining(terms::add));
     }
 
     @Override
     public void build() {
         super.build();
 
-        transitions.forEach((e, ts) -> existentials.forEach(exi -> ts.addAll(existentialERule(e, exi))));
+        if (!forbiddenRules.contains(ERule.ELIM_EXISTENTIAL))
+            graph.forEach((e, ts) -> existentials.forEach(exi -> ts.addAll(existentialERule(e, exi))));
     }
 
     protected void addNode(IASTExp node, boolean canGen) {
@@ -51,48 +45,49 @@ public class TransitionGraphFOL extends TransitionGraphPL {
         IASTExp psi = ExpUtils.removeParenthesis(exi.getRight());
         ASTVariable xVar = (ASTVariable) exi.getLeft();
 
-        terms.forEach(t -> {
+        for (AASTTerm t : terms) {
             IASTExp psiXT = FOLReplaceExps.replace(psi, xVar, t);
 
             if (t instanceof ASTVariable x && FOLWFFChecker.check(psi).isABoundedVariable(x))
-                return;
+                continue;
 
             addEdge(exi, new TransitionEdge(ERule.INTRO_EXISTENTIAL)
                     .addTransition(psiXT), true);
-        });
+        }
     }
 
     private void universalERule(ASTUniversal uni) {
         IASTExp psi = ExpUtils.removeParenthesis(uni.getRight());
         ASTVariable xVar = (ASTVariable) uni.getLeft();
 
-        terms.forEach(t -> {
+        for (AASTTerm t : terms) {
             IASTExp psiXT = FOLReplaceExps.replace(psi, xVar, t);
 
-            if (t instanceof ASTVariable x && FOLWFFChecker.check(psi).isABoundedVariable(x))
-                return;
+            if ((t instanceof ASTVariable x && FOLWFFChecker.check(psi).isABoundedVariable(x)) ||
+                    !FOLReplaceExps.replace(psiXT, t, xVar).equals(psi))
+                continue;
 
             addEdge(psiXT, new TransitionEdge(ERule.ELIM_UNIVERSAL)
                     .addTransition(uni), true);
-        });
+        }
     }
 
     private void universalIRule(ASTUniversal uni) {
         IASTExp psi = ExpUtils.removeParenthesis(uni.getRight());
         ASTVariable xVar = (ASTVariable) uni.getLeft();
 
-        terms.forEach(t -> {
+        for (AASTTerm t : terms) {
             if (!(t instanceof ASTVariable yVar))
-                return;
-            IASTExp psiXY = FOLReplaceExps.replace(psi, xVar, yVar);
+                continue;
 
+            IASTExp psiXY = FOLReplaceExps.replace(psi, xVar, yVar);
             if (!uni.getLeft().equals(yVar) &&
                     FOLWFFChecker.check(psi).isAnUnboundedVariable(yVar))
                 return;
 
             addEdge(uni, new TransitionEdge(ERule.INTRO_UNIVERSAL)
                     .addTransition(psiXY, null, yVar), true);
-        });
+        }
     }
 
     private List<TransitionEdge> existentialERule(IASTExp exp, ASTExistential exi) {
@@ -106,11 +101,9 @@ public class TransitionGraphFOL extends TransitionGraphPL {
                 continue;
 
             IASTExp psiXY = FOLReplaceExps.replace(psi, xVar, yVar);
-
-            //TODO Do I need to add !r.getConclusion().equals(ExpUtils.BOT)?
-            //TODO check with exercise 11 if it generates rules with bottom
-            if (!FOLWFFChecker.check(exp).isABoundedVariable(yVar) || (!exi.getLeft().equals(yVar)
-                    && FOLWFFChecker.check(psi).isAnUnboundedVariable(yVar)))
+            if ((!FOLWFFChecker.check(exp).isABoundedVariable(yVar) && !exp.equals(ExpUtils.BOT)) || (!exi.getLeft().equals(yVar)
+                    && FOLWFFChecker.check(psi).isAnUnboundedVariable(yVar)) ||
+                    !FOLReplaceExps.replace(psiXY, t, xVar).equals(psi))
                 continue;
 
             edges.add(new TransitionEdge(ERule.ELIM_EXISTENTIAL)
@@ -136,11 +129,11 @@ public class TransitionGraphFOL extends TransitionGraphPL {
     @Override
     public String toString() {
         String str = "";
-        str += "Total nodes: " + transitions.size() + "\n";
-        str += "Total edges: " + transitions.values().stream().mapToInt(Set::size).sum() + "\n";
+        str += "Total nodes: " + graph.size() + "\n";
+        str += "Total edges: " + graph.values().stream().mapToInt(Set::size).sum() + "\n";
         str += "Disjunctions: " + disjunctions + "\n";
         str += "Existentials: " + existentials + "\n";
-        for (Map.Entry<IASTExp, Set<TransitionEdge>> entry : transitions.entrySet()) {
+        for (Map.Entry<IASTExp, Set<TransitionEdge>> entry : graph.entrySet()) {
             str += entry.getKey() + ":  \n";
             for (TransitionEdge transition : entry.getValue())
                 str += "\t" + transition + "\n";
