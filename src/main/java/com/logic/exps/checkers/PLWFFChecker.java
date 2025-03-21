@@ -16,16 +16,18 @@ public class PLWFFChecker implements IExpsVisitor<Void, Void> {
 
     public static final String ERROR_MESSAGE = "PL expressions only!";
     final Set<ASTLiteral> literals;
+    final Set<ASTArbitrary> generics;
 
     PLWFFChecker() {
         literals = new LinkedHashSet<>();
+        generics = new LinkedHashSet<>();
     }
 
     public static IPLFormula check(IASTExp exp) {
         PLWFFChecker checker = new PLWFFChecker();
         exp.accept(checker, null);
 
-        return new PLExp(exp, checker.literals);
+        return new PLExp(exp, checker.literals, checker.generics);
     }
 
     @Override
@@ -51,6 +53,7 @@ public class PLWFFChecker implements IExpsVisitor<Void, Void> {
 
     @Override
     public Void visit(ASTArbitrary e, Void env) {
+        generics.add(e);
         return null;
     }
 

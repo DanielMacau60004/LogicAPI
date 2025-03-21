@@ -4,31 +4,26 @@ import com.logic.api.IFormula;
 import com.logic.api.INDProof;
 import com.logic.api.IPLFormula;
 import com.logic.nd.ERule;
-import com.logic.nd.algorithm.state.ParallelStateGraph;
-import com.logic.nd.algorithm.state.StateGraph;
-import com.logic.nd.algorithm.state.StateNode;
-import com.logic.nd.algorithm.state.StateSolution;
+import com.logic.nd.algorithm.state.*;
+import com.logic.nd.algorithm.state.strategies.IStateGraph;
 import com.logic.nd.algorithm.transition.ITransitionGraph;
-import com.logic.nd.algorithm.transition.TransitionGraphFOL;
 import com.logic.nd.algorithm.transition.TransitionGraphPL;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class AlgoProofPLBuilder extends AAlgoProofBuilder<AlgoProofPLBuilder> {
+public class AlgoProofPLBuilder {
 
     private final IPLFormula conclusion;
     private final Set<IFormula> premises;
     private final Set<ERule> forbiddenRules;
-    private AlgoProofStateBuilder state;
+    private AlgoSettingsBuilder algoSettingsBuilder = new AlgoSettingsBuilder();
 
     public AlgoProofPLBuilder(IPLFormula conclusion) {
-        super(new AlgoProofStateBuilder(conclusion));
         this.conclusion = conclusion;
         this.premises = new HashSet<>();
         this.forbiddenRules = new HashSet<>();
 
-        state = new AlgoProofStateBuilder(conclusion);
     }
 
     public AlgoProofPLBuilder addPremise(IPLFormula premise) {
@@ -51,24 +46,19 @@ public class AlgoProofPLBuilder extends AAlgoProofBuilder<AlgoProofPLBuilder> {
         return this;
     }
 
-    @Override
-    protected AlgoProofPLBuilder self() {
+    public AlgoProofPLBuilder setAlgoSettingsBuilder(AlgoSettingsBuilder algoSettingsBuilder) {
+        this.algoSettingsBuilder = algoSettingsBuilder;
         return this;
     }
 
-    //TODO the graph should be generated from this node
-    public AlgoProofPLBuilder setInitialState(AlgoProofStateBuilder stateBuilder) {
-        this.state = stateBuilder;
-        return this;
-    }
 
     public INDProof build() {
+        StateGraphSettings s = algoSettingsBuilder.build(conclusion, premises);
         ITransitionGraph tg = new TransitionGraphPL(conclusion, premises, forbiddenRules);
         tg.build();
 
-        StateGraph sg = useParallel ?
-                new ParallelStateGraph(tg, state.build(premises), heightLimit, totalClosedNodesLimit, hypothesesPerStateLimit) :
-                new StateGraph(tg, state.build(premises), heightLimit, totalClosedNodesLimit, hypothesesPerStateLimit);
+        IStateGraph sg = new StateGraph(tg, s);
+        sg.build();
 
         return new StateSolution(sg, false).findSolution();
     }

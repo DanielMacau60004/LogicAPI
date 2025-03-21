@@ -1,39 +1,48 @@
-package com.logic.nd.algorithm.state;
+package com.logic.nd.algorithm.state.strategies;
 
+import com.logic.nd.algorithm.state.StateEdge;
+import com.logic.nd.algorithm.state.StateGraphSettings;
+import com.logic.nd.algorithm.state.StateNode;
 import com.logic.nd.algorithm.transition.ITransitionGraph;
 import com.logic.nd.algorithm.transition.TransitionEdge;
-import com.logic.nd.algorithm.transition.TransitionGraphPL;
 import com.logic.nd.algorithm.transition.TransitionNode;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ForkJoinPool;
 
-public class ParallelStateGraph extends StateGraph {
+public class ParallelBuildStrategy implements IBuildStrategy {
 
     private static final int MAX_BATCH = 5000;
 
-    public ParallelStateGraph(ITransitionGraph transitionGraph, StateNode initialState
-            , int heightLimit, int totalClosedNodesLimit, int hypothesesPerStateLimit) {
-        super(transitionGraph, initialState, heightLimit, totalClosedNodesLimit, hypothesesPerStateLimit);
+    private final Map<StateNode, StateNode> nodes;
+    public final Map<StateNode, Set<StateEdge>> graph;
+    public final Queue<StateNode> closed;
+    public final Queue<StateNode> explore;
+    public final Map<StateNode, Set<StateEdge>> inverted;
+
+    public ParallelBuildStrategy() {
+        nodes = new ConcurrentHashMap<>();
+        graph = new ConcurrentHashMap<>();
+        closed = new ConcurrentLinkedQueue<>();
+        explore = new ConcurrentLinkedQueue<>();
+        inverted = new ConcurrentHashMap<>();
     }
 
     @Override
-    void build() {
-        nodes = new ConcurrentHashMap<>();
+    public void build(ITransitionGraph transitionGraph, StateGraphSettings settings) {
 
-        ConcurrentMap<StateNode, Set<StateEdge>> graph = new ConcurrentHashMap<>();
-        Queue<StateNode> closed = new ConcurrentLinkedQueue<>();
-        Queue<StateNode> explore = new ConcurrentLinkedQueue<>();
-        ConcurrentMap<StateNode, Set<StateEdge>> inverted = new ConcurrentHashMap<>();
-
-        explore.add(initialState);
+        explore.add(settings.getState());
 
         ForkJoinPool pool = new ForkJoinPool(); // Uses all available CPU cores
 
+        long start = System.currentTimeMillis() + settings.getTimeout();
+
         while (!explore.isEmpty()) {
+            if ((start - System.currentTimeMillis()) < 0)
+                break;
+
             List<StateNode> batch = new ArrayList<>();
 
             for (int i = 0; i < MAX_BATCH; i++) {
@@ -44,20 +53,18 @@ public class ParallelStateGraph extends StateGraph {
 
             pool.submit(() ->
                     batch.parallelStream().forEach(state ->
-                            processNode(state, closed, explore, inverted, graph)
+                            processNode(transitionGraph, state, settings)
                     )
             ).join();
         }
 
-        trim(closed, inverted, graph);
     }
 
-    private void processNode(StateNode state,
-                             Queue<StateNode> closed, Queue<StateNode> explore,
-                             ConcurrentMap<StateNode, Set<StateEdge>> inverted, ConcurrentMap<StateNode, Set<StateEdge>> graph) {
-
-        if (graph.containsKey(state) || state.getHeight() > heightLimit || closed.size() >= totalClosedNodesLimit
-            || state.getHypotheses().size() > hypothesesPerStateLimit) return;
+    private void processNode(ITransitionGraph transitionGraph, StateNode  state, StateGraphSettings settings) {
+        if (graph.containsKey(state) || state.getHeight() > settings.getHeightLimit()
+                || closed.size() >= settings.getTotalClosedNodesLimit()
+                || state.getHypotheses().size() > settings.getHypothesesPerStateLimit())
+            return;
 
         Set<StateEdge> edges = ConcurrentHashMap.newKeySet();
         Set<StateEdge> existingEdges = graph.putIfAbsent(state, edges);
@@ -70,7 +77,7 @@ public class ParallelStateGraph extends StateGraph {
             return;
         }
 
-        for (TransitionEdge edge : transitionGraph.getEdges(state.getExp())) {
+        for (TransitionEdge edge : transitionGraph.getEdges(state.getExp().getFormula())) {
             StateEdge e = new StateEdge(edge.getRule());
 
             for (TransitionNode transition : edge.getTransitions()) {
@@ -90,5 +97,20 @@ public class ParallelStateGraph extends StateGraph {
 
             edges.add(e);
         }
+    }
+
+    @Override
+    public Map<StateNode, Set<StateEdge>> getGraph() {
+        return graph;
+    }
+
+    @Override
+    public Map<StateNode, Set<StateEdge>> getInvertedGraph() {
+        return inverted;
+    }
+
+    @Override
+    public Queue<StateNode> getClosedNodes() {
+        return closed;
     }
 }

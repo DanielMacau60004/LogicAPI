@@ -5,26 +5,25 @@ import com.logic.api.IFormula;
 import com.logic.api.INDProof;
 import com.logic.exps.asts.others.AASTTerm;
 import com.logic.nd.ERule;
-import com.logic.nd.algorithm.state.ParallelStateGraph;
+import com.logic.nd.algorithm.state.StateGraphSettings;
+import com.logic.nd.algorithm.state.strategies.IStateGraph;
 import com.logic.nd.algorithm.state.StateGraph;
 import com.logic.nd.algorithm.state.StateSolution;
 import com.logic.nd.algorithm.transition.ITransitionGraph;
 import com.logic.nd.algorithm.transition.TransitionGraphFOL;
-import com.logic.nd.algorithm.transition.TransitionGraphPL;
-import com.logic.others.Utils;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class AlgoProofFOLBuilder extends AAlgoProofBuilder<AlgoProofFOLBuilder> {
+public class AlgoProofFOLBuilder {
 
     private final IFOLFormula conclusion;
     private final Set<IFormula> premises;
     private final Set<ERule> forbiddenRules;
     private final Set<AASTTerm> terms;
+    private AlgoSettingsBuilder algoSettingsBuilder = new AlgoSettingsBuilder();
 
     public AlgoProofFOLBuilder(IFOLFormula conclusion) {
-        super(new AlgoProofStateBuilder(conclusion));
         this.conclusion = conclusion;
         this.premises = new HashSet<>();
         this.forbiddenRules = new HashSet<>();
@@ -55,19 +54,30 @@ public class AlgoProofFOLBuilder extends AAlgoProofBuilder<AlgoProofFOLBuilder> 
         return this;
     }
 
+    public AlgoProofFOLBuilder addTerm(AASTTerm term) {
+        this.terms.add(term);
+        return this;
+    }
+
+    public AlgoProofFOLBuilder addTerms(Set<AASTTerm> terms) {
+        this.terms.addAll(terms);
+        return this;
+    }
+
+    public AlgoProofFOLBuilder setAlgoSettingsBuilder(AlgoSettingsBuilder algoSettingsBuilder) {
+        this.algoSettingsBuilder = algoSettingsBuilder;
+        return this;
+    }
+
     public INDProof build() {
+        StateGraphSettings s = algoSettingsBuilder.build(conclusion, premises);
         ITransitionGraph tg = new TransitionGraphFOL(conclusion, premises, forbiddenRules, terms);
         tg.build();
 
-        StateGraph sg = useParallel ?
-                new ParallelStateGraph(tg, state.build(premises), heightLimit, totalClosedNodesLimit, hypothesesPerStateLimit) :
-                new StateGraph(tg, state.build(premises), heightLimit, totalClosedNodesLimit, hypothesesPerStateLimit);
+        IStateGraph sg = new StateGraph(tg, s);
+        sg.build();
 
         return new StateSolution(sg, true).findSolution();
     }
 
-    @Override
-    protected AlgoProofFOLBuilder self() {
-        return this;
-    }
 }

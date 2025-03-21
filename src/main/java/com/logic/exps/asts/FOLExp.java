@@ -1,10 +1,8 @@
 package com.logic.exps.asts;
 
 import com.logic.api.IFOLFormula;
-import com.logic.exps.asts.others.AASTTerm;
-import com.logic.exps.asts.others.ASTFun;
-import com.logic.exps.asts.others.ASTPred;
-import com.logic.exps.asts.others.ASTVariable;
+import com.logic.api.IFormula;
+import com.logic.exps.asts.others.*;
 import com.logic.others.Utils;
 
 import java.util.HashSet;
@@ -22,20 +20,35 @@ public class FOLExp implements IFOLFormula {
     private final Set<ASTVariable> boundedVariables;
     private final Set<ASTVariable> unboundedVariables;
 
+    private final Set<ASTArbitrary> generics;
+
     public FOLExp(IASTExp exp,
                   Set<ASTFun> functions, Set<ASTPred> predicates,
-                  Set<ASTVariable> boundedVariables, Set<ASTVariable> unboundedVariables) {
+                  Set<ASTVariable> boundedVariables, Set<ASTVariable> unboundedVariables
+            , Set<ASTArbitrary> generics) {
         this.exp = exp;
         this.functions = functions;
         this.predicates = predicates;
         this.boundedVariables = boundedVariables;
         this.unboundedVariables = unboundedVariables;
 
+        this.generics = generics;
+
     }
 
     @Override
     public IASTExp getFormula() {
         return exp;
+    }
+
+    @Override
+    public Iterator<ASTArbitrary> iterateGenerics() {
+        return generics.iterator();
+    }
+
+    @Override
+    public boolean hasGenerics() {
+        return !generics.isEmpty();
     }
 
     @Override
@@ -88,6 +101,11 @@ public class FOLExp implements IFOLFormula {
     }
 
     @Override
+    public boolean isAFreeVariable(ASTVariable variable) {
+        return isAVariable(variable) && isAnUnboundedVariable(variable);
+    }
+
+    @Override
     public Iterator<ASTVariable> iterateUnboundedVariables() {
         return unboundedVariables.iterator();
     }
@@ -105,9 +123,8 @@ public class FOLExp implements IFOLFormula {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        FOLExp folExp = (FOLExp) o;
-        return Objects.equals(exp, folExp.exp);
+        if (! (o instanceof IFormula formula)) return false;
+        return exp.equals(formula.getFormula());
     }
 
     @Override

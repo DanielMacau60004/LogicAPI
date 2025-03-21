@@ -8,6 +8,7 @@ import com.logic.exps.asts.binary.*;
 import com.logic.exps.asts.others.AASTTerm;
 import com.logic.exps.asts.others.ASTVariable;
 import com.logic.exps.checkers.FOLWFFChecker;
+import com.logic.exps.checkers.PLWFFChecker;
 import com.logic.exps.interpreters.FOLReplaceExps;
 import com.logic.nd.ERule;
 
@@ -23,6 +24,7 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
                               Set<AASTTerm> terms) {
         super(conclusion, premisses, forbiddenRules);
         this.terms = terms;
+
         existentials = new HashSet<>();
     }
 
@@ -32,6 +34,12 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
 
         if (!forbiddenRules.contains(ERule.ELIM_EXISTENTIAL))
             graph.forEach((e, ts) -> existentials.forEach(exi -> ts.addAll(existentialERule(e, exi))));
+    }
+
+    @Override
+    protected IFOLFormula getFormula(IASTExp exp) {
+        formulas.putIfAbsent(exp, FOLWFFChecker.check(exp));
+        return (IFOLFormula)  formulas.get(exp);
     }
 
     protected void addNode(IASTExp node, boolean canGen) {
@@ -48,11 +56,11 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
         for (AASTTerm t : terms) {
             IASTExp psiXT = FOLReplaceExps.replace(psi, xVar, t);
 
-            if (t instanceof ASTVariable x && FOLWFFChecker.check(psi).isABoundedVariable(x))
+            if (t instanceof ASTVariable x && getFormula(psi).isABoundedVariable(x))
                 continue;
 
             addEdge(exi, new TransitionEdge(ERule.INTRO_EXISTENTIAL)
-                    .addTransition(psiXT), true);
+                    .addTransition(getFormula(psiXT)), true);
         }
     }
 
@@ -63,12 +71,12 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
         for (AASTTerm t : terms) {
             IASTExp psiXT = FOLReplaceExps.replace(psi, xVar, t);
 
-            if ((t instanceof ASTVariable x && FOLWFFChecker.check(psi).isABoundedVariable(x)) ||
+            if ((t instanceof ASTVariable x && getFormula(psi).isABoundedVariable(x)) ||
                     !FOLReplaceExps.replace(psiXT, t, xVar).equals(psi))
                 continue;
 
             addEdge(psiXT, new TransitionEdge(ERule.ELIM_UNIVERSAL)
-                    .addTransition(uni), true);
+                    .addTransition(getFormula(uni)), true);
         }
     }
 
@@ -82,11 +90,11 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
 
             IASTExp psiXY = FOLReplaceExps.replace(psi, xVar, yVar);
             if (!uni.getLeft().equals(yVar) &&
-                    FOLWFFChecker.check(psi).isAnUnboundedVariable(yVar))
+                    getFormula(psi).isAFreeVariable(yVar))
                 return;
 
             addEdge(uni, new TransitionEdge(ERule.INTRO_UNIVERSAL)
-                    .addTransition(psiXY, null, yVar), true);
+                    .addTransition(getFormula(psiXY), null, yVar), true);
         }
     }
 
@@ -101,14 +109,14 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
                 continue;
 
             IASTExp psiXY = FOLReplaceExps.replace(psi, xVar, yVar);
-            if ((!FOLWFFChecker.check(exp).isABoundedVariable(yVar) && !exp.equals(ExpUtils.BOT)) || (!exi.getLeft().equals(yVar)
-                    && FOLWFFChecker.check(psi).isAnUnboundedVariable(yVar)) ||
+            if ((getFormula(exp).isAFreeVariable(yVar))
+                    || (!exi.getLeft().equals(yVar)  && (getFormula(psi).isAFreeVariable(yVar))) ||
                     !FOLReplaceExps.replace(psiXY, t, xVar).equals(psi))
                 continue;
 
             edges.add(new TransitionEdge(ERule.ELIM_EXISTENTIAL)
-                    .addTransition(exi)
-                    .addTransition(exp, psiXY, yVar));
+                    .addTransition(getFormula(exi))
+                    .addTransition(getFormula(exp), getFormula(psiXY), yVar));
         }
 
         return edges;
@@ -128,16 +136,16 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
 
     @Override
     public String toString() {
-        String str = "";
-        str += "Total nodes: " + graph.size() + "\n";
-        str += "Total edges: " + graph.values().stream().mapToInt(Set::size).sum() + "\n";
-        str += "Disjunctions: " + disjunctions + "\n";
-        str += "Existentials: " + existentials + "\n";
+        StringBuilder str = new StringBuilder();
+        str.append("Total nodes: ").append(graph.size()).append("\n");
+        str.append("Total edges: ").append(graph.values().stream().mapToInt(Set::size).sum()).append("\n");
+        str.append("Disjunctions: ").append(disjunctions).append("\n");
+        str.append("Existentials: ").append(existentials).append("\n");
         for (Map.Entry<IASTExp, Set<TransitionEdge>> entry : graph.entrySet()) {
-            str += entry.getKey() + ":  \n";
+            str.append(entry.getKey()).append(":  \n");
             for (TransitionEdge transition : entry.getValue())
-                str += "\t" + transition + "\n";
+                str.append("\t").append(transition).append("\n");
         }
-        return str;
+        return str.toString();
     }
 }

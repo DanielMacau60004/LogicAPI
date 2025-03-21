@@ -3,7 +3,7 @@ package com.logic.nd.algorithm.state;
 import com.logic.api.IFormula;
 import com.logic.api.INDProof;
 import com.logic.exps.asts.IASTExp;
-import com.logic.exps.asts.others.ASTVariable;
+import com.logic.nd.algorithm.state.strategies.IStateGraph;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.binary.ASTEExist;
 import com.logic.nd.asts.binary.ASTEImp;
@@ -25,32 +25,34 @@ import java.util.Map;
 
 public class StateSolution {
 
-    private final StateGraph graph;
+    private final IStateGraph graph;
     private int mark;
 
-    private boolean isFOL;
+    private final boolean isFOL;
 
-    public StateSolution(StateGraph graph, boolean isFOL) {
+    public StateSolution(IStateGraph graph, boolean isFOL) {
         this.graph = graph;
         this.isFOL = isFOL;
     }
 
     public INDProof findSolution() {
-        return findSolution(graph.initialState.getExp(), new HashMap<>());
+        return findSolution(graph.getInitialState(), new HashMap<>());
     }
 
+    //TODO Develop a solution using an incomplete proof
+
     //Specify which hypothesis cannot be closed
-    public INDProof findSolution(IASTExp exp, Map<IASTExp, Integer> hypotheses) {
+    public INDProof findSolution(IFormula exp, Map<IFormula, Integer> hypotheses) {
         if (!graph.isSolvable())
             return null;
 
         //TODO will cause conflict with premises marks, they might not start with 1
         int mark = 1;
-        Map<IASTExp, Integer> marks = new HashMap<>(hypotheses);
-        for(IFormula e : graph.initialState.getPremisses()) marks.put(e.getFormula(), mark++);
+        Map<IFormula, Integer> marks = new HashMap<>(hypotheses);
+        for(IFormula e : graph.getPremises()) marks.put(e, mark++);
 
         this.mark = mark;
-        IASTND proof = rule(new StateNode(exp, graph.initialState.getPremisses(), hypotheses.keySet(), 0), marks);
+        IASTND proof = rule(new StateNode(exp, graph.getPremises(), hypotheses.keySet(), 0), marks);
 
         System.out.println(Utils.getToken(proof.toString()));
         //TODO....
@@ -62,13 +64,13 @@ public class StateSolution {
         return NDInterpreter.interpret(proof, formulas, premises);
     }
 
-    private IASTND rule(StateNode initState, Map<IASTExp, Integer> marks) {
-        StateEdge edge = graph.tree.get(initState);
-        IASTExp exp = initState.getExp();
+    private IASTND rule(StateNode initState, Map<IFormula, Integer> marks) {
+        StateEdge edge = graph.getEdge(initState);
+        IASTExp exp = initState.getExp().getFormula();
         marks = new HashMap<>(marks);
 
         if(edge == null)
-            return new ASTHypothesis(exp, marks.get(exp));
+            return new ASTHypothesis(exp, marks.get(initState.getExp()));
 
         List<StateTransitionEdge> transitions = edge.getTransitions();
 

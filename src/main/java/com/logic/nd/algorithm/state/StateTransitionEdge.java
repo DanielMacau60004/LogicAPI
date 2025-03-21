@@ -1,19 +1,18 @@
 package com.logic.nd.algorithm.state;
 
-import com.logic.exps.asts.IASTExp;
-import com.logic.nd.ERule;
+import com.logic.api.IFormula;
 
 public class StateTransitionEdge {
 
     private final StateNode transition;
-    private final IASTExp produces;
+    private final IFormula produces;
 
-    public StateTransitionEdge(StateNode transition, IASTExp produces) {
+    public StateTransitionEdge(StateNode transition, IFormula produces) {
         this.transition = transition;
         this.produces = produces;
     }
 
-    public IASTExp getProduces() {
+    public IFormula getProduces() {
         return produces;
     }
 

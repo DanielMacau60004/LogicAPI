@@ -2,10 +2,7 @@ package com.logic.nd.algorithm.state;
 
 import com.logic.api.IFOLFormula;
 import com.logic.api.IFormula;
-import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.others.ASTVariable;
-import com.logic.exps.checkers.FOLWFFChecker;
-import com.logic.others.Utils;
 
 import java.util.HashSet;
 import java.util.Objects;
@@ -13,36 +10,24 @@ import java.util.Set;
 
 public class StateNode {
 
-    private final IASTExp exp;
+    private final IFormula exp;
     private final Set<IFormula> premisses;
-    private final Set<IASTExp> hypotheses;
+    private final Set<IFormula> hypotheses;
     private boolean isClosed;
     private final int height;
 
-    private final Set<IASTExp> noFree;
+    private final Set<IFormula> noFree;
 
-    public StateNode(IASTExp exp, Set<IFormula> premisses) {
-        this(exp, premisses, new HashSet<>(),null, 0, new HashSet<>());
-    }
-
-    public StateNode(IASTExp exp, Set<IFormula> premisses, Set<IASTExp> hypotheses) {
-        this(exp, premisses, hypotheses, null, 0, new HashSet<>());
-    }
-
-    public StateNode(IASTExp exp, Set<IFormula> premisses, Set<IASTExp> hypotheses, Set<IASTExp> noFree) {
-        this(exp, premisses, hypotheses, null, 0, noFree);
-    }
-
-    public StateNode(IASTExp exp, Set<IFormula> premisses, Set<IASTExp> hypotheses, int height) {
+    public StateNode(IFormula exp, Set<IFormula> premisses, Set<IFormula> hypotheses, int height) {
         this(exp, premisses, hypotheses, null, height, new HashSet<>());
     }
 
-    public StateNode(IASTExp exp, Set<IFormula> premisses, Set<IASTExp> hypotheses, int height, Set<IASTExp> noFree) {
+    public StateNode(IFormula exp, Set<IFormula> premisses, Set<IFormula> hypotheses, int height, Set<IFormula> noFree) {
         this(exp, premisses, hypotheses, null, height, noFree);
     }
 
-    StateNode(IASTExp exp, Set<IFormula> premisses, Set<IASTExp> hypotheses, IASTExp hypothesis, int height
-            , Set<IASTExp> noFree) {
+    StateNode(IFormula exp, Set<IFormula> premisses, Set<IFormula> hypotheses, IFormula hypothesis, int height
+            , Set<IFormula> noFree) {
         this.exp = exp;
         this.hypotheses = hypotheses;
         this.premisses = premisses;
@@ -59,7 +44,7 @@ public class StateNode {
         return height;
     }
 
-    public IASTExp getExp() {
+    public IFormula getExp() {
         return exp;
     }
 
@@ -72,11 +57,10 @@ public class StateNode {
     }
 
     public void resetClose() {
-        //TODO performance
-        isClosed = (hypotheses.contains(exp) || premisses.stream().anyMatch(i->i.getFormula().equals(exp))) && !noFree.contains(exp);
+        isClosed = (hypotheses.contains(exp) || premisses.contains(exp)) && !noFree.contains(exp);
     }
 
-    public Set<IASTExp> getHypotheses() {
+    public Set<IFormula> getHypotheses() {
         return hypotheses;
     }
 
@@ -84,20 +68,17 @@ public class StateNode {
         return premisses;
     }
 
-    public StateNode transit(IASTExp exp, IASTExp hypothesis, ASTVariable notFree) {
-        Set<IASTExp> noFree = notFree == null ? this.noFree : new HashSet<>(this.noFree);
-        Set<IASTExp> hypotheses = hypothesis == null ? this.hypotheses : new HashSet<>(this.hypotheses);
+    public StateNode transit(IFormula exp, IFormula hypothesis, ASTVariable notFree) {
+        Set<IFormula> noFree = notFree == null ? this.noFree : new HashSet<>(this.noFree);
+        Set<IFormula> hypotheses = hypothesis == null ? this.hypotheses : new HashSet<>(this.hypotheses);
 
-        //TODO performance, we can store formulas
         if(notFree != null) {
             noFree.addAll(hypotheses.stream()
-                    .filter(h-> {
-                        IFOLFormula formula = FOLWFFChecker.check(h);
-                        return formula.isAVariable(notFree) && !formula.isABoundedVariable(notFree);
-                    }).toList());
+                    .filter(h-> ((IFOLFormula)h).isAVariable(notFree) && !((IFOLFormula)h).isABoundedVariable(notFree)
+                    ).toList());
             noFree.addAll(premisses.stream()
                     .filter(p-> ((IFOLFormula)p).isAVariable(notFree) && !((IFOLFormula)p).isABoundedVariable(notFree)
-                    ).map(IFormula::getFormula).toList());
+                    ).toList());
         }
 
         if (hypothesis != null)

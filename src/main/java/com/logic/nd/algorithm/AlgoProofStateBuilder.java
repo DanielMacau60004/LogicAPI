@@ -2,7 +2,6 @@ package com.logic.nd.algorithm;
 
 import com.logic.api.IFOLFormula;
 import com.logic.api.IFormula;
-import com.logic.exps.asts.IASTExp;
 import com.logic.nd.algorithm.state.StateNode;
 
 import java.util.HashSet;
@@ -11,7 +10,7 @@ import java.util.Set;
 public class AlgoProofStateBuilder {
 
     private final IFormula state;
-    private final Set<IASTExp> hypotheses;
+    private final Set<IFormula> hypotheses;
     private int height;
 
     //TODO include variables that cannot be closed
@@ -22,12 +21,12 @@ public class AlgoProofStateBuilder {
     }
 
     public AlgoProofStateBuilder addHypothesis(IFOLFormula hypothesis) {
-        this.hypotheses.add(hypothesis.getFormula());
+        this.hypotheses.add(hypothesis);
         return this;
     }
 
     public AlgoProofStateBuilder addHypotheses(Set<IFOLFormula> hypotheses) {
-        this.hypotheses.addAll(hypotheses.stream().map(IFormula::getFormula).toList());
+        this.hypotheses.addAll(hypotheses);
         return this;
     }
 
@@ -37,7 +36,7 @@ public class AlgoProofStateBuilder {
     }
 
     public StateNode build(Set<IFormula> premises) {
-        return new StateNode(state.getFormula(), premises, hypotheses, height);
+        return new StateNode(state, premises, hypotheses, height);
     }
 
 }

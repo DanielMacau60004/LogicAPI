@@ -13,12 +13,10 @@ import com.logic.nd.asts.binary.ASTIConj;
 import com.logic.nd.asts.others.ASTEDisj;
 import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
-import com.logic.nd.checkers.NDMarksChecker;
-import com.logic.nd.checkers.NDWWFChecker;
-import com.logic.nd.checkers.NDWWFExpsChecker;
 import com.logic.others.Env;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class NDInterpreter implements INDVisitor<Integer, Env<Integer, IASTExp>> {
 
@@ -31,7 +29,11 @@ public class NDInterpreter implements INDVisitor<Integer, Env<Integer, IASTExp>>
     public static INDProof interpret(IASTND nd, Map<IASTExp, IFormula> formulas, Map<IASTExp, Integer> premises) {
         NDInterpreter interpret = new NDInterpreter();
         int height = nd.accept(interpret, new Env<>());
-        return new NDProof(formulas.get(nd.getConclusion()), premises, nd, height, interpret.size);
+        return new NDProof(formulas.get(nd.getConclusion()), premises.entrySet().stream()
+                        .collect(Collectors.toMap(
+                                entry -> formulas.get(entry.getKey()),
+                                Map.Entry::getValue
+                        )), nd, height, interpret.size);
     }
 
     @Override

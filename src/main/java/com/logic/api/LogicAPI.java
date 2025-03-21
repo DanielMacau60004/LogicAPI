@@ -65,7 +65,6 @@ public class LogicAPI {
         return FOLWFFChecker.check(parser.parseFOL());
     }
 
-
     //TODO add documentation
     public static INDProof parseNDPLProof(String expression) throws Exception {
         IASTND proof = new Parser(new ByteArrayInputStream((expression).getBytes())).parseNDPL();

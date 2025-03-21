@@ -3,12 +3,12 @@ package api.nd;
 import com.logic.api.IFOLFormula;
 import com.logic.api.INDProof;
 import com.logic.api.LogicAPI;
+import com.logic.exps.asts.others.ASTVariable;
+import com.logic.nd.ERule;
 import com.logic.nd.algorithm.AlgoProofStateBuilder;
-import com.logic.nd.algorithm.state.ParallelStateGraph;
-import com.logic.nd.algorithm.state.StateGraph;
-import com.logic.nd.algorithm.state.StateSolution;
-import com.logic.nd.algorithm.transition.TransitionGraphFOL;
 import com.logic.nd.algorithm.AlgoProofFOLBuilder;
+import com.logic.nd.algorithm.AlgoSettingsBuilder;
+import com.logic.nd.algorithm.state.strategies.LinearBuildStrategy;
 import com.logic.others.Utils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -88,20 +88,27 @@ public class NDFOLTest {
             /*2*/"∀y(C(y) ∨ D(y)). ∀x(C(x) → L(x)). ∃x¬L(x). ∃x D(x)",
             /*3*/"∀x(C(x) → S(x)). ∀x(¬A(x,b) → ¬S(x)). ∀x((C(x)∨S(x)) → A(x,b))",
             /*4*///"L(a,b). ∀x(∃y(L(y,x) ∨ L(x,y)) → L(x,x)). ∃x L(x,a)", //Is not computable
-            /*5*/"∀x ∀y (L(x,y) → L(y,x)). ∃x ∀y L(x,y). ∀x ∃y L(x,y)", //Require aux variables but is computable
+            /*5*///"∀x ∀y (L(x,y) → L(y,x)). ∃x ∀y L(x,y). ∀x ∃y L(x,y)", //Require aux variables but is computable
     })
-    void testAlgorithm(String premissesAndExpression) throws Exception {
-        String[] parts = premissesAndExpression.split("\\.");
+    void testAlgorithm(String premisesAndExpression) throws Exception {
+        String[] parts = premisesAndExpression.split("\\.");
         String expression = parts[parts.length - 1].trim();
 
-        Set<IFOLFormula> premisses = new HashSet<>();
+        Set<IFOLFormula> premises = new HashSet<>();
         for (int i = 0; i < parts.length - 1; i++) {
-            premisses.add(LogicAPI.parseFOL(parts[i].trim()));
+            premises.add(LogicAPI.parseFOL(parts[i].trim()));
         }
 
         Assertions.assertDoesNotThrow(() -> {
             INDProof proof = new AlgoProofFOLBuilder(LogicAPI.parseFOL(expression))
-                    .addPremises(premisses)
+                    .addPremises(premises)
+                    .setAlgoSettingsBuilder(
+                            new AlgoSettingsBuilder()
+                                    .setTotalClosedNodesLimit(10000)
+                                    .setHypothesesPerStateLimit(5)
+                                    .setTimeout(1000))
+                    //.addTerm(new ASTVariable("w"))
+                    //.addTerm(new ASTVariable("z"))
                     .build();
 
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
@@ -113,19 +120,23 @@ public class NDFOLTest {
     @ValueSource(strings = {
             "∃y∀x φ. ∀x∃y φ",
     })
-    void testSingleAlgorithm(String premissesAndExpression) throws Exception {
-        String[] parts = premissesAndExpression.split("\\.");
+    void testSingleAlgorithm(String premisesAndExpression) throws Exception {
+        String[] parts = premisesAndExpression.split("\\.");
         String expression = parts[parts.length - 1].trim();
 
-        Set<IFOLFormula> premisses = new HashSet<>();
+        Set<IFOLFormula> premises = new HashSet<>();
         for (int i = 0; i < parts.length - 1; i++) {
-            premisses.add(LogicAPI.parseFOL(parts[i].trim()));
+            premises.add(LogicAPI.parseFOL(parts[i].trim()));
         }
 
         Assertions.assertDoesNotThrow(() -> {
             INDProof proof = new AlgoProofFOLBuilder(LogicAPI.parseFOL(expression))
-                    .addPremises(premisses)
-                    //.setInitialState(new AlgoProofStateBuilder(LogicAPI.parseFOL("∀x φ")))
+                    .addPremises(premises)
+                    .setAlgoSettingsBuilder(
+                            new AlgoSettingsBuilder()
+                                .setInitialState
+                                        (new AlgoProofStateBuilder(LogicAPI.parseFOL("∀x φ")))
+                                .setTimeout(100))
                     .build();
 
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());

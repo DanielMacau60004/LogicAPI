@@ -1,27 +1,27 @@
 package com.logic.nd.algorithm.transition;
 
-import com.logic.exps.asts.IASTExp;
+import com.logic.api.IFormula;
 import com.logic.exps.asts.others.ASTVariable;
 
 import java.util.Objects;
 
 public class TransitionNode {
 
-    private final IASTExp to;
-    private final IASTExp produces;
+    private final IFormula to;
+    private final IFormula produces;
     private final ASTVariable free;
 
-    TransitionNode(IASTExp to, IASTExp produces, ASTVariable free) {
+    TransitionNode(IFormula to, IFormula produces, ASTVariable free) {
         this.to = to;
         this.produces = produces;
         this.free = free;
     }
 
-    public IASTExp getTo() {
+    public IFormula getTo() {
         return to;
     }
 
-    public IASTExp getProduces() {
+    public IFormula getProduces() {
         return produces;
     }
 

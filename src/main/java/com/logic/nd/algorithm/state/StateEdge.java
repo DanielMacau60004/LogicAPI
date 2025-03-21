@@ -1,6 +1,6 @@
 package com.logic.nd.algorithm.state;
 
-import com.logic.exps.asts.IASTExp;
+import com.logic.api.IFormula;
 import com.logic.nd.ERule;
 
 import java.util.*;
@@ -10,19 +10,19 @@ public class StateEdge {
     private final ERule rule;
     private final List<StateTransitionEdge> transitions;
 
-    StateEdge(ERule rule, StateNode transition, IASTExp produces) {
+    public StateEdge(ERule rule, StateNode transition, IFormula produces) {
         this.rule = rule;
         this.transitions = new LinkedList<>();
 
         transitions.add(new StateTransitionEdge(transition, produces));
     }
 
-    StateEdge(ERule rule) {
+    public StateEdge(ERule rule) {
         this.rule = rule;
         this.transitions = new LinkedList<>();
     }
 
-    public void addTransition(StateNode to, IASTExp produces) {
+    public void addTransition(StateNode to, IFormula produces) {
         transitions.add(new StateTransitionEdge(to, produces));
     }
 

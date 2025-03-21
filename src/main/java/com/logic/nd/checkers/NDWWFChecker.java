@@ -176,17 +176,17 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         IASTExp exp = r.getConclusion();
 
         if (!(r.getHyp1().getConclusion() instanceof ASTOr or))
-            throw new RuntimeException("The elimination of the conjunction rule is incorrectly typed!\n " +
+            throw new RuntimeException("The elimination of the disjunction rule is incorrectly typed!\n " +
                     "The first hypothesis should be a disjunction, but you provided: " + r.getHyp1() + "!");
 
         IASTExp left = ExpUtils.removeParenthesis(r.getHyp2().getConclusion());
         IASTExp right = ExpUtils.removeParenthesis(r.getHyp3().getConclusion());
 
         if (!exp.equals(left))
-            throw new RuntimeException("The elimination of the conjunction rule is incorrectly typed!\n " +
+            throw new RuntimeException("The elimination of the disjunction rule is incorrectly typed!\n " +
                     "The second hypothesis is different from the conclusion!");
         if (!exp.equals(right))
-            throw new RuntimeException("The elimination of the conjunction rule is incorrectly typed!\n " +
+            throw new RuntimeException("The elimination of the disjunction rule is incorrectly typed!\n " +
                     "The third hypothesis is different from the conclusion!");
 
         r.getHyp1().accept(this, env);

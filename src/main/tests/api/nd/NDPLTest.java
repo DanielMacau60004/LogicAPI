@@ -100,18 +100,18 @@ public class NDPLTest {
             "¬p → q, r ∨ ¬q, p → (a ∨ b), ¬r ∧ ¬b, a",
             "p → (q ∨ r), (p → q) ∨ (p → r)"
     })
-    void testAlgorithmWithParser(String premissesAndExpression) throws Exception {
-        String[] parts = premissesAndExpression.split(",");
+    void testAlgorithmWithParser(String premisesAndExpression) throws Exception {
+        String[] parts = premisesAndExpression.split(",");
         String expression = parts[parts.length - 1].trim();
 
-        Set<IPLFormula> premisses = new HashSet<>();
+        Set<IPLFormula> premises = new HashSet<>();
         for (int i = 0; i < parts.length - 1; i++) {
-            premisses.add(LogicAPI.parsePL(parts[i].trim()));
+            premises.add(LogicAPI.parsePL(parts[i].trim()));
         }
 
         Assertions.assertDoesNotThrow(() -> {
             INDProof proof = new AlgoProofPLBuilder(LogicAPI.parsePL(expression))
-                    .addPremises(premisses)
+                    .addPremises(premises)
                     .build();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
@@ -156,18 +156,18 @@ public class NDPLTest {
             "(a → b) ∧ (b → a), ((a ∧ c) → (b ∧ c)) ∧ ((b ∧ c) → (a ∧ c))",
             "¬(¬a ∨ ¬b), a ∧ b"
     })
-    void testBig(String premissesAndExpression) throws Exception {
-        String[] parts = premissesAndExpression.split(",");
+    void testBig(String premisesAndExpression) throws Exception {
+        String[] parts = premisesAndExpression.split(",");
         String expression = parts[parts.length - 1].trim();
 
-        Set<IPLFormula> premisses = new HashSet<>();
+        Set<IPLFormula> premises = new HashSet<>();
         for (int i = 0; i < parts.length - 1; i++) {
-            premisses.add(LogicAPI.parsePL(parts[i].trim()));
+            premises.add(LogicAPI.parsePL(parts[i].trim()));
         }
 
         Assertions.assertDoesNotThrow(() -> {
             INDProof proof = new AlgoProofPLBuilder(LogicAPI.parsePL(expression))
-                    .addPremises(premisses)
+                    .addPremises(premises)
                     .build();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
@@ -209,18 +209,18 @@ public class NDPLTest {
             "(a ∨ a) → a",
             "(a → ¬¬a) ∧ (¬¬a → a)",
     })
-    void testMore(String premissesAndExpression) throws Exception {
-        String[] parts = premissesAndExpression.split(",");
+    void testMore(String premisesAndExpression) throws Exception {
+        String[] parts = premisesAndExpression.split(",");
         String expression = parts[parts.length - 1].trim();
 
-        Set<IPLFormula> premisses = new HashSet<>();
+        Set<IPLFormula> premises = new HashSet<>();
         for (int i = 0; i < parts.length - 1; i++) {
-            premisses.add(LogicAPI.parsePL(parts[i].trim()));
+            premises.add(LogicAPI.parsePL(parts[i].trim()));
         }
 
         Assertions.assertDoesNotThrow(() -> {
             INDProof proof = new AlgoProofPLBuilder(LogicAPI.parsePL(expression))
-                    .addPremises(premisses)
+                    .addPremises(premises)
                     .build();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
@@ -236,18 +236,18 @@ public class NDPLTest {
             "¬⊥",
             "a ∧ b, a ∧ a"
     })
-    void testSingle(String premissesAndExpression) throws Exception {
-        String[] parts = premissesAndExpression.split(",");
+    void testSingle(String premisesAndExpression) throws Exception {
+        String[] parts = premisesAndExpression.split(",");
         String expression = parts[parts.length - 1].trim();
 
-        Set<IPLFormula> premisses = new HashSet<>();
+        Set<IPLFormula> premises = new HashSet<>();
         for (int i = 0; i < parts.length - 1; i++) {
-            premisses.add(LogicAPI.parsePL(parts[i].trim()));
+            premises.add(LogicAPI.parsePL(parts[i].trim()));
         }
 
         Assertions.assertDoesNotThrow(() -> {
             INDProof proof = new AlgoProofPLBuilder(LogicAPI.parsePL(expression))
-                    .addPremises(premisses)
+                    .addPremises(premises)
                     .build();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);

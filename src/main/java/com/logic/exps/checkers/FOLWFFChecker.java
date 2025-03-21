@@ -29,6 +29,8 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
     final Set<ASTVariable> boundedVariables;
     final Set<ASTVariable> unboundedVariables;
 
+    final Set<ASTArbitrary> generics;
+
     FOLWFFChecker() {
         functionsMap = new HashMap<>();
         predicatesMap = new HashMap<>();
@@ -37,6 +39,8 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
         predicates = new HashSet<>();
         boundedVariables = new HashSet<>();
         unboundedVariables = new HashSet<>();
+
+        generics = new HashSet<>();
     }
 
     public static IFOLFormula check(IASTExp exp) {
@@ -46,7 +50,8 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
 
         return new FOLExp(exp,
                 checker.functions, checker.predicates,
-                checker.boundedVariables, checker.unboundedVariables);
+                checker.boundedVariables, checker.unboundedVariables,
+                checker.generics);
     }
 
     @Override
@@ -87,6 +92,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
 
     @Override
     public Void visit(ASTArbitrary e, Env<String, IASTExp> env) {
+        generics.add(e);
         return null;
     }
 

@@ -1,6 +1,7 @@
 package com.logic.exps.asts;
 
 import com.logic.api.IPLFormula;
+import com.logic.exps.asts.others.ASTArbitrary;
 import com.logic.exps.asts.others.ASTLiteral;
 import com.logic.exps.interpreters.PLInterpreter;
 import com.logic.others.Utils;
@@ -11,15 +12,27 @@ public class PLExp implements IPLFormula {
 
     private final IASTExp exp;
     private final Set<ASTLiteral> literals;
+    private final Set<ASTArbitrary> generics;
 
-    public PLExp(IASTExp exp, Set<ASTLiteral> literals) {
+    public PLExp(IASTExp exp, Set<ASTLiteral> literals, Set<ASTArbitrary> generics) {
         this.exp = exp;
         this.literals = literals;
+        this.generics = generics;
     }
 
     @Override
     public IASTExp getFormula() {
         return exp;
+    }
+
+    @Override
+    public Iterator<ASTArbitrary> iterateGenerics() {
+        return generics.iterator();
+    }
+
+    @Override
+    public boolean hasGenerics() {
+        return !generics.isEmpty();
     }
 
     @Override

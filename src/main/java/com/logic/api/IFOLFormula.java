@@ -77,6 +77,8 @@ public interface IFOLFormula extends IFormula {
 
     boolean isAVariable(ASTVariable variable);
 
+    boolean isAFreeVariable(ASTVariable variable);
+
     /**
      * Iterates through all the unbounded variables in the first-order logic expression.
      * An unbounded (or free) variable is one that is not part of any quantifier's scope.

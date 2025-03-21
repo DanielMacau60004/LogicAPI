@@ -1,5 +1,6 @@
 package com.logic.nd.algorithm.transition;
 
+import com.logic.api.IFormula;
 import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.others.ASTVariable;
 import com.logic.nd.ERule;
@@ -11,12 +12,12 @@ public class TransitionEdge {
     private final ERule rule;
     private final List<TransitionNode> transitions;
 
-    TransitionEdge(ERule rule, IASTExp to, IASTExp produces) {
+    TransitionEdge(ERule rule, IFormula to, IFormula produces) {
         this(rule);
         addTransition(to, produces);
     }
 
-    TransitionEdge(ERule rule, IASTExp to) {
+    TransitionEdge(ERule rule, IFormula to) {
         this(rule);
         addTransition(to, null);
     }
@@ -26,17 +27,17 @@ public class TransitionEdge {
         this.transitions = new LinkedList<>();
     }
 
-    public TransitionEdge addTransition(IASTExp to, IASTExp produces, ASTVariable free) {
+    public TransitionEdge addTransition(IFormula to, IFormula produces, ASTVariable free) {
         transitions.add(new TransitionNode(to, produces, free));
         return this;
     }
 
-    public TransitionEdge addTransition(IASTExp to, IASTExp produces) {
+    public TransitionEdge addTransition(IFormula to, IFormula produces) {
         transitions.add(new TransitionNode(to, produces, null));
         return this;
     }
 
-    public TransitionEdge addTransition(IASTExp to) {
+    public TransitionEdge addTransition(IFormula to) {
         transitions.add(new TransitionNode(to, null, null));
         return this;
     }

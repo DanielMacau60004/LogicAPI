@@ -3,9 +3,6 @@ package com.logic;
 import com.logic.api.INDProof;
 import com.logic.api.LogicAPI;
 import com.logic.exps.asts.IASTExp;
-import com.logic.nd.asts.IASTND;
-import com.logic.nd.checkers.NDWWFExpsChecker;
-import com.logic.nd.interpreters.NDInterpreter;
 import com.logic.others.Utils;
 import com.logic.parser.Parser;
 

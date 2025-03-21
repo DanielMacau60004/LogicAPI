@@ -13,12 +13,12 @@ import java.util.Map;
 public class NDProof implements INDProof {
 
     private final IFormula conclusion;
-    private final Map<IASTExp, Integer> premises;
+    private final Map<IFormula, Integer> premises;
     private final IASTND proof;
     private final int height;
     private final int size;
 
-    public NDProof(IFormula conclusion, Map<IASTExp, Integer> premises, IASTND proof, int height, int size) {
+    public NDProof(IFormula conclusion, Map<IFormula, Integer> premises, IASTND proof, int height, int size) {
         this.conclusion = conclusion;
         this.premises = premises;
         this.proof = proof;
@@ -32,7 +32,7 @@ public class NDProof implements INDProof {
     }
 
     @Override
-    public Iterator<IASTExp> getPremises() {
+    public Iterator<IFormula> getPremises() {
         return premises.keySet().iterator();
     }
 
