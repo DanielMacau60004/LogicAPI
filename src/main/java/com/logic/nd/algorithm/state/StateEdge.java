@@ -26,9 +26,13 @@ public class StateEdge {
         transitions.add(new StateTransitionEdge(to, produces));
     }
 
+    public int height() {
+        return transitions.stream().mapToInt(i->i.getNode().getHeight()).sum();
+    }
+
     public List<StateTransitionEdge> getTransitions() {return transitions;}
 
-    public boolean isClosed() {return transitions.stream().allMatch(s->s.getTransition().isClosed());}
+    public boolean isClosed() {return transitions.stream().allMatch(s->s.getNode().isClosed());}
 
     public ERule getRule() {
         return rule;

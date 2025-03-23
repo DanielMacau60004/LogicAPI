@@ -14,7 +14,7 @@ public class StateNode {
     private final Set<IFormula> premisses;
     private final Set<IFormula> hypotheses;
     private boolean isClosed;
-    private final int height;
+    private int height;
 
     private final Set<IFormula> noFree;
 
@@ -42,6 +42,10 @@ public class StateNode {
 
     public int getHeight() {
         return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     public IFormula getExp() {

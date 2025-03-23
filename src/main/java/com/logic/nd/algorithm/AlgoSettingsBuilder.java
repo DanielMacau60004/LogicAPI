@@ -1,9 +1,8 @@
 package com.logic.nd.algorithm;
 
-import com.logic.api.IFOLFormula;
 import com.logic.api.IFormula;
 import com.logic.nd.algorithm.state.StateGraphSettings;
-import com.logic.nd.algorithm.state.strategies.DFSTrimStrategy;
+import com.logic.nd.algorithm.state.strategies.HeightTrimStrategy;
 import com.logic.nd.algorithm.state.strategies.IBuildStrategy;
 import com.logic.nd.algorithm.state.strategies.ITrimStrategy;
 import com.logic.nd.algorithm.state.strategies.ParallelBuildStrategy;
@@ -21,7 +20,7 @@ public class AlgoSettingsBuilder {
     private long timeout = 5000; //In milliseconds
 
     private IBuildStrategy buildStrategy = new ParallelBuildStrategy();
-    private ITrimStrategy trimStrategy = new DFSTrimStrategy();
+    private ITrimStrategy trimStrategy = new HeightTrimStrategy();
 
     public AlgoSettingsBuilder setInitialState(AlgoProofStateBuilder stateBuilder) {
         this.state = stateBuilder;

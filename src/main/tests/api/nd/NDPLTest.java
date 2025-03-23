@@ -2,6 +2,8 @@ package api.nd;
 
 import com.logic.api.*;
 import com.logic.nd.algorithm.AlgoProofPLBuilder;
+import com.logic.nd.algorithm.AlgoSettingsBuilder;
+import com.logic.nd.algorithm.state.strategies.SizeTrimStrategy;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -234,7 +236,8 @@ public class NDPLTest {
             "(a → ¬¬a) ∧ (¬¬a → a)",
             "⊥ → a",
             "¬⊥",
-            "a ∧ b, a ∧ a"
+            "a ∧ b, a ∧ a",
+            "a ∨ ¬a"
     })
     void testSingle(String premisesAndExpression) throws Exception {
         String[] parts = premisesAndExpression.split(",");
@@ -248,6 +251,8 @@ public class NDPLTest {
         Assertions.assertDoesNotThrow(() -> {
             INDProof proof = new AlgoProofPLBuilder(LogicAPI.parsePL(expression))
                     .addPremises(premises)
+                    .setAlgoSettingsBuilder(
+                            new AlgoSettingsBuilder().setTrimStrategy(new SizeTrimStrategy()))
                     .build();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);

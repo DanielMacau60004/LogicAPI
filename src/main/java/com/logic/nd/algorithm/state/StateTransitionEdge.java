@@ -4,11 +4,11 @@ import com.logic.api.IFormula;
 
 public class StateTransitionEdge {
 
-    private final StateNode transition;
+    private final StateNode node;
     private final IFormula produces;
 
     public StateTransitionEdge(StateNode transition, IFormula produces) {
-        this.transition = transition;
+        this.node = transition;
         this.produces = produces;
     }
 
@@ -16,7 +16,7 @@ public class StateTransitionEdge {
         return produces;
     }
 
-    public StateNode getTransition() {
-        return transition;
+    public StateNode getNode() {
+        return node;
     }
 }

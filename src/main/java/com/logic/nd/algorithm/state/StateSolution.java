@@ -77,9 +77,9 @@ public class StateSolution {
         for(StateTransitionEdge e : transitions)
             if(e.getProduces() != null) marks.put(e.getProduces(), mark++);
 
-        IASTND first = !transitions.isEmpty() ? rule(transitions.get(0).getTransition(), marks) : null;
-        IASTND second = transitions.size() > 1 ? rule(transitions.get(1).getTransition(), marks) : null;
-        IASTND third = transitions.size() > 2 ? rule(transitions.get(2).getTransition(), marks) : null;
+        IASTND first = !transitions.isEmpty() ? rule(transitions.get(0).getNode(), marks) : null;
+        IASTND second = transitions.size() > 1 ? rule(transitions.get(1).getNode(), marks) : null;
+        IASTND third = transitions.size() > 2 ? rule(transitions.get(2).getNode(), marks) : null;
 
         return switch (edge.getRule()) {
             case INTRO_CONJUNCTION  -> new ASTIConj(first, second, exp);

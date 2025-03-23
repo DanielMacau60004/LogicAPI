@@ -6,8 +6,10 @@ import com.logic.nd.algorithm.state.StateTransitionEdge;
 
 import java.util.*;
 
-public class DFSTrimStrategy implements ITrimStrategy {
+public class HeightTrimStrategy implements ITrimStrategy {
 
+    //The final answer may differ, it always returns solutions with the lowest height possible
+    //It is faster time complexity O(E+N)
     @Override
     public Map<StateNode, StateEdge> trim(IBuildStrategy buildStrategy) {
         Queue<StateNode> explore = buildStrategy.getClosedNodes();
@@ -28,16 +30,15 @@ public class DFSTrimStrategy implements ITrimStrategy {
             if (inverted.get(state) != null) {
                 for (StateEdge prev : inverted.get(state)) {
                     for (StateTransitionEdge to : prev.getTransitions()) {
-                        Set<StateEdge> edges = graph.get(to.getTransition());
+                        Set<StateEdge> edges = graph.get(to.getNode());
                         if (edges != null) {
 
-                            Optional<StateEdge> e = edges.stream().filter(StateEdge::isClosed)
-                                    .min(Comparator.comparingInt(o -> o.getTransitions().size()));
+                            Optional<StateEdge> e = edges.stream().filter(StateEdge::isClosed).findFirst();
                             if (e.isPresent()) {
-                                explore.add(to.getTransition());
+                                explore.add(to.getNode());
 
-                                if(!tree.containsKey(to.getTransition()))
-                                    tree.put(to.getTransition(), e.get());
+                                if(!tree.containsKey(to.getNode()))
+                                    tree.put(to.getNode(), e.get());
                             }
                         }
                     }

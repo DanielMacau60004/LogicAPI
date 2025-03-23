@@ -3,9 +3,12 @@ package api.nd;
 import com.logic.api.IFOLFormula;
 import com.logic.api.INDProof;
 import com.logic.api.LogicAPI;
+import com.logic.exps.asts.others.ASTConstant;
+import com.logic.exps.asts.others.ASTVariable;
 import com.logic.nd.algorithm.AlgoProofStateBuilder;
 import com.logic.nd.algorithm.AlgoProofFOLBuilder;
 import com.logic.nd.algorithm.AlgoSettingsBuilder;
+import com.logic.nd.algorithm.state.strategies.SizeTrimStrategy;
 import com.logic.others.Utils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -95,8 +98,11 @@ public class NDFOLTest {
 
             /*2*/"∀y(C(y) ∨ D(y)). ∀x(C(x) → L(x)). ∃x¬L(x). ∃x D(x)",
             /*3*/"∀x(C(x) → S(x)). ∀x(¬A(x,b) → ¬S(x)). ∀x((C(x)∨S(x)) → A(x,b))",
-            /*4*///"L(a,b). ∀x(∃y(L(y,x) ∨ L(x,y)) → L(x,x)). ∃x L(x,a)", //Is not computable
-            /*5*///"∀x ∀y (L(x,y) → L(y,x)). ∃x ∀y L(x,y). ∀x ∃y L(x,y)", //Require aux variables but is computable
+            /*4*/"L(a,b). ∀x(∃y(L(y,x) ∨ L(x,y)) → L(x,x)). ∃x L(x,a)",
+            /*5*///"∀x ∀y (L(x,y) → L(y,x)). ∃x ∀y L(x,y). ∀x ∃y L(x,y)", //Requires an aux variable
+
+            //Others
+            //"∀x∀y P(x,y). ∀y∀x P(y,x)" //Require an aux variable z
     })
     void testAlgorithm(String premisesAndExpression) throws Exception {
         String[] parts = premisesAndExpression.split("\\.");
@@ -113,10 +119,39 @@ public class NDFOLTest {
                     .setAlgoSettingsBuilder(
                             new AlgoSettingsBuilder()
                                     .setTotalClosedNodesLimit(10000)
-                                    .setHypothesesPerStateLimit(5)
-                                    .setTimeout(1000))
+                                    .setHypothesesPerStateLimit(4)
+                                    .setTimeout(500)
+                    .setTrimStrategy(new SizeTrimStrategy()))
                     //.addTerm(new ASTVariable("w"))
                     //.addTerm(new ASTVariable("z"))
+                    .build();
+
+            System.out.println("Size: " + proof.size() + " Height: " + proof.height());
+            System.out.println(proof);
+        });
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "P(a) → ∃x Q(x). ∃x(P(a) → Q(x))",
+    })
+    void testSingleSimpleAlgorithm(String premisesAndExpression) throws Exception {
+        String[] parts = premisesAndExpression.split("\\.");
+        String expression = parts[parts.length - 1].trim();
+
+        Set<IFOLFormula> premises = new HashSet<>();
+        for (int i = 0; i < parts.length - 1; i++) {
+            premises.add(LogicAPI.parseFOL(parts[i].trim()));
+        }
+
+        Assertions.assertDoesNotThrow(() -> {
+            INDProof proof = new AlgoProofFOLBuilder(LogicAPI.parseFOL(expression))
+                    .addPremises(premises)
+                    .setAlgoSettingsBuilder(
+                            new AlgoSettingsBuilder()
+                                .setTimeout(1000))
+                    .addTerm(new ASTConstant("b"))
+                    .addTerm(new ASTConstant("c"))
                     .build();
 
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
@@ -142,9 +177,36 @@ public class NDFOLTest {
                     .addPremises(premises)
                     .setAlgoSettingsBuilder(
                             new AlgoSettingsBuilder()
-                                .setInitialState
-                                        (new AlgoProofStateBuilder(LogicAPI.parseFOL("∀x φ")))
-                                .setTimeout(100))
+                                    .setInitialState
+                                            (new AlgoProofStateBuilder(LogicAPI.parseFOL("∀x φ")))
+                                    .setTimeout(100))
+                    .build();
+
+            System.out.println("Size: " + proof.size() + " Height: " + proof.height());
+            System.out.println(proof);
+        });
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "∀x(P(a) → Q(x)). P(a) → ∀z Q(z)",
+            "∀x P(a) ∧ ∀y Q(y). P(a) → ∀z (P(z) ∧ Q(z))",
+    })
+    void testAlgorithmWithNoExtra(String premisesAndExpression) throws Exception {
+        String[] parts = premisesAndExpression.split("\\.");
+        String expression = parts[parts.length - 1].trim();
+
+        Set<IFOLFormula> premises = new HashSet<>();
+        for (int i = 0; i < parts.length - 1; i++) {
+            premises.add(LogicAPI.parseFOL(parts[i].trim()));
+        }
+
+        Assertions.assertDoesNotThrow(() -> {
+            INDProof proof = new AlgoProofFOLBuilder(LogicAPI.parseFOL(expression))
+                    .addPremises(premises)
+                    .setAlgoSettingsBuilder(
+                            new AlgoSettingsBuilder()
+                                    .setTimeout(1000))
                     .build();
 
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());

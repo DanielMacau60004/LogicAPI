@@ -35,13 +35,13 @@ public class AlgoProofFOLBuilder {
 
     public AlgoProofFOLBuilder addPremise(IFOLFormula premise) {
         this.premises.add(premise);
-        premise.iterateVariables().forEachRemaining(terms::add);
+        premise.iterateTerms().forEachRemaining(terms::add);
         return this;
     }
 
     public AlgoProofFOLBuilder addPremises(Set<IFOLFormula> premises) {
         this.premises.addAll(premises);
-        premises.forEach(premise -> premise.iterateVariables().forEachRemaining(terms::add));
+        premises.forEach(premise -> premise.iterateTerms().forEachRemaining(terms::add));
         return this;
     }
 
@@ -75,6 +75,7 @@ public class AlgoProofFOLBuilder {
         ITransitionGraph tg = new TransitionGraphFOL(conclusion, premises, forbiddenRules, terms);
         tg.build();
 
+        System.out.println(Utils.getToken(tg+""));
         IStateGraph sg = new StateGraph(tg, s);
         sg.build();
 
