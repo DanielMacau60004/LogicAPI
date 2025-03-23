@@ -1,7 +1,7 @@
 package com.logic.exps.asts;
 
-public interface IASTExp{
+public interface IASTExp {
 
-    <T,E> T accept(IVisitor<T,E> v, E env);
+    <T, E> T accept(IExpsVisitor<T, E> v, E env);
 
 }

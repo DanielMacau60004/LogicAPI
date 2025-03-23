@@ -2,7 +2,7 @@ package com.logic.exps.asts.others;
 
 import com.logic.exps.asts.AASTExp;
 import com.logic.exps.asts.IASTExp;
-import com.logic.exps.asts.IVisitor;
+import com.logic.exps.asts.IExpsVisitor;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -10,11 +10,11 @@ import java.util.stream.Collectors;
 
 public class ASTPred extends AASTExp {
 
-    private final String predicate;
+    protected final String predicate;
     private final List<IASTExp> terms;
 
     public ASTPred(String predicate) {
-       this(predicate, new LinkedList<>());
+        this(predicate, new LinkedList<>());
     }
 
     public ASTPred(String predicate, List<IASTExp> terms) {
@@ -35,13 +35,14 @@ public class ASTPred extends AASTExp {
     }
 
     @Override
-    public <T, E> T accept(IVisitor<T, E> v, E env) {
+    public <T, E> T accept(IExpsVisitor<T, E> v, E env) {
         return v.visit(this, env);
     }
 
     @Override
     public String toString() {
-        return predicate + "(" + terms.stream().map(Object::toString).collect(Collectors.joining(",")) + ")";
+        return predicate + (terms.isEmpty() ? "" :
+                "(" + terms.stream().map(Object::toString).collect(Collectors.joining(",")) + ")");
     }
 }
 

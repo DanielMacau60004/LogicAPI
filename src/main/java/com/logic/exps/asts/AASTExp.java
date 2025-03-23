@@ -1,37 +1,40 @@
 package com.logic.exps.asts;
 
-import com.logic.exps.parser.ExpressionsParser;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.logic.parser.Parser;
 
 public abstract class AASTExp implements IASTExp {
 
-    protected String getToken(int kind) {
-        Pattern pattern = Pattern.compile("\\\\u([0-9A-Fa-f]{4})");
-        Matcher matcher = pattern.matcher(ExpressionsParser.tokenImage[kind].replace("\"",""));
+    private int iD;
+    private String name;
 
-        StringBuilder result = new StringBuilder();
-
-        while (matcher.find()) {
-            String hexCode = matcher.group(1);
-            int codePoint = Integer.parseInt(hexCode, 16);
-            matcher.appendReplacement(result, String.valueOf((char) codePoint));
+    public int getID() {
+        if (name == null) {
+            name = toString();
+            iD = name.hashCode();
         }
+        return iD;
+    }
 
-        matcher.appendTail(result);
-        return result.toString();
+    protected String getToken(int kind) {
+        return Parser.tokenImage[kind].replace("\"", "");
+    }
+
+    @Override
+    public String toString() {
+        getID();
+        return name;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof AASTExp s)
-            return this.toString().equals(s.toString());
+        if (obj instanceof AASTExp s)
+            return getID() == s.getID();
         return false;
     }
 
     @Override
     public int hashCode() {
-        return this.toString().hashCode();
+        return getID();
     }
+
 }

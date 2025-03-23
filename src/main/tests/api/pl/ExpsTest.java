@@ -22,9 +22,12 @@ public class ExpsTest {
             "a ∧ a ∧ p",
             "a ∧ a → p",
             "a) ∧ (a → p",
+            "¬(¬(¬p))",
+            "¬¬(¬p)",
+            "(p)"
     })
     void testIncorrect1Exps(String expression) {
-        assertThrows(Throwable.class, ()->LogicAPI.parsePL(expression));
+        assertThrows(Throwable.class, () -> LogicAPI.parsePL(expression));
     }
 
 
@@ -95,11 +98,13 @@ public class ExpsTest {
             "(p → q) ∨ (q → r)",
             "¬p → q", "r ∨ ¬q", "p → (a ∨ b)", "¬r ∧ ¬b", "a",
             "p → (q ∨ r)", "(p → q) ∨ (p → r)",
-            "¬(p ∧ q) ↔ (¬p ∨ ¬q)"
+            "¬(p ∧ q) ↔ (¬p ∨ ¬q)",
+
+            "(a ∧ q)", "¬(a ∧ q)", "¬(¬a ∧ ¬¬¬¬q)"
 
     })
     void testCorrect1Exps(String expression) {
-        assertDoesNotThrow(()->LogicAPI.parsePL(expression));
+        assertDoesNotThrow(() -> LogicAPI.parsePL(expression));
     }
 
     @ParameterizedTest
@@ -116,7 +121,7 @@ public class ExpsTest {
             "(p → (q → r)) ↔ (p → r)", "p ↔ (q ∨ r)",
             "(p ∧ q) → (r ∨ (s ∧ t))", "(p → q) ∧ (q → p)",
             "(p ↔ q) → (r → s)", "(p → q) → (p ∨ r)",
-            "(¬p) ∨ (q ∧ r)", "¬(p ∧ (q ∨ r))",
+            "¬p ∨ (q ∧ r)", "¬(p ∧ (q ∨ r))",
             "(p → q) → (r ∨ s)", "p ↔ (q ∨ r)", "(p → (q → r))",
             "p → (q ∨ (r ∧ s))", "(p ∨ (q ∧ r)) → p",
             "(p → q) → ((p → q) → r)", "¬(p ∨ q) ∨ (p ∧ q)"
@@ -131,7 +136,7 @@ public class ExpsTest {
             "(p → q)", "(p → q) → r", "(p → (q → r)) → (p → r)",
             "(p ∧ q) → ((r → s) ∨ (t → u))",
 
-            "¬¬p", "¬¬¬p", "¬(¬p)", "¬(¬(¬p))",
+            "¬¬p", "¬¬¬p",
             "¬(¬p ∧ q)", "¬(p ∨ ¬q)", "¬(p ∧ q) ∧ ¬(r ∨ s)",
 
             "p ↔ p", "p ↔ q", "p ↔ (q ↔ p)", "(p ↔ q) ↔ p", "(p ∨ q) ↔ p",
@@ -168,8 +173,8 @@ public class ExpsTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "φ ∧ ψ", "α ∨ β", "γ → δ", "λ ∧ μ", "ρ → σ", "τ ↔ ω",
-            "(φ ∧ (ψ → α))", "(τ → ω) ∧ (λ ↔ μ)", "(β ∧ γ) → δ"
+            "φ ∧ ψ", "α ∨ β", "γ → δ", "φ2 ∧ φ3", "φ4 → φ5", "φ6 ↔ φ7",
+            "(φ ∧ (ψ → α))", "(φ6 → φ7) ∧ (φ2 ↔ φ3)", "(β ∧ γ) → δ"
     })
     void testGreekSymbolsExps(String expression) {
         assertDoesNotThrow(() -> LogicAPI.parsePL(expression));
@@ -188,15 +193,15 @@ public class ExpsTest {
     @ParameterizedTest
     @ValueSource(strings = {
             "(φ ∧ ψ) → (α ∨ β)",
-            "(λ ∨ μ) → (ρ ∧ σ)",
-            "(τ → ω) ↔ (λ ∨ (ρ ∧ σ))",
+            "(φ2 ∨ φ3) → (φ4 ∧ φ5)",
+            "(φ6 → φ7) ↔ (φ2 ∨ (φ4 ∧ φ5))",
             "(α ↔ β) ∧ (γ → δ)",
             "((φ → (ψ ↔ α)) ∨ (β ∧ (γ → δ)))",
-            "(λ ∧ μ) ↔ ((ρ ∨ σ) → (τ ∧ ω))",
-            "(α ∨ (β ∧ (γ → δ))) ↔ (ε → φ)",
-            "((τ ∧ ω) → (λ ∨ μ)) ↔ (ρ ∧ σ)",
-            "(τ → (ρ ∧ (σ ∨ λ))) ↔ (μ → α)",
-            "(φ ∧ ψ) → ((λ → μ) ∧ (ρ ∨ σ))"
+            "(φ2 ∧ φ3) ↔ ((φ4 ∨ φ5) → (φ6 ∧ φ7))",
+            "(α ∨ (β ∧ (γ → δ))) ↔ (φ1 → φ)",
+            "((φ6 ∧ φ7) → (φ2 ∨ φ3)) ↔ (φ4 ∧ φ5)",
+            "(φ6 → (φ4 ∧ (φ5 ∨ φ2))) ↔ (φ3 → α)",
+            "(φ ∧ ψ) → ((φ2 → φ3) ∧ (φ4 ∨ φ5))"
     })
     void testComplexGreekSymbolsExps(String expression) {
         assertDoesNotThrow(() -> LogicAPI.parsePL(expression));
@@ -205,18 +210,28 @@ public class ExpsTest {
     @ParameterizedTest
     @ValueSource(strings = {
             "(p ∧ φ) → (q ∨ ψ)",
-            "(r → (α ∧ τ)) ↔ (β ∨ λ)",
-            "(a ∧ b) → (γ ∨ (δ ∧ ε))",
+            "(r → (α ∧ φ6)) ↔ (β ∨ φ2)",
+            "(a ∧ b) → (γ ∨ (δ ∧ φ1))",
             "(x ∨ (φ ∧ ψ)) → (y ∧ (α → β))",
-            "(p → (λ ∧ μ)) ↔ ((r ∨ s) ∧ (τ ∨ ω))",
+            "(p → (φ2 ∧ φ3)) ↔ ((r ∨ s) ∧ (φ6 ∨ φ7))",
             "(z ∧ φ) → (p ∨ (q ∧ α))",
-            "(p ↔ (r ∨ τ)) → (q ∧ (μ → φ))",
-            "(x ∨ (y ∧ (α → β))) → (λ ∧ φ)",
-            "(a → (β ∨ γ)) ∧ (δ → (τ ∨ ω))",
-            "(p ∧ (q ∨ (r → τ))) ↔ (α ∧ (β ∨ (γ → δ)))"
+            "(p ↔ (r ∨ φ6)) → (q ∧ (φ3 → φ))",
+            "(x ∨ (y ∧ (α → β))) → (φ2 ∧ φ)",
+            "(a → (β ∨ γ)) ∧ (δ → (φ6 ∨ φ7))",
+            "(p ∧ (q ∨ (r → φ6))) ↔ (α ∧ (β ∨ (γ → δ)))"
     })
     void testMixGreekAndLettersExps(String expression) {
         assertDoesNotThrow(() -> LogicAPI.parsePL(expression));
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "(p ∧ φ) → (q ∨ ψ).dwadawd",
+            "(r → (α ∧ b)) ∨ (β ∨ φ2).WDAWDAWDC ADAW DA DA",
+    })
+    void testEOF(String expression) {
+        assertDoesNotThrow(() -> System.out.println(LogicAPI.parsePL(expression)));
     }
 
 }
