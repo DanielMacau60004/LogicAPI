@@ -47,15 +47,12 @@ const MAX_RESULTS = 300;
 const UNICODE_LETTER = 0;
 const UNICODE_DIGIT = 1;
 const UNICODE_OTHER = 2;
-
 function checkUnnamed(name, separator) {
     return name === "<Unnamed>" || !name ? "" : name + separator;
 }
-
 function escapeHtml(str) {
     return str.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
-
 function getHighlightedText(str, boundaries, from, to) {
     var start = from;
     var text = "";
@@ -74,7 +71,6 @@ function getHighlightedText(str, boundaries, from, to) {
     text += escapeHtml(str.slice(start, to));
     return text;
 }
-
 function getURLPrefix(item, category) {
     var urlPrefix = "";
     var slash = "/";
@@ -86,7 +82,7 @@ function getURLPrefix(item, category) {
         if (item.m) {
             urlPrefix = item.m + slash;
         } else {
-            $.each(packageSearchIndex, function (index, it) {
+            $.each(packageSearchIndex, function(index, it) {
                 if (it.m && item.p === it.l) {
                     urlPrefix = it.m + slash;
                 }
@@ -95,7 +91,6 @@ function getURLPrefix(item, category) {
     }
     return urlPrefix;
 }
-
 function getURL(item, category) {
     if (item.url) {
         return item.url;
@@ -128,21 +123,20 @@ function getURL(item, category) {
     item.url = url;
     return url;
 }
-
 function createMatcher(term, camelCase) {
     if (camelCase && !isUpperCase(term)) {
         return null;  // no need for camel-case matcher for lower case query
     }
     var pattern = "";
     var upperCase = [];
-    term.trim().split(/\s+/).forEach(function (w, index, array) {
+    term.trim().split(/\s+/).forEach(function(w, index, array) {
         var tokens = w.split(/(?=[\p{Lu},.()<>?[\/])/u);
         for (var i = 0; i < tokens.length; i++) {
             var s = tokens[i];
             // ',' and '?' are the only delimiters commonly followed by space in java signatures
             pattern += "(" + escapeUnicodeRegex(s).replace(/[,?]/g, "$&\\s*?") + ")";
             upperCase.push(false);
-            var isWordToken = /[\p{L}\p{Nd}_]$/u.test(s);
+            var isWordToken =  /[\p{L}\p{Nd}_]$/u.test(s);
             if (isWordToken) {
                 if (i === tokens.length - 1 && index < array.length - 1) {
                     // space in query string matches all delimiters
@@ -166,12 +160,10 @@ function createMatcher(term, camelCase) {
     re.upperCase = upperCase;
     return re;
 }
-
 // Unicode regular expressions do not allow certain characters to be escaped
 function escapeUnicodeRegex(pattern) {
     return pattern.replace(/[\[\]{}()*+?.\\^$|\s]/g, '\\$&');
 }
-
 function findMatch(matcher, input, startOfName, endOfName) {
     var from = startOfName;
     matcher.lastIndex = from;
@@ -234,23 +226,18 @@ function findMatch(matcher, input, startOfName, endOfName) {
         boundaries: boundaries
     };
 }
-
 function isLetter(s) {
     return /\p{L}/u.test(s);
 }
-
 function isUpperCase(s) {
     return /\p{Lu}/u.test(s);
 }
-
 function isLowerCase(s) {
     return /\p{Ll}/u.test(s);
 }
-
 function isDigit(s) {
     return /\p{Nd}/u.test(s);
 }
-
 function getCharType(s) {
     if (isLetter(s)) {
         return UNICODE_LETTER;
@@ -260,13 +247,11 @@ function getCharType(s) {
         return UNICODE_OTHER;
     }
 }
-
 function rateNoise(str) {
     return (str.match(/([.(])/g) || []).length / 5
-        + (str.match(/(\p{Lu}+)/gu) || []).length / 10
-        + str.length / 20;
+         + (str.match(/(\p{Lu}+)/gu) || []).length / 10
+         +  str.length / 20;
 }
-
 function doSearch(request, response) {
     var term = request.term.trim();
     var maxResults = request.maxResults || MAX_RESULTS;
@@ -291,7 +276,6 @@ function doSearch(request, response) {
                 return "";
         }
     }
-
     function useQualifiedName(category) {
         switch (category) {
             case "packages":
@@ -303,12 +287,11 @@ function doSearch(request, response) {
                 return false;
         }
     }
-
     function searchIndex(indexArray, category) {
         var matches = [];
         if (!indexArray) {
             if (!indexLoaded) {
-                matches.push({l: messages.loading, category: category});
+                matches.push({ l: messages.loading, category: category });
             }
             return matches;
         }
@@ -331,7 +314,7 @@ function doSearch(request, response) {
                 m.category = category;
                 if (!useQualified) {
                     m.input = qualifiedName;
-                    m.boundaries = m.boundaries.map(function (b) {
+                    m.boundaries = m.boundaries.map(function(b) {
                         return b + prefix.length;
                     });
                 }
@@ -339,57 +322,55 @@ function doSearch(request, response) {
             }
             return true;
         });
-        return matches.sort(function (e1, e2) {
+        return matches.sort(function(e1, e2) {
             return e2.score - e1.score;
         }).slice(0, maxResults);
     }
 
     var result = searchIndex(moduleSearchIndex, "modules")
-        .concat(searchIndex(packageSearchIndex, "packages"))
-        .concat(searchIndex(typeSearchIndex, "types"))
-        .concat(searchIndex(memberSearchIndex, "members"))
-        .concat(searchIndex(tagSearchIndex, "searchTags"));
+         .concat(searchIndex(packageSearchIndex, "packages"))
+         .concat(searchIndex(typeSearchIndex, "types"))
+         .concat(searchIndex(memberSearchIndex, "members"))
+         .concat(searchIndex(tagSearchIndex, "searchTags"));
 
     if (!indexLoaded) {
-        updateSearchResults = function () {
+        updateSearchResults = function() {
             doSearch(request, response);
         }
     } else {
-        updateSearchResults = function () {
-        };
+        updateSearchResults = function() {};
     }
     response(result);
 }
-
 // JQuery search menu implementation
 $.widget("custom.catcomplete", $.ui.autocomplete, {
-    _create: function () {
+    _create: function() {
         this._super();
         this.widget().menu("option", "items", "> .result-item");
         // workaround for search result scrolling
-        this.menu._scrollIntoView = function _scrollIntoView(item) {
+        this.menu._scrollIntoView = function _scrollIntoView( item ) {
             var borderTop, paddingTop, offset, scroll, elementHeight, itemHeight;
-            if (this._hasScroll()) {
-                borderTop = parseFloat($.css(this.activeMenu[0], "borderTopWidth")) || 0;
-                paddingTop = parseFloat($.css(this.activeMenu[0], "paddingTop")) || 0;
+            if ( this._hasScroll() ) {
+                borderTop = parseFloat( $.css( this.activeMenu[ 0 ], "borderTopWidth" ) ) || 0;
+                paddingTop = parseFloat( $.css( this.activeMenu[ 0 ], "paddingTop" ) ) || 0;
                 offset = item.offset().top - this.activeMenu.offset().top - borderTop - paddingTop;
                 scroll = this.activeMenu.scrollTop();
                 elementHeight = this.activeMenu.height() - 26;
                 itemHeight = item.outerHeight();
 
-                if (offset < 0) {
-                    this.activeMenu.scrollTop(scroll + offset);
-                } else if (offset + itemHeight > elementHeight) {
-                    this.activeMenu.scrollTop(scroll + offset - elementHeight + itemHeight);
+                if ( offset < 0 ) {
+                    this.activeMenu.scrollTop( scroll + offset );
+                } else if ( offset + itemHeight > elementHeight ) {
+                    this.activeMenu.scrollTop( scroll + offset - elementHeight + itemHeight );
                 }
             }
         };
     },
-    _renderMenu: function (ul, items) {
+    _renderMenu: function(ul, items) {
         var currentCategory = "";
         var widget = this;
         widget.menu.bindings = $();
-        $.each(items, function (index, item) {
+        $.each(items, function(index, item) {
             if (item.category && item.category !== currentCategory) {
                 ul.append("<li class='ui-autocomplete-category'>" + categories[item.category] + "</li>");
                 currentCategory = item.category;
@@ -405,7 +386,7 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
         ul.append("<li class='ui-static-link'><a href='" + pathtoroot + "search.html?q="
             + encodeURI(widget.term) + "'>Go to search page</a></li>");
     },
-    _renderItem: function (ul, item) {
+    _renderItem: function(ul, item) {
         var li = $("<li/>").appendTo(ul);
         var div = $("<div/>").appendTo(li);
         var label = item.l
@@ -425,10 +406,9 @@ $.widget("custom.catcomplete", $.ui.autocomplete, {
         return li;
     }
 });
-$(function () {
+$(function() {
     var expanded = false;
     var windowWidth;
-
     function collapse() {
         if (expanded) {
             $("div#navbar-top").removeAttr("style");
@@ -438,7 +418,6 @@ $(function () {
             expanded = false;
         }
     }
-
     $("button#navbar-toggle-button").click(function (e) {
         if (expanded) {
             collapse();
@@ -455,17 +434,17 @@ $(function () {
     $("ul.sub-nav-list-small li a").click(collapse);
     $("input#search-input").focus(collapse);
     $("main").click(collapse);
-    $("section[id] > :header, :header[id], :header:has(a[id])").each(function (idx, el) {
+    $("section[id] > :header, :header[id], :header:has(a[id])").each(function(idx, el) {
         // Create anchor links for headers with an associated id attribute
         var hdr = $(el);
         var id = hdr.attr("id") || hdr.parent("section").attr("id") || hdr.children("a").attr("id");
         if (id) {
             hdr.append(" <a href='#" + id + "' class='anchor-link' aria-label='" + messages.linkToSection
-                + "'><img src='" + pathtoroot + "resource-files/link.svg' alt='" + messages.linkIcon + "' tabindex='0'"
+                + "'><img src='" + pathtoroot + "resource-files/link.svg' alt='" + messages.linkIcon +"' tabindex='0'"
                 + " width='16' height='16'></a>");
         }
     });
-    $(window).on("orientationchange", collapse).on("resize", function (e) {
+    $(window).on("orientationchange", collapse).on("resize", function(e) {
         if (expanded && windowWidth !== window.innerWidth) collapse();
     });
     var search = $("#search-input");
@@ -474,21 +453,21 @@ $(function () {
         minLength: 1,
         delay: 200,
         source: doSearch,
-        response: function (event, ui) {
+        response: function(event, ui) {
             if (!ui.content.length) {
-                ui.content.push({l: messages.noResult});
+                ui.content.push({ l: messages.noResult });
             } else {
                 $("#search-input").empty();
             }
         },
         autoFocus: true,
-        focus: function (event, ui) {
+        focus: function(event, ui) {
             return false;
         },
         position: {
             collision: "flip"
         },
-        select: function (event, ui) {
+        select: function(event, ui) {
             if (ui.item.indexItem) {
                 var url = getURL(ui.item.indexItem, ui.item.category);
                 window.location.href = pathtoroot + url;
@@ -499,7 +478,7 @@ $(function () {
     search.val('');
     search.prop("disabled", false);
     reset.prop("disabled", false);
-    reset.click(function () {
+    reset.click(function() {
         search.val('').focus();
     });
     search.focus();
