@@ -5,7 +5,6 @@ import com.logic.api.IPLFormula;
 import com.logic.api.LogicAPI;
 import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.others.ASTArbitrary;
-
 import com.logic.exps.interpreters.FOLReplaceExps;
 import com.logic.others.Utils;
 import org.junit.jupiter.api.Assertions;

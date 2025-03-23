@@ -1,6 +1,8 @@
 package api.nd;
 
-import com.logic.api.*;
+import com.logic.api.INDProof;
+import com.logic.api.IPLFormula;
+import com.logic.api.LogicAPI;
 import com.logic.nd.algorithm.AlgoProofPLBuilder;
 import com.logic.nd.algorithm.AlgoSettingsBuilder;
 import com.logic.nd.algorithm.state.strategies.SizeTrimStrategy;

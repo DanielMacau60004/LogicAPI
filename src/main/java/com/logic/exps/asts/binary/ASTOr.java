@@ -6,17 +6,17 @@ import com.logic.parser.Parser;
 
 public class ASTOr extends AASTBinaryExp {
 
-	public ASTOr(IASTExp e1, IASTExp e2) {
-		super(e1, e2);
-	}
+    public ASTOr(IASTExp e1, IASTExp e2) {
+        super(e1, e2);
+    }
 
-	@Override
-	public <T, E> T accept(IExpsVisitor<T, E> v, E env) {
-		return v.visit(this, env);
-	}
+    @Override
+    public <T, E> T accept(IExpsVisitor<T, E> v, E env) {
+        return v.visit(this, env);
+    }
 
-	@Override
-	public String toString() {
-		return left.toString() + " " + getToken(Parser.OR) + " " + right.toString();
-	}
+    @Override
+    public String toString() {
+        return left.toString() + " " + getToken(Parser.OR) + " " + right.toString();
+    }
 }

@@ -10,7 +10,10 @@ import com.logic.exps.asts.unary.ASTNot;
 import com.logic.exps.asts.unary.ASTParenthesis;
 import com.logic.others.Env;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, ASTVariable>> {
 
@@ -45,9 +48,9 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, ASTVariable
         Env<String, ASTVariable> env = new Env<>();
         exp.accept(checker, env);
 
-        for(Set<ASTVariable> s : checker.generics.values()) {
-            for(ASTVariable v : checker.boundedVariables) {
-                if(!s.contains(v))
+        for (Set<ASTVariable> s : checker.generics.values()) {
+            for (ASTVariable v : checker.boundedVariables) {
+                if (!s.contains(v))
                     checker.unboundedVariables.add(v);
             }
         }
@@ -72,10 +75,10 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, ASTVariable
     public Void visit(ASTConstant e, Env<String, ASTVariable> env) {
         Integer size = functionsMap.get(e.getName());
 
-        if(size == null) {
+        if (size == null) {
             functionsMap.put(e.getName(), 0);
             functions.add(e);
-        } else if(size != 0)
+        } else if (size != 0)
             throw new RuntimeException(String.format(ERROR_MESSAGE_FUNCTION, e.getName(), size, 0));
 
         return null;
@@ -85,10 +88,10 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, ASTVariable
     public Void visit(ASTLiteral e, Env<String, ASTVariable> env) {
         Integer size = predicatesMap.get(e.getName());
 
-        if(size == null) {
+        if (size == null) {
             predicatesMap.put(e.getName(), 0);
             predicates.add(e);
-        } else if(size != 0)
+        } else if (size != 0)
             throw new RuntimeException(String.format(ERROR_MESSAGE_PREDICATE, e.getName(), size, 0));
 
         return null;
@@ -97,7 +100,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, ASTVariable
     @Override
     public Void visit(ASTArbitrary e, Env<String, ASTVariable> env) {
         Set<ASTVariable> bounded = generics.get(e);
-        if(bounded != null) bounded.addAll(env.map().values());
+        if (bounded != null) bounded.addAll(env.map().values());
         else bounded = new HashSet<>(env.map().values());
 
         generics.put(e, bounded);
@@ -106,7 +109,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, ASTVariable
 
     @Override
     public Void visit(ASTVariable e, Env<String, ASTVariable> env) {
-        if(env.find(e.getName()) != null)
+        if (env.find(e.getName()) != null)
             boundedVariables.add(e);
         else unboundedVariables.add(e);
 
@@ -152,13 +155,13 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, ASTVariable
         Integer size = functionsMap.get(e.getName());
         int arity = e.getTerms().size();
 
-        if(size == null) {
+        if (size == null) {
             functionsMap.put(e.getName(), arity);
             functions.add(e);
-        } else if(size != arity)
+        } else if (size != arity)
             throw new RuntimeException(String.format(ERROR_MESSAGE_FUNCTION, e.getName(), size, arity));
 
-        e.getTerms().forEach(t->t.accept(this, env));
+        e.getTerms().forEach(t -> t.accept(this, env));
         return null;
     }
 
@@ -167,13 +170,13 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, ASTVariable
         Integer size = predicatesMap.get(e.getName());
         int arity = e.getTerms().size();
 
-        if(size == null) {
+        if (size == null) {
             predicatesMap.put(e.getName(), arity);
             predicates.add(e);
-        } else if(size != arity)
+        } else if (size != arity)
             throw new RuntimeException(String.format(ERROR_MESSAGE_PREDICATE, e.getName(), size, arity));
 
-        e.getTerms().forEach(t->t.accept(this, env));
+        e.getTerms().forEach(t -> t.accept(this, env));
         return null;
     }
 
@@ -181,7 +184,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, ASTVariable
     public Void visit(ASTExistential e, Env<String, ASTVariable> env) {
         env = env.beginScope();
 
-        ASTVariable variable = ((ASTVariable)e.getLeft());
+        ASTVariable variable = ((ASTVariable) e.getLeft());
         env.bind(variable.getName(), variable);
         boundedVariables.add(variable);
         e.getRight().accept(this, env);
@@ -193,7 +196,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, ASTVariable
     public Void visit(ASTUniversal e, Env<String, ASTVariable> env) {
         env = env.beginScope();
 
-        ASTVariable variable = ((ASTVariable)e.getLeft());
+        ASTVariable variable = ((ASTVariable) e.getLeft());
         env.bind(variable.getName(), variable);
         boundedVariables.add(variable);
         e.getRight().accept(this, env);

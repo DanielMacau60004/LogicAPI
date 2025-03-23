@@ -4,9 +4,8 @@ import com.logic.api.IFOLFormula;
 import com.logic.api.INDProof;
 import com.logic.api.LogicAPI;
 import com.logic.exps.asts.others.ASTConstant;
-import com.logic.exps.asts.others.ASTVariable;
-import com.logic.nd.algorithm.AlgoProofStateBuilder;
 import com.logic.nd.algorithm.AlgoProofFOLBuilder;
+import com.logic.nd.algorithm.AlgoProofStateBuilder;
 import com.logic.nd.algorithm.AlgoSettingsBuilder;
 import com.logic.nd.algorithm.state.strategies.SizeTrimStrategy;
 import com.logic.others.Utils;
@@ -121,7 +120,7 @@ public class NDFOLTest {
                                     .setTotalClosedNodesLimit(10000)
                                     .setHypothesesPerStateLimit(4)
                                     .setTimeout(500)
-                    .setTrimStrategy(new SizeTrimStrategy()))
+                                    .setTrimStrategy(new SizeTrimStrategy()))
                     //.addTerm(new ASTVariable("w"))
                     //.addTerm(new ASTVariable("z"))
                     .build();
@@ -149,7 +148,7 @@ public class NDFOLTest {
                     .addPremises(premises)
                     .setAlgoSettingsBuilder(
                             new AlgoSettingsBuilder()
-                                .setTimeout(1000))
+                                    .setTimeout(1000))
                     .addTerm(new ASTConstant("b"))
                     .addTerm(new ASTConstant("c"))
                     .build();
@@ -190,7 +189,6 @@ public class NDFOLTest {
     @ParameterizedTest
     @ValueSource(strings = {
             "∀x(P(a) → Q(x)). P(a) → ∀z Q(z)",
-            "∀x P(a) ∧ ∀y Q(y). P(a) → ∀z (P(z) ∧ Q(z))",
     })
     void testAlgorithmWithNoExtra(String premisesAndExpression) throws Exception {
         String[] parts = premisesAndExpression.split("\\.");

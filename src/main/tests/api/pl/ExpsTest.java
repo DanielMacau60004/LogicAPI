@@ -100,7 +100,7 @@ public class ExpsTest {
             "p → (q ∨ r)", "(p → q) ∨ (p → r)",
             "¬(p ∧ q) ↔ (¬p ∨ ¬q)",
 
-            "(a ∧ q)",  "¬(a ∧ q)",  "¬(¬a ∧ ¬¬¬¬q)"
+            "(a ∧ q)", "¬(a ∧ q)", "¬(¬a ∧ ¬¬¬¬q)"
 
     })
     void testCorrect1Exps(String expression) {

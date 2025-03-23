@@ -75,9 +75,9 @@ public class PLExp implements IPLFormula {
             interpretation.keySet().retainAll(literals);
             Boolean newBool = table.get(interpretation);
 
-            if(newBool == null)
+            if (newBool == null)
                 table.put(interpretation, bool);
-            else if(newBool != bool)
+            else if (newBool != bool)
                 return null;
         }
 
@@ -94,11 +94,11 @@ public class PLExp implements IPLFormula {
         intersection.retainAll(iteratedBounded);
 
         Map<Map<ASTLiteral, Boolean>, Boolean> truthTable = getShortenTruthTable(getTruthTable(), intersection);
-        if(truthTable == null)
+        if (truthTable == null)
             return false;
 
         Map<Map<ASTLiteral, Boolean>, Boolean> truthTableOther = getShortenTruthTable(other.getTruthTable(), intersection);
-        if(truthTableOther == null)
+        if (truthTableOther == null)
             return false;
 
         return truthTable.equals(truthTableOther);

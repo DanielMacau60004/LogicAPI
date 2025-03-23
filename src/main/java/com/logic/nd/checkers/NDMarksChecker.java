@@ -2,14 +2,14 @@ package com.logic.nd.checkers;
 
 import com.logic.api.IFOLFormula;
 import com.logic.api.IFormula;
-import com.logic.api.INDProof;
 import com.logic.exps.ExpUtils;
 import com.logic.exps.asts.IASTExp;
-import com.logic.exps.asts.binary.*;
+import com.logic.exps.asts.binary.ASTConditional;
+import com.logic.exps.asts.binary.ASTExistential;
+import com.logic.exps.asts.binary.ASTOr;
 import com.logic.exps.asts.others.ASTVariable;
 import com.logic.exps.asts.unary.ASTNot;
 import com.logic.exps.interpreters.FOLReplaceExps;
-import com.logic.nd.NDProof;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
 import com.logic.nd.asts.binary.ASTEExist;
@@ -20,9 +20,11 @@ import com.logic.nd.asts.others.ASTEDisj;
 import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
 import com.logic.others.Env;
-import com.logic.others.Utils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class NDMarksChecker implements INDVisitor<Void, Env<Integer, IASTExp>> {
 

@@ -42,7 +42,7 @@ public class NDWWFExpsChecker implements INDVisitor<Void, Void> {
 
     private IFormula verifyAndCreateFormula(IASTExp exp) {
         return fol ? FOLWFFChecker.check(exp)
-             : PLWFFChecker.check(exp);
+                : PLWFFChecker.check(exp);
     }
 
     @Override

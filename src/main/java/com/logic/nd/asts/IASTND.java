@@ -6,5 +6,5 @@ public interface IASTND {
 
     IASTExp getConclusion();
 
-    <T,E> T accept(INDVisitor<T,E> v, E env);
+    <T, E> T accept(INDVisitor<T, E> v, E env);
 }

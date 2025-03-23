@@ -1,10 +1,13 @@
 package com.logic.nd.algorithm.state;
 
 import com.logic.api.IFormula;
-import com.logic.nd.algorithm.state.strategies.*;
+import com.logic.nd.algorithm.state.strategies.IStateGraph;
 import com.logic.nd.algorithm.transition.ITransitionGraph;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 public class StateGraph implements IStateGraph {
 

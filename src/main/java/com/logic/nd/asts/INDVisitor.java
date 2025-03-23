@@ -8,7 +8,7 @@ import com.logic.nd.asts.others.ASTEDisj;
 import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
 
-public interface INDVisitor <T, E> {
+public interface INDVisitor<T, E> {
 
     T visit(ASTHypothesis h, E env);
 

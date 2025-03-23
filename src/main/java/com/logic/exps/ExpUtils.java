@@ -7,12 +7,9 @@ import com.logic.exps.asts.binary.ASTBiconditional;
 import com.logic.exps.asts.binary.ASTConditional;
 import com.logic.exps.asts.binary.ASTOr;
 import com.logic.exps.asts.others.ASTBottom;
-import com.logic.exps.asts.others.ASTLiteral;
-import com.logic.exps.asts.others.ASTPred;
 import com.logic.exps.asts.unary.ASTNot;
 import com.logic.exps.asts.unary.ASTParenthesis;
 import com.logic.exps.checkers.FOLWFFChecker;
-import com.logic.parser.Parser;
 
 public class ExpUtils {
 

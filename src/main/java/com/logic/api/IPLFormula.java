@@ -6,10 +6,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * The {@code IPLExp} interface represents a propositional logic expression.
+ * The {@code IPLFormula} interface represents a propositional logic expression.
  * This interface provides methods to interpret the expression, iterate over the literals, compute its truth table, and
  * check logical equivalence between different propositional logic expressions.
- * An instance of {@code IPLExp} can represent any propositional logic expression, such as:
+ * An instance of {@code IPLFormula} can represent any propositional logic expression, such as:
  * <ul>
  *     <li>Atomic propositions</li>
  *     <li>Negations</li>
@@ -24,33 +24,32 @@ import java.util.Map;
  * </p>
  *
  * @author Daniel Macau
- * @version 1.0
+ * @version 1.1
  * @see LogicAPI
  * @see Map
  * @since 08-03-2025
  */
-//TODO remake documentation
-//TODO create interfaces for exposed classes (ASTLiteral)
 public interface IPLFormula extends IFormula {
 
     /**
      * Iterates through all literals in the propositional logic expression.
      * A literal is a propositional variable (e.g., "p" or "q").
      *
-     * @return An iterator over the literals in this expression.
+     * @return An {@code Iterator<ASTLiteral>} that iterates over the literals in this expression.
      */
     Iterator<ASTLiteral> iterateLiterals();
 
     /**
-     * Interprets the propositional expression based on a given interpretation of the literals.
+     * Evaluates the propositional logic expression based on a given interpretation of the literals.
      * The interpretation is provided as a map, where each key is a literal and each value is its corresponding truth value (true/false).
      *
      * <p>
-     * If the interpretation does not provide a truth value for every literal, or if the expression contains arbitrary expressions, this method will throw a {@link RuntimeException}.
+     * If the interpretation does not provide a truth value for every literal, or if the expression contains arbitrary expressions,
+     * this method will throw a {@link RuntimeException}.
      * </p>
      *
-     * @param interpretation A map of literals and their corresponding truth values.
-     * @return {@code true} if the expression evaluates to true under the given interpretation, {@code false} otherwise.
+     * @param interpretation A {@code Map<ASTLiteral, Boolean>} representing the truth values of literals.
+     * @return {@code boolean} - {@code true} if the expression evaluates to true under the given interpretation, {@code false} otherwise.
      * @throws RuntimeException If a literal does not have a truth value in the interpretation or if the expression contains arbitrary expressions.
      */
     boolean interpret(Map<ASTLiteral, Boolean> interpretation);
@@ -59,11 +58,12 @@ public interface IPLFormula extends IFormula {
      * Generates and returns the truth table for the propositional expression.
      * The truth table is represented as a map where:
      * <ul>
-     *     <li>The key represents an interpretation of the literals (a map of literals to their truth values).</li>
+     *     <li>The key represents an interpretation of the literals (a {@code Map<ASTLiteral, Boolean>} of literals to their truth values).</li>
      *     <li>The value is the truth value of the expression for that particular interpretation.</li>
      * </ul>
      *
-     * @return A map where each key is an interpretation (a map of literal-to-truth-value), and the corresponding value is the truth value of the expression for that interpretation.
+     * @return A {@code Map<Map<ASTLiteral, Boolean>, Boolean>} where each key is an interpretation of literals,
+     * and the corresponding value is the truth value of the expression for that interpretation.
      */
     Map<Map<ASTLiteral, Boolean>, Boolean> getTruthTable();
 
@@ -82,8 +82,8 @@ public interface IPLFormula extends IFormula {
      * the expressions are equivalent. Otherwise, they are not.
      * </p>
      *
-     * @param other The other propositional expression to check for equivalence.
-     * @return {@code true} if the two expressions are logically equivalent, {@code false} otherwise.
+     * @param other An instance of {@code IPLFormula} representing the other propositional logic expression.
+     * @return {@code boolean} - {@code true} if the two expressions are logically equivalent, {@code false} otherwise.
      * @throws RuntimeException If any of the expressions contain arbitrary expressions.
      */
     boolean isEquivalentTo(IPLFormula other);

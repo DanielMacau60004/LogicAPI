@@ -1,6 +1,5 @@
 package com.logic.exps.asts;
 
-import com.logic.others.Utils;
 import com.logic.parser.Parser;
 
 public abstract class AASTExp implements IASTExp {
@@ -9,15 +8,15 @@ public abstract class AASTExp implements IASTExp {
     private String name;
 
     public int getID() {
-        if(name == null) {
+        if (name == null) {
             name = toString();
-            iD =  name.hashCode();
+            iD = name.hashCode();
         }
         return iD;
     }
 
     protected String getToken(int kind) {
-        return Parser.tokenImage[kind].replace("\"","");
+        return Parser.tokenImage[kind].replace("\"", "");
     }
 
     @Override
@@ -28,7 +27,7 @@ public abstract class AASTExp implements IASTExp {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof AASTExp s)
+        if (obj instanceof AASTExp s)
             return getID() == s.getID();
         return false;
     }

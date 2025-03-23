@@ -33,10 +33,10 @@ public class ExpsTest {
             "∀", "∃", "¬", "→", "↔", "∧", "∨", "( )", ",",
             "∀x (P(x) Q(x))", "∃y R(y", "¬∃z (S(z ∧ T(z))", "∀x ∃y L(x y) → M(y, x))",
             "P(x) → Q(y) ∧ R(z))", "¬(A(x) ∨ B(y", "(C(x) → D(y)) ↔ (E(z) ∧ F(x",
-            "∃x ∀y (G(x, y ∨ H(y, x))", "∀x (I(x) ↔ J(x)" , "¬∀y (K(y ∧ L(y))",
+            "∃x ∀y (G(x, y ∨ H(y, x))", "∀x (I(x) ↔ J(x)", "¬∀y (K(y ∧ L(y))",
             "height(x + weight(y))", "f(x - g(y))", "daniel(x * h(z))", "p(x y) → q(y, x)",
             "¬∀x (M(x → N(x))", "∃y (O(y ∨ P(y))", "(Q(x) → R(y)) ∨ (S(z) → T(x)",
-            "∀x (∃y (F(x, y) ∨ G(y, x)) → ∀z H(z, x)" , "¬∃w (I(w) → J(w",
+            "∀x (∃y (F(x, y) ∨ G(y, x)) → ∀z H(z, x)", "¬∃w (I(w) → J(w",
             "(K(x) ∨ L(y)) → (M(z) ∧ N(w)", "∃x (P(x) ↔ Q(x"
     })
     void testIncorrectExps(String expression) {

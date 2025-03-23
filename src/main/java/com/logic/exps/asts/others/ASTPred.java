@@ -14,7 +14,7 @@ public class ASTPred extends AASTExp {
     private final List<IASTExp> terms;
 
     public ASTPred(String predicate) {
-       this(predicate, new LinkedList<>());
+        this(predicate, new LinkedList<>());
     }
 
     public ASTPred(String predicate, List<IASTExp> terms) {

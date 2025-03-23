@@ -1,9 +1,7 @@
 package com.logic.nd;
 
-import com.logic.api.IFOLFormula;
 import com.logic.api.IFormula;
 import com.logic.api.INDProof;
-import com.logic.exps.asts.IASTExp;
 import com.logic.nd.asts.IASTND;
 import com.logic.others.Utils;
 
@@ -47,7 +45,7 @@ public class NDProof implements INDProof {
     }
 
     @Override
-    public String toString()  {
+    public String toString() {
         return Utils.getToken(proof.toString());
     }
 }

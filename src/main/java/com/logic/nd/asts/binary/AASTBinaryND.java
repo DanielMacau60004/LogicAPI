@@ -30,6 +30,6 @@ public abstract class AASTBinaryND extends AASTND implements IASTND {
 
     @Override
     public String toString() {
-        return "["+ conclusion + ". " + hyp1 + " " + hyp2 + "]";
+        return "[" + conclusion + ". " + hyp1 + " " + hyp2 + "]";
     }
 }

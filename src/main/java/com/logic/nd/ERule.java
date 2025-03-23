@@ -30,7 +30,7 @@ public enum ERule {
 
     @Override
     public String toString() {
-        return Utils.getToken(Parser.tokenImage[kind].replace("\"",""));
+        return Utils.getToken(Parser.tokenImage[kind].replace("\"", ""));
     }
 
 }

@@ -49,7 +49,7 @@ public class StateSolution {
         //TODO will cause conflict with premises marks, they might not start with 1
         int mark = 1;
         Map<IFormula, Integer> marks = new HashMap<>(hypotheses);
-        for(IFormula e : graph.getPremises()) marks.put(e, mark++);
+        for (IFormula e : graph.getPremises()) marks.put(e, mark++);
 
         this.mark = mark;
         IASTND proof = rule(new StateNode(exp, graph.getPremises(), hypotheses.keySet(), 0), marks);
@@ -69,21 +69,21 @@ public class StateSolution {
         IASTExp exp = initState.getExp().getFormula();
         marks = new HashMap<>(marks);
 
-        if(edge == null)
+        if (edge == null)
             return new ASTHypothesis(exp, marks.get(initState.getExp()));
 
         List<StateTransitionEdge> transitions = edge.getTransitions();
 
-        for(StateTransitionEdge e : transitions)
-            if(e.getProduces() != null) marks.put(e.getProduces(), mark++);
+        for (StateTransitionEdge e : transitions)
+            if (e.getProduces() != null) marks.put(e.getProduces(), mark++);
 
         IASTND first = !transitions.isEmpty() ? rule(transitions.get(0).getNode(), marks) : null;
         IASTND second = transitions.size() > 1 ? rule(transitions.get(1).getNode(), marks) : null;
         IASTND third = transitions.size() > 2 ? rule(transitions.get(2).getNode(), marks) : null;
 
         return switch (edge.getRule()) {
-            case INTRO_CONJUNCTION  -> new ASTIConj(first, second, exp);
-            case ELIM_CONJUNCTION_LEFT  -> new ASTELConj(first, exp);
+            case INTRO_CONJUNCTION -> new ASTIConj(first, second, exp);
+            case ELIM_CONJUNCTION_LEFT -> new ASTELConj(first, exp);
             case ELIM_CONJUNCTION_RIGHT -> new ASTERConj(first, exp);
             case INTRO_DISJUNCTION_LEFT -> new ASTILDis(first, exp);
             case INTRO_DISJUNCTION_RIGHT -> new ASTIRDis(first, exp);

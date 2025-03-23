@@ -30,10 +30,10 @@ public class NDInterpreter implements INDVisitor<Integer, Env<Integer, IASTExp>>
         NDInterpreter interpret = new NDInterpreter();
         int height = nd.accept(interpret, new Env<>());
         return new NDProof(formulas.get(nd.getConclusion()), premises.entrySet().stream()
-                        .collect(Collectors.toMap(
-                                entry -> formulas.get(entry.getKey()),
-                                Map.Entry::getValue
-                        )), nd, height, interpret.size);
+                .collect(Collectors.toMap(
+                        entry -> formulas.get(entry.getKey()),
+                        Map.Entry::getValue
+                )), nd, height, interpret.size);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class NDInterpreter implements INDVisitor<Integer, Env<Integer, IASTExp>>
     public Integer visit(ASTEDisj r, Env<Integer, IASTExp> env) {
         size++;
         return Math.max(r.getHyp1().accept(this, env),
-                Math.max(r.getHyp2().accept(this, env),  r.getHyp3().accept(this, env))) + 1;
+                Math.max(r.getHyp2().accept(this, env), r.getHyp3().accept(this, env))) + 1;
     }
 
     @Override

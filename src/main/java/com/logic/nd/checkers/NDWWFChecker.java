@@ -19,10 +19,8 @@ import com.logic.nd.asts.binary.ASTIConj;
 import com.logic.nd.asts.others.ASTEDisj;
 import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
-import com.logic.others.Utils;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 

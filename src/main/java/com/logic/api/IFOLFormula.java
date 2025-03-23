@@ -8,90 +8,119 @@ import com.logic.exps.asts.others.ASTVariable;
 import java.util.Iterator;
 
 /**
- * The {@code IFOLExp} interface represents a first-order logic expression.
- * This interface provides methods to iterate over various components of a first-order logic expression,
- * such as functions, predicates, bounded variables, unbounded variables, and to check whether the expression
- * is a sentence or contains free variables.
- * An instance of {@code IFOLExp} can represent any first-order logic expression, which may include:
+ * The {@code IFOLFormula} interface defines a first-order logic formula.
+ * This interface provides methods for iterating over different components of a first-order logic formula,
+ * such as functions, predicates, bounded variables, unbounded variables, and terms. It also includes
+ * methods for checking whether a variable belongs to a specific category and whether the formula is a sentence.
+ * <p>
+ * Implementations of {@code IFOLFormula} represent logical expressions composed of:
  * <ul>
- *     <li>Functions</li>
- *     <li>Predicates</li>
- *     <li>Bounded variables (quantified variables)</li>
- *     <li>Unbounded variables (free variables)</li>
- *     <li>Sentences (logical expressions with no free variables)</li>
+ *     <li>Functions (e.g., f(x), g(a, b))</li>
+ *     <li>Predicates (e.g., P(x), Parent(x, y))</li>
+ *     <li>Bounded variables (variables within quantifier scopes, e.g., ∀x, ∃y)</li>
+ *     <li>Unbounded (free) variables</li>
+ *     <li>Terms (sub-expressions within a formula)</li>
+ *     <li>Sentences (formulas with no free variables)</li>
  * </ul>
- *
+ * </p>
  *
  * <p>
- * The methods in this interface allow for working with first-order logic expressions, such as determining the set of bounded and unbounded variables,
- * checking if a variable is bounded, and verifying whether an expression is a sentence (i.e., has no free variables).
+ * This interface allows structured manipulation of logical formulas, supporting operations such as
+ * variable classification, expression iteration, and sentence validation.
  * </p>
  *
  * @author Daniel Macau
- * @version 1.0
- * @since 08-03-2025
+ * @version 1.2
  * @see LogicAPI
+ * @since 08-03-2025
  */
-//TODO remake documentation
-//TODO create interfaces for exposed classes (ASTLiteral)
 public interface IFOLFormula extends IFormula {
 
     /**
-     * Iterates through all the function names used in the first-order logic expression.
-     * A function is typically a mapping from a set of terms to another term, such as "f(x)" or "g(a, b)".
+     * Returns an iterator over all function symbols used in this first-order logic formula.
+     * Functions represent mappings from terms to other terms (e.g., f(x), g(a, b)).
      *
-     * @return An iterator over the functions in this expression.
+     * @return An iterator over function symbols in the formula.
      */
     Iterator<ASTFun> iterateFunctions();
 
     /**
-     * Iterates through all the predicate names used in the first-order logic expression.
-     * A predicate is a relation between terms, such as "P(x)" or "Father(x, y)".
+     * Returns an iterator over all predicate symbols used in this first-order logic formula.
+     * Predicates define relations between terms (e.g., P(x), Father(x, y)).
      *
-     * @return An iterator over the predicates in this expression.
+     * @return An iterator over predicate symbols in the formula.
      */
     Iterator<ASTPred> iteratePredicates();
 
     /**
-     * Iterates through all the bounded variables in the first-order logic expression.
-     * A bounded variable is a variable that is within the scope of a quantifier (e.g., "∀x" or "∃y").
+     * Returns an iterator over all bounded variables in this formula.
+     * A bounded variable is one that is bound by a quantifier (e.g., ∀x, ∃y).
      *
-     * @return An iterator over the bounded variables in this expression.
+     * @return An iterator over bounded variables in the formula.
      */
     Iterator<ASTVariable> iterateBoundedVariables();
 
+    /**
+     * Returns an iterator over all terms present in this formula.
+     * Terms include variables, functions, and constants that make up the logical expression.
+     *
+     * @return An iterator over terms in the formula.
+     */
     Iterator<AASTTerm> iterateTerms();
 
+    /**
+     * Returns an iterator over all variables in this formula, including both bounded and unbounded variables.
+     *
+     * @return An iterator over all variables in the formula.
+     */
     Iterator<ASTVariable> iterateVariables();
 
     /**
-     * Checks if a given variable is a bounded variable in this first-order logic expression.
-     * A bounded variable is one that is part of a quantifier's scope.
+     * Determines whether the specified variable is a bounded variable in this formula.
      *
      * @param variable The variable to check.
      * @return {@code true} if the variable is bounded, {@code false} otherwise.
      */
     boolean isABoundedVariable(ASTVariable variable);
 
+    /**
+     * Determines whether the specified variable is an unbounded variable in this formula.
+     *
+     * @param variable The variable to check.
+     * @return {@code true} if the variable is unbounded, {@code false} otherwise.
+     */
     boolean isAnUnboundedVariable(ASTVariable variable);
 
+    /**
+     * Determines whether the specified variable exists in this formula (either bounded or unbounded).
+     *
+     * @param variable The variable to check.
+     * @return {@code true} if the variable is present in the formula, {@code false} otherwise.
+     */
     boolean isAVariable(ASTVariable variable);
 
+    /**
+     * Determines whether the specified variable is a free variable in this formula.
+     * A free variable is an unbounded variable that is not within a quantifier's scope and occurs in the formula.
+     *
+     * @param variable The variable to check.
+     * @return {@code true} if the variable is free, {@code false} otherwise.
+     */
     boolean isAFreeVariable(ASTVariable variable);
 
     /**
-     * Iterates through all the unbounded variables in the first-order logic expression.
-     * An unbounded (or free) variable is one that is not part of any quantifier's scope.
+     * Returns an iterator over all unbounded (free) variables in this formula.
+     * Unbounded variables are not restricted by any quantifier.
      *
-     * @return An iterator over the unbounded variables in this expression.
+     * @return An iterator over unbounded variables in the formula.
      */
     Iterator<ASTVariable> iterateUnboundedVariables();
 
     /**
-     * Checks if this first-order logic expression is a sentence.
-     * A sentence is a formula that contains no free (unbounded) variables.
+     * Checks whether this first-order logic formula is a sentence.
+     * A sentence is a formula that contains no unbounded variables.
      *
-     * @return {@code true} if the expression is a sentence, {@code false} if it contains free variables.
+     * @return {@code true} if the formula is a sentence, {@code false} otherwise.
      */
     boolean isASentence();
 }

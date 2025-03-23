@@ -1,15 +1,10 @@
 package com.logic.exps.asts;
 
 
-import com.logic.exps.asts.binary.ASTAnd;
-import com.logic.exps.asts.binary.ASTBiconditional;
-import com.logic.exps.asts.binary.ASTConditional;
-import com.logic.exps.asts.binary.ASTOr;
-import com.logic.exps.asts.binary.ASTExistential;
+import com.logic.exps.asts.binary.*;
 import com.logic.exps.asts.others.*;
-import com.logic.exps.asts.unary.ASTParenthesis;
 import com.logic.exps.asts.unary.ASTNot;
-import com.logic.exps.asts.binary.ASTUniversal;
+import com.logic.exps.asts.unary.ASTParenthesis;
 
 public interface IExpsVisitor<T, E> {
 

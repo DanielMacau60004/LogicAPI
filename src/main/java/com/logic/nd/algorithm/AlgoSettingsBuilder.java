@@ -58,7 +58,7 @@ public class AlgoSettingsBuilder {
     }
 
     public StateGraphSettings build(IFormula conclusion, Set<IFormula> premises) {
-        if(state == null)
+        if (state == null)
             state = new AlgoProofStateBuilder(conclusion);
         return new StateGraphSettings(state.build(premises), heightLimit, totalClosedNodesLimit,
                 hypothesesPerStateLimit, timeout, buildStrategy, trimStrategy);

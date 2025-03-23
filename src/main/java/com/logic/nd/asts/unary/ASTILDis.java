@@ -5,7 +5,7 @@ import com.logic.nd.ERule;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
 
-public class ASTILDis extends AASTUnaryND  {
+public class ASTILDis extends AASTUnaryND {
 
     public ASTILDis(IASTND hypothesis, IASTExp conclusion) {
         super(hypothesis, conclusion);

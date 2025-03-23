@@ -14,7 +14,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -41,7 +40,7 @@ public class ExpsWithWFFTest {
             Set<String> bounded = new HashSet<>(Arrays.asList(boundedStr.split(",")));
             Iterator<ASTVariable> it = exp.get().iterateBoundedVariables();
             Set<String> iteratedBounded = new HashSet<>();
-            it.forEachRemaining(i->iteratedBounded.add(i.toString()));
+            it.forEachRemaining(i -> iteratedBounded.add(i.toString()));
 
             Assertions.assertEquals(iteratedBounded, bounded);
         }
@@ -50,7 +49,7 @@ public class ExpsWithWFFTest {
             Set<String> unbounded = new HashSet<>(Arrays.asList(unboundedStr.split(",")));
             Iterator<ASTVariable> it = exp.get().iterateUnboundedVariables();
             Set<String> iteratedUnbounded = new HashSet<>();
-            it.forEachRemaining(i->iteratedUnbounded.add(i.toString()));
+            it.forEachRemaining(i -> iteratedUnbounded.add(i.toString()));
 
             Assertions.assertEquals(iteratedUnbounded, unbounded);
         }

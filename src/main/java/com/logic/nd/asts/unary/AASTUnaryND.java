@@ -24,6 +24,6 @@ public abstract class AASTUnaryND extends AASTND implements IASTND {
 
     @Override
     public String toString() {
-        return "["+ conclusion + ". " + hyp + "]";
+        return "[" + conclusion + ". " + hyp + "]";
     }
 }

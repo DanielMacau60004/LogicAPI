@@ -7,7 +7,6 @@ import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.binary.ASTExistential;
 import com.logic.exps.asts.binary.ASTUniversal;
 import com.logic.exps.asts.others.ASTVariable;
-import com.logic.exps.checkers.FOLWFFChecker;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
 import com.logic.nd.asts.binary.ASTEExist;
@@ -18,11 +17,8 @@ import com.logic.nd.asts.others.ASTEDisj;
 import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
 import com.logic.others.Env;
-import com.logic.others.Utils;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class NDSideCondChecker implements INDVisitor<Void, Env<Integer, IASTExp>> {
 
@@ -35,7 +31,7 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<Integer, IASTExp>
     public static Map<IASTExp, IFormula> check(IASTND nd, Map<IASTExp, IFormula> formulas, Map<IASTExp, Integer> premises) {
         NDSideCondChecker checker = new NDSideCondChecker(formulas);
         Env<Integer, IASTExp> env = new Env<>();
-        premises.forEach((p,m) -> env.bind(m, p));
+        premises.forEach((p, m) -> env.bind(m, p));
         nd.accept(checker, env);
         return checker.formulas;
     }

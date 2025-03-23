@@ -76,17 +76,13 @@ public class StateNode {
         Set<IFormula> noFree = notFree == null ? this.noFree : new HashSet<>(this.noFree);
         Set<IFormula> hypotheses = hypothesis == null ? this.hypotheses : new HashSet<>(this.hypotheses);
 
-        if(notFree != null) {
-            noFree.addAll(hypotheses.stream()
-                    .filter(h-> ((IFOLFormula)h).isAFreeVariable(notFree)
-                    ).toList());
-            noFree.addAll(premisses.stream()
-                    .filter(p-> ((IFOLFormula)p).isAFreeVariable(notFree)
-                    ).toList());
+        if (notFree != null) {
+            noFree.addAll(hypotheses.stream().filter(h -> ((IFOLFormula) h).isAFreeVariable(notFree)).toList());
+            noFree.addAll(premisses.stream().filter(p -> ((IFOLFormula) p).isAFreeVariable(notFree)).toList());
         }
 
         if (hypothesis != null)
-            return new StateNode(exp,premisses, hypotheses, hypothesis, height + 1, noFree);
+            return new StateNode(exp, premisses, hypotheses, hypothesis, height + 1, noFree);
         return new StateNode(exp, premisses, hypotheses, height + 1, noFree);
     }
 

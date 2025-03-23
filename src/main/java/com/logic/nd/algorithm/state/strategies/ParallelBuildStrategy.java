@@ -60,7 +60,7 @@ public class ParallelBuildStrategy implements IBuildStrategy {
 
     }
 
-    private void processNode(ITransitionGraph transitionGraph, StateNode  state, StateGraphSettings settings) {
+    private void processNode(ITransitionGraph transitionGraph, StateNode state, StateGraphSettings settings) {
         if (graph.containsKey(state) || state.getHeight() > settings.getHeightLimit()
                 || closed.size() >= settings.getTotalClosedNodesLimit()
                 || state.getHypotheses().size() > settings.getHypothesesPerStateLimit())

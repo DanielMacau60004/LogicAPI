@@ -45,10 +45,10 @@ public class Utils {
 
             System.out.print("| ");
             for (String header : headers) {
-                System.out.print((interpretation.get(header)? "T":"F") + " | ");
+                System.out.print((interpretation.get(header) ? "T" : "F") + " | ");
             }
 
-            System.out.println((result ? "T":"F"));
+            System.out.println((result ? "T" : "F"));
         }
     }
 

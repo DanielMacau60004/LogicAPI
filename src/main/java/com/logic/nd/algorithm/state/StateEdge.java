@@ -3,7 +3,9 @@ package com.logic.nd.algorithm.state;
 import com.logic.api.IFormula;
 import com.logic.nd.ERule;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 
 public class StateEdge {
 
@@ -27,12 +29,16 @@ public class StateEdge {
     }
 
     public int height() {
-        return transitions.stream().mapToInt(i->i.getNode().getHeight()).sum();
+        return transitions.stream().mapToInt(i -> i.getNode().getHeight()).sum();
     }
 
-    public List<StateTransitionEdge> getTransitions() {return transitions;}
+    public List<StateTransitionEdge> getTransitions() {
+        return transitions;
+    }
 
-    public boolean isClosed() {return transitions.stream().allMatch(s->s.getNode().isClosed());}
+    public boolean isClosed() {
+        return transitions.stream().allMatch(s -> s.getNode().isClosed());
+    }
 
     public ERule getRule() {
         return rule;

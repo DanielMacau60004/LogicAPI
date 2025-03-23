@@ -5,12 +5,12 @@ import com.logic.parser.Parser;
 public abstract class AASTND implements IASTND {
 
     protected String getToken(int kind) {
-        return Parser.tokenImage[kind].replace("\"","");
+        return Parser.tokenImage[kind].replace("\"", "");
     }
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof AASTND s)
+        if (obj instanceof AASTND s)
             return this.toString().equals(s.toString());
         return false;
     }

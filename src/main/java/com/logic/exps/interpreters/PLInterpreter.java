@@ -21,7 +21,7 @@ public class PLInterpreter implements IExpsVisitor<Boolean, Void> {
 
     private final Set<String> missing;
 
-    PLInterpreter(Map<ASTLiteral, Boolean> interpretation){
+    PLInterpreter(Map<ASTLiteral, Boolean> interpretation) {
         this.interpretation = interpretation;
         this.missing = new HashSet<>();
     }
@@ -29,7 +29,7 @@ public class PLInterpreter implements IExpsVisitor<Boolean, Void> {
     public static boolean interpret(IASTExp exp, Map<ASTLiteral, Boolean> interpretation) {
         PLInterpreter interpreter = new PLInterpreter(interpretation);
         Boolean result = exp.accept(interpreter, null);
-        if(result == null)
+        if (result == null)
             throw new RuntimeException(String.format(ERROR_INTERPRETATION, interpreter.missing));
         return result;
     }
@@ -52,7 +52,7 @@ public class PLInterpreter implements IExpsVisitor<Boolean, Void> {
     @Override
     public Boolean visit(ASTLiteral e, Void env) {
         Boolean bool = interpretation.get(e);
-        if(bool == null) {
+        if (bool == null) {
             missing.add(e.getName());
             return null;
         }

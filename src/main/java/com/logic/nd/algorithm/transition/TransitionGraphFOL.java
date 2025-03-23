@@ -4,14 +4,13 @@ import com.logic.api.IFOLFormula;
 import com.logic.api.IFormula;
 import com.logic.exps.ExpUtils;
 import com.logic.exps.asts.IASTExp;
-import com.logic.exps.asts.binary.*;
+import com.logic.exps.asts.binary.ASTExistential;
+import com.logic.exps.asts.binary.ASTUniversal;
 import com.logic.exps.asts.others.AASTTerm;
 import com.logic.exps.asts.others.ASTVariable;
 import com.logic.exps.checkers.FOLWFFChecker;
-import com.logic.exps.checkers.PLWFFChecker;
 import com.logic.exps.interpreters.FOLReplaceExps;
 import com.logic.nd.ERule;
-import com.logic.others.Utils;
 
 import java.util.*;
 
@@ -20,7 +19,6 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
     private final Set<ASTExistential> existentials;
     private final Set<AASTTerm> terms;
 
-    //TODO SPECIFY GENERICS FREE VARIABLES
     public TransitionGraphFOL(IFOLFormula conclusion, Set<IFormula> premisses, Set<ERule> forbiddenRules,
                               Set<AASTTerm> terms) {
         super(conclusion, premisses, forbiddenRules);
@@ -40,7 +38,7 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
     @Override
     protected IFOLFormula getFormula(IASTExp exp) {
         formulas.putIfAbsent(exp, FOLWFFChecker.check(exp));
-        return (IFOLFormula)  formulas.get(exp);
+        return (IFOLFormula) formulas.get(exp);
     }
 
     protected void addNode(IASTExp node, boolean canGen) {
@@ -109,7 +107,7 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
 
             IASTExp psiXY = FOLReplaceExps.replace(psi, xVar, yVar);
             if ((getFormula(exp).isAFreeVariable(yVar))
-                    || (!exi.getLeft().equals(yVar)  && (getFormula(psi).isAFreeVariable(yVar))) ||
+                    || (!exi.getLeft().equals(yVar) && (getFormula(psi).isAFreeVariable(yVar))) ||
                     !FOLReplaceExps.replace(psiXY, t, xVar).equals(psi))
                 continue;
 

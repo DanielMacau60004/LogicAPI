@@ -14,7 +14,9 @@ public interface IBuildStrategy {
     void build(ITransitionGraph transitionGraph, StateGraphSettings settings);
 
     Map<StateNode, Set<StateEdge>> getGraph();
+
     Map<StateNode, Set<StateEdge>> getInvertedGraph();
+
     Queue<StateNode> getClosedNodes();
 
 }

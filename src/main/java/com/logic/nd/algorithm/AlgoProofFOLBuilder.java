@@ -5,13 +5,12 @@ import com.logic.api.IFormula;
 import com.logic.api.INDProof;
 import com.logic.exps.asts.others.AASTTerm;
 import com.logic.nd.ERule;
-import com.logic.nd.algorithm.state.StateGraphSettings;
-import com.logic.nd.algorithm.state.strategies.IStateGraph;
 import com.logic.nd.algorithm.state.StateGraph;
+import com.logic.nd.algorithm.state.StateGraphSettings;
 import com.logic.nd.algorithm.state.StateSolution;
+import com.logic.nd.algorithm.state.strategies.IStateGraph;
 import com.logic.nd.algorithm.transition.ITransitionGraph;
 import com.logic.nd.algorithm.transition.TransitionGraphFOL;
-import com.logic.others.Utils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -75,7 +74,6 @@ public class AlgoProofFOLBuilder {
         ITransitionGraph tg = new TransitionGraphFOL(conclusion, premises, forbiddenRules, terms);
         tg.build();
 
-        System.out.println(Utils.getToken(tg+""));
         IStateGraph sg = new StateGraph(tg, s);
         sg.build();
 

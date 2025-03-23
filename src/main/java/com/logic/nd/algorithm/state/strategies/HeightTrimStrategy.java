@@ -37,7 +37,7 @@ public class HeightTrimStrategy implements ITrimStrategy {
                             if (e.isPresent()) {
                                 explore.add(to.getNode());
 
-                                if(!tree.containsKey(to.getNode()))
+                                if (!tree.containsKey(to.getNode()))
                                     tree.put(to.getNode(), e.get());
                             }
                         }

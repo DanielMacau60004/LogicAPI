@@ -1,6 +1,5 @@
 package com.logic.exps.asts.others;
 
-import com.logic.exps.asts.AASTExp;
 import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.IExpsVisitor;
 
@@ -13,7 +12,7 @@ public class ASTFun extends AASTTerm {
     private final List<IASTExp> terms;
 
     public ASTFun(String fun) {
-       this(fun, new LinkedList<>());
+        this(fun, new LinkedList<>());
     }
 
     public ASTFun(String fun, List<IASTExp> terms) {

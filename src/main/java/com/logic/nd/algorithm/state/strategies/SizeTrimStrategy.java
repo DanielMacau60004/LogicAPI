@@ -4,7 +4,10 @@ import com.logic.nd.algorithm.state.StateEdge;
 import com.logic.nd.algorithm.state.StateNode;
 import com.logic.nd.algorithm.state.StateTransitionEdge;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
 public class SizeTrimStrategy implements ITrimStrategy {
 
@@ -20,7 +23,7 @@ public class SizeTrimStrategy implements ITrimStrategy {
         Map<StateNode, Integer> explored = new HashMap<>();
 
         //Reset heights
-        graph.keySet().forEach(node-> node.setHeight(node.isClosed() ? 1 : -1));
+        graph.keySet().forEach(node -> node.setHeight(node.isClosed() ? 1 : -1));
 
         while (!explore.isEmpty()) {
             StateNode state = explore.poll();
@@ -36,11 +39,11 @@ public class SizeTrimStrategy implements ITrimStrategy {
                         Set<StateEdge> edges = graph.get(to.getNode());
                         if (edges != null) {
                             edges.removeIf(e -> {
-                                if(!e.isClosed()) return false;
+                                if (!e.isClosed()) return false;
 
                                 //Ignore node because there is a smaller path to that node
                                 StateNode toNode = to.getNode();
-                                if(toNode.getHeight() > 0 && toNode.getHeight() <= e.height()) return true;
+                                if (toNode.getHeight() > 0 && toNode.getHeight() <= e.height()) return true;
 
                                 toNode.setHeight(e.height() + 1);
 

@@ -102,7 +102,7 @@ public class FOLExp implements IFOLFormula {
 
     @Override
     public boolean isAFreeVariable(ASTVariable variable) {
-        if(hasGenerics())
+        if (hasGenerics())
             return isAnUnboundedVariable(variable) || !isAVariable(variable);
         return isAnUnboundedVariable(variable);
     }
@@ -125,7 +125,7 @@ public class FOLExp implements IFOLFormula {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (! (o instanceof IFormula formula)) return false;
+        if (!(o instanceof IFormula formula)) return false;
         return exp.equals(formula.getFormula());
     }
 

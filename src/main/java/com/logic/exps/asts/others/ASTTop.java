@@ -13,5 +13,7 @@ public class ASTTop extends AASTExp {
     }
 
     @Override
-    public String toString() {return getToken(Parser.TOP);}
+    public String toString() {
+        return getToken(Parser.TOP);
+    }
 }

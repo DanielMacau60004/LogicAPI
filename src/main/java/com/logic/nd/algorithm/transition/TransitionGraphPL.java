@@ -1,16 +1,19 @@
 package com.logic.nd.algorithm.transition;
 
-import com.logic.api.IFOLFormula;
 import com.logic.api.IFormula;
 import com.logic.exps.ExpUtils;
 import com.logic.exps.asts.IASTExp;
-import com.logic.exps.asts.binary.*;
+import com.logic.exps.asts.binary.ASTAnd;
+import com.logic.exps.asts.binary.ASTConditional;
+import com.logic.exps.asts.binary.ASTOr;
 import com.logic.exps.asts.unary.ASTNot;
-import com.logic.exps.checkers.FOLWFFChecker;
 import com.logic.exps.checkers.PLWFFChecker;
 import com.logic.nd.ERule;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class TransitionGraphPL implements ITransitionGraph {
 
@@ -46,7 +49,7 @@ public class TransitionGraphPL implements ITransitionGraph {
 
         //Add the disjunction rules to each node
         if (!forbiddenRules.contains(ERule.ELIM_DISJUNCTION))
-            graph.forEach((e, ts) -> ts.addAll(disjunctions.stream().map(d->disjunctionERule(e, d)).toList()));
+            graph.forEach((e, ts) -> ts.addAll(disjunctions.stream().map(d -> disjunctionERule(e, d)).toList()));
     }
 
     protected IFormula getFormula(IASTExp exp) {
@@ -151,8 +154,8 @@ public class TransitionGraphPL implements ITransitionGraph {
         IFormula left = getFormula(ExpUtils.removeParenthesis(and.getLeft()));
 
         addEdge(and, new TransitionEdge(ERule.INTRO_CONJUNCTION)
-                        .addTransition(left)
-                        .addTransition(right), true);
+                .addTransition(left)
+                .addTransition(right), true);
     }
 
     protected void genBottomUp(IASTExp exp) {

@@ -1,7 +1,6 @@
 package com.logic.nd.asts.binary;
 
 import com.logic.exps.asts.IASTExp;
-import com.logic.exps.asts.others.AASTTerm;
 import com.logic.exps.asts.others.ASTVariable;
 import com.logic.nd.ERule;
 import com.logic.nd.asts.IASTND;

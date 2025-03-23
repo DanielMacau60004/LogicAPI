@@ -13,5 +13,7 @@ public class ASTBottom extends AASTExp {
     }
 
     @Override
-    public String toString() {return getToken(Parser.BOTTOM);}
+    public String toString() {
+        return getToken(Parser.BOTTOM);
+    }
 }

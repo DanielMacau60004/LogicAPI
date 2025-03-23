@@ -1,11 +1,12 @@
 package com.logic.nd.algorithm.transition;
 
 import com.logic.api.IFormula;
-import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.others.ASTVariable;
 import com.logic.nd.ERule;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
 
 public class TransitionEdge {
 
