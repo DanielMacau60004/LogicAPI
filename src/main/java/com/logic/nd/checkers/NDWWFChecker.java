@@ -243,20 +243,21 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
                     "The hypothesis should be an universal, but you provided: " + r.getHyp() + "!");
 
         //Find mapping
-        ASTVariable x =  (ASTVariable) uni.getLeft();
+        ASTVariable x = (ASTVariable) uni.getLeft();
         IASTExp psi = ExpUtils.removeParenthesis(uni.getRight());
         IFOLFormula psiXT = (IFOLFormula) formulas.get(r.getConclusion());
 
         List<AASTTerm> terms = new ArrayList<>();
-        psiXT.iterateTerms().forEachRemaining(terms::add);
         terms.add(x);
+        psiXT.iterateTerms().forEachRemaining(terms::add);
 
-        for(AASTTerm term : terms) {
-            if (FOLReplaceExps.replace(psi, x, term).equals(psiXT.getFormula())) {
-                r.setMapping(term);
-                break;
+        if (r.getMapping() == null)
+            for (AASTTerm term : terms) {
+                if (FOLReplaceExps.replace(psi, x, term).equals(psiXT.getFormula())) {
+                    r.setMapping(term);
+                    break;
+                }
             }
-        }
 
         if (r.getMapping() == null)
             throw new RuntimeException("The elimination of the universal rule is incorrectly typed!\n" +
@@ -274,20 +275,21 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
                     "The conclusion should be an existential, but you provided: " + r.getConclusion() + "!");
 
         //Find mapping
-        ASTVariable x =  (ASTVariable) exi.getLeft();
+        ASTVariable x = (ASTVariable) exi.getLeft();
         IASTExp psi = ExpUtils.removeParenthesis(exi.getRight());
         IFOLFormula psiXT = (IFOLFormula) formulas.get(r.getHyp().getConclusion());
 
         List<AASTTerm> terms = new ArrayList<>();
-        psiXT.iterateTerms().forEachRemaining(terms::add);
         terms.add(x);
+        psiXT.iterateTerms().forEachRemaining(terms::add);
 
-        for(AASTTerm term : terms) {
-            if (FOLReplaceExps.replace(psi, x, term).equals(psiXT.getFormula())) {
-                r.setMapping(term);
-                break;
+        if (r.getMapping() == null)
+            for (AASTTerm term : terms) {
+                if (FOLReplaceExps.replace(psi, x, term).equals(psiXT.getFormula())) {
+                    r.setMapping(term);
+                    break;
+                }
             }
-        }
 
         if (r.getMapping() == null)
             throw new RuntimeException("The introduction of the existential rule is incorrectly typed!\n" +
@@ -305,7 +307,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
                     "The conclusion should be an universal, but you provided: " + r.getConclusion() + "!");
 
         //Find mapping
-        ASTVariable x =  (ASTVariable) uni.getLeft();
+        ASTVariable x = (ASTVariable) uni.getLeft();
         IASTExp psi = ExpUtils.removeParenthesis(uni.getRight());
         IFOLFormula psiXY = (IFOLFormula) formulas.get(r.getHyp().getConclusion());
 
@@ -313,12 +315,13 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         variables.add(x); //It can be itself
         psiXY.iterateVariables().forEachRemaining(variables::add);
 
-        for(ASTVariable var : variables) {
-            if (FOLReplaceExps.replace(psi, x, var).equals(psiXY.getFormula())) {
-                r.setMapping(var);
-                break;
+        if (r.getMapping() == null)
+            for (ASTVariable var : variables) {
+                if (FOLReplaceExps.replace(psi, x, var).equals(psiXY.getFormula())) {
+                    r.setMapping(var);
+                    break;
+                }
             }
-        }
 
         if (r.getMapping() == null)
             throw new RuntimeException("The introduction of the universal rule is incorrectly typed!\n" +
@@ -335,7 +338,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
             throw new RuntimeException("The elimination of the existential rule is incorrectly typed!\n" +
                     "The first hypothesis should be an existential, but you provided: " + r.getConclusion() + "!");
 
-        if(!r.getConclusion().equals(r.getHyp2().getConclusion()))
+        if (!r.getConclusion().equals(r.getHyp2().getConclusion()))
             throw new RuntimeException("The elimination of the existential rule is incorrectly typed!\n" +
                     "The second hypothesis and the conclusion should be the same!");
 

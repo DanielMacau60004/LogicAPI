@@ -74,10 +74,10 @@ public class StateNode {
 
         if(notFree != null) {
             noFree.addAll(hypotheses.stream()
-                    .filter(h-> ((IFOLFormula)h).isAVariable(notFree) && !((IFOLFormula)h).isABoundedVariable(notFree)
+                    .filter(h-> ((IFOLFormula)h).isAFreeVariable(notFree)
                     ).toList());
             noFree.addAll(premisses.stream()
-                    .filter(p-> ((IFOLFormula)p).isAVariable(notFree) && !((IFOLFormula)p).isABoundedVariable(notFree)
+                    .filter(p-> ((IFOLFormula)p).isAFreeVariable(notFree)
                     ).toList());
         }
 

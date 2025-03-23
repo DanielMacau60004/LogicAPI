@@ -3,22 +3,30 @@ package api.nd;
 import com.logic.api.IFOLFormula;
 import com.logic.api.INDProof;
 import com.logic.api.LogicAPI;
-import com.logic.exps.asts.others.ASTVariable;
-import com.logic.nd.ERule;
 import com.logic.nd.algorithm.AlgoProofStateBuilder;
 import com.logic.nd.algorithm.AlgoProofFOLBuilder;
 import com.logic.nd.algorithm.AlgoSettingsBuilder;
-import com.logic.nd.algorithm.state.strategies.LinearBuildStrategy;
 import com.logic.others.Utils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
 public class NDFOLTest {
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            " [∀I] [∀x ∃y φ. [∃I] [∃y φ. [∀E] [φ. [∃E,1] [∀x φ. [H,2] [∃y ∀x φ.] [H,3] [∀x φ.]]]]]",
+            " [∧I] [((∀x φ ∧ ψ) → ∀x (φ ∧ ψ)) ∧ (∀x (φ ∧ ψ) → (∀x φ ∧ ψ)). [→I, 1] [(∀x φ ∧ ψ) → ∀x (φ ∧ ψ). [∀I] [∀x (φ ∧ ψ). [∧I] [φ ∧ ψ. [∀E] [φ. [∧ER] [∀x φ. [H, 1] [∀x φ ∧ ψ.]]] [∧EL] [ψ. [H, 1] [∀x φ ∧ ψ.]]]]] [→I, 2] [∀x (φ ∧ ψ) → (∀x φ ∧ ψ). [∧I] [∀x φ ∧ ψ. [∀I] [∀x φ. [∧ER] [φ. [∀E] [φ ∧ ψ. [H, 2] [∀x (φ ∧ ψ).]]]] [∧EL] [ψ. [∀E] [φ ∧ ψ. [H, 2] [∀x (φ ∧ ψ).]]]]]]",
+    })
+    void testFailSingle(String proof) {
+        Throwable thrown = Assertions.assertThrows(Throwable.class, () -> {
+            LogicAPI.parseNDFOLProof(proof);
+        });
+        System.out.println(Utils.getToken(thrown.getMessage()));
+    }
 
     @ParameterizedTest
     @ValueSource(strings = {
@@ -129,7 +137,7 @@ public class NDFOLTest {
             premises.add(LogicAPI.parseFOL(parts[i].trim()));
         }
 
-        Assertions.assertDoesNotThrow(() -> {
+        Assertions.assertThrows(Throwable.class, () -> {
             INDProof proof = new AlgoProofFOLBuilder(LogicAPI.parseFOL(expression))
                     .addPremises(premises)
                     .setAlgoSettingsBuilder(

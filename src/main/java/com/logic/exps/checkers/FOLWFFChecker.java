@@ -10,12 +10,9 @@ import com.logic.exps.asts.unary.ASTNot;
 import com.logic.exps.asts.unary.ASTParenthesis;
 import com.logic.others.Env;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
+public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, ASTVariable>> {
 
     public static final String ERROR_MESSAGE_FUNCTION = "Function %s was declared with different arities: %d and %d!";
     public static final String ERROR_MESSAGE_PREDICATE = "Predicate %s was declared with different arities: %d and %d!";
@@ -29,7 +26,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
     final Set<ASTVariable> boundedVariables;
     final Set<ASTVariable> unboundedVariables;
 
-    final Set<ASTArbitrary> generics;
+    final Map<ASTArbitrary, Set<ASTVariable>> generics;
 
     FOLWFFChecker() {
         functionsMap = new HashMap<>();
@@ -40,32 +37,39 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
         boundedVariables = new HashSet<>();
         unboundedVariables = new HashSet<>();
 
-        generics = new HashSet<>();
+        generics = new HashMap<>();
     }
 
     public static IFOLFormula check(IASTExp exp) {
         FOLWFFChecker checker = new FOLWFFChecker();
-        Env<String, IASTExp> env = new Env<>();
+        Env<String, ASTVariable> env = new Env<>();
         exp.accept(checker, env);
+
+        for(Set<ASTVariable> s : checker.generics.values()) {
+            for(ASTVariable v : checker.boundedVariables) {
+                if(!s.contains(v))
+                    checker.unboundedVariables.add(v);
+            }
+        }
 
         return new FOLExp(exp,
                 checker.functions, checker.predicates,
                 checker.boundedVariables, checker.unboundedVariables,
-                checker.generics);
+                checker.generics.keySet());
     }
 
     @Override
-    public Void visit(ASTTop e, Env<String, IASTExp> env) {
+    public Void visit(ASTTop e, Env<String, ASTVariable> env) {
         return null;
     }
 
     @Override
-    public Void visit(ASTBottom e, Env<String, IASTExp> env) {
+    public Void visit(ASTBottom e, Env<String, ASTVariable> env) {
         return null;
     }
 
     @Override
-    public Void visit(ASTConstant e, Env<String, IASTExp> env) {
+    public Void visit(ASTConstant e, Env<String, ASTVariable> env) {
         Integer size = functionsMap.get(e.getName());
 
         if(size == null) {
@@ -78,7 +82,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
     }
 
     @Override
-    public Void visit(ASTLiteral e, Env<String, IASTExp> env) {
+    public Void visit(ASTLiteral e, Env<String, ASTVariable> env) {
         Integer size = predicatesMap.get(e.getName());
 
         if(size == null) {
@@ -91,13 +95,17 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
     }
 
     @Override
-    public Void visit(ASTArbitrary e, Env<String, IASTExp> env) {
-        generics.add(e);
+    public Void visit(ASTArbitrary e, Env<String, ASTVariable> env) {
+        Set<ASTVariable> bounded = generics.get(e);
+        if(bounded != null) bounded.addAll(env.map().values());
+        else bounded = new HashSet<>(env.map().values());
+
+        generics.put(e, bounded);
         return null;
     }
 
     @Override
-    public Void visit(ASTVariable e, Env<String, IASTExp> env) {
+    public Void visit(ASTVariable e, Env<String, ASTVariable> env) {
         if(env.find(e.getName()) != null)
             boundedVariables.add(e);
         else unboundedVariables.add(e);
@@ -106,41 +114,41 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
     }
 
     @Override
-    public Void visit(ASTNot e, Env<String, IASTExp> env) {
+    public Void visit(ASTNot e, Env<String, ASTVariable> env) {
         e.getExp().accept(this, env);
         return null;
     }
 
     @Override
-    public Void visit(ASTAnd e, Env<String, IASTExp> env) {
+    public Void visit(ASTAnd e, Env<String, ASTVariable> env) {
         e.getLeft().accept(this, env);
         e.getRight().accept(this, env);
         return null;
     }
 
     @Override
-    public Void visit(ASTOr e, Env<String, IASTExp> env) {
+    public Void visit(ASTOr e, Env<String, ASTVariable> env) {
         e.getLeft().accept(this, env);
         e.getRight().accept(this, env);
         return null;
     }
 
     @Override
-    public Void visit(ASTConditional e, Env<String, IASTExp> env) {
+    public Void visit(ASTConditional e, Env<String, ASTVariable> env) {
         e.getLeft().accept(this, env);
         e.getRight().accept(this, env);
         return null;
     }
 
     @Override
-    public Void visit(ASTBiconditional e, Env<String, IASTExp> env) {
+    public Void visit(ASTBiconditional e, Env<String, ASTVariable> env) {
         e.getLeft().accept(this, env);
         e.getRight().accept(this, env);
         return null;
     }
 
     @Override
-    public Void visit(ASTFun e, Env<String, IASTExp> env) {
+    public Void visit(ASTFun e, Env<String, ASTVariable> env) {
         Integer size = functionsMap.get(e.getName());
         int arity = e.getTerms().size();
 
@@ -155,7 +163,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
     }
 
     @Override
-    public Void visit(ASTPred e, Env<String, IASTExp> env) {
+    public Void visit(ASTPred e, Env<String, ASTVariable> env) {
         Integer size = predicatesMap.get(e.getName());
         int arity = e.getTerms().size();
 
@@ -170,7 +178,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
     }
 
     @Override
-    public Void visit(ASTExistential e, Env<String, IASTExp> env) {
+    public Void visit(ASTExistential e, Env<String, ASTVariable> env) {
         env = env.beginScope();
 
         ASTVariable variable = ((ASTVariable)e.getLeft());
@@ -182,7 +190,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
     }
 
     @Override
-    public Void visit(ASTUniversal e, Env<String, IASTExp> env) {
+    public Void visit(ASTUniversal e, Env<String, ASTVariable> env) {
         env = env.beginScope();
 
         ASTVariable variable = ((ASTVariable)e.getLeft());
@@ -194,7 +202,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, IASTExp>> {
     }
 
     @Override
-    public Void visit(ASTParenthesis e, Env<String, IASTExp> env) {
+    public Void visit(ASTParenthesis e, Env<String, ASTVariable> env) {
         e.getExp().accept(this, env);
         return null;
     }

@@ -11,6 +11,7 @@ import com.logic.exps.checkers.FOLWFFChecker;
 import com.logic.exps.checkers.PLWFFChecker;
 import com.logic.exps.interpreters.FOLReplaceExps;
 import com.logic.nd.ERule;
+import com.logic.others.Utils;
 
 import java.util.*;
 
@@ -53,10 +54,10 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
         IASTExp psi = ExpUtils.removeParenthesis(exi.getRight());
         ASTVariable xVar = (ASTVariable) exi.getLeft();
 
-        for (AASTTerm t : terms) {
-            IASTExp psiXT = FOLReplaceExps.replace(psi, xVar, t);
+        for (AASTTerm term : terms) {
+            IASTExp psiXT = FOLReplaceExps.replace(psi, xVar, term);
 
-            if (t instanceof ASTVariable x && getFormula(psi).isABoundedVariable(x))
+            if (term instanceof ASTVariable t && !getFormula(psiXT).isAFreeVariable(t))
                 continue;
 
             addEdge(exi, new TransitionEdge(ERule.INTRO_EXISTENTIAL)
@@ -68,11 +69,15 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
         IASTExp psi = ExpUtils.removeParenthesis(uni.getRight());
         ASTVariable xVar = (ASTVariable) uni.getLeft();
 
-        for (AASTTerm t : terms) {
-            IASTExp psiXT = FOLReplaceExps.replace(psi, xVar, t);
+        for (AASTTerm term : terms) {
+            IASTExp psiXT = FOLReplaceExps.replace(psi, xVar, term);
 
-            if ((t instanceof ASTVariable x && getFormula(psi).isABoundedVariable(x)) ||
-                    !FOLReplaceExps.replace(psiXT, t, xVar).equals(psi))
+            if(term instanceof ASTVariable t && t.getName().equals("y"))
+                System.out.println(Utils.getToken(xVar+"->"+term+" "+uni+"->"+psiXT)+
+                        " " +!getFormula(psi).isAFreeVariable(t)+" " + !FOLReplaceExps.replace(psiXT, term, xVar).equals(psi));
+
+            if ((term instanceof ASTVariable t && !getFormula(psiXT).isAFreeVariable(t)) ||
+                    !FOLReplaceExps.replace(psiXT, term, xVar).equals(psi))
                 continue;
 
             addEdge(psiXT, new TransitionEdge(ERule.ELIM_UNIVERSAL)
@@ -102,7 +107,6 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
         IASTExp psi = ExpUtils.removeParenthesis(exi.getRight());
         ASTVariable xVar = (ASTVariable) exi.getLeft();
 
-
         List<TransitionEdge> edges = new ArrayList<>();
         for (AASTTerm t : terms) {
             if (!(t instanceof ASTVariable yVar))
@@ -116,7 +120,7 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
 
             edges.add(new TransitionEdge(ERule.ELIM_EXISTENTIAL)
                     .addTransition(getFormula(exi))
-                    .addTransition(getFormula(exp), getFormula(psiXY), yVar));
+                    .addTransition(getFormula(exp), getFormula(psiXY), psi.equals(psiXY) ? xVar : yVar));
         }
 
         return edges;

@@ -159,11 +159,12 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<Integer, IASTExp>
         IFOLFormula psi = (IFOLFormula) formulas.get(ExpUtils.removeParenthesis(uni.getRight()));
 
         if (!uni.getLeft().equals(r.getMapping()) && psi.isAFreeVariable(r.getMapping()))
-            throw new RuntimeException("AThe introduction of the universal rule is incorrectly typed!\n" +
+            throw new RuntimeException("The introduction of the universal rule is incorrectly typed!\n" +
                     "Variable " + r.getMapping() + " appears free in " + psi + "!");
 
         for (Map.Entry<Integer, IASTExp> e : env.map().entrySet()) {
             IFOLFormula formula = (IFOLFormula) formulas.get(e.getValue());
+
             if (formula.isAFreeVariable(r.getMapping()))
                 throw new RuntimeException("The introduction of the universal rule is incorrectly typed!\n" +
                         "Variable " + r.getMapping() + " appears free in " + e.getKey() + "!");
@@ -179,7 +180,7 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<Integer, IASTExp>
         IFOLFormula exp = (IFOLFormula) formulas.get(r.getConclusion());
 
         if (!exi.getLeft().equals(r.getMapping()) && psi.isAFreeVariable(r.getMapping()))
-            throw new RuntimeException("CThe elimination of the existential rule is incorrectly typed!\n" +
+            throw new RuntimeException("The elimination of the existential rule is incorrectly typed!\n" +
                     "Variable " + r.getMapping() + " appears free in " + psi + "!");
 
         if (exp.isAFreeVariable(r.getMapping()))
@@ -188,7 +189,8 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<Integer, IASTExp>
 
         for (Map.Entry<Integer, IASTExp> e : env.map().entrySet()) {
             IFOLFormula formula = (IFOLFormula) formulas.get(e.getValue());
-            if (!e.equals(r.getGeneratedHypothesis()) && formula.isAFreeVariable(r.getMapping()))
+
+            if (!e.getValue().equals(r.getGeneratedHypothesis()) && formula.isAFreeVariable(r.getMapping()))
                 throw new RuntimeException("The elimination of the existential rule is incorrectly typed!\n" +
                         "Variable " + r.getMapping() + " appears free in mark " + e.getKey() + "!");
         }

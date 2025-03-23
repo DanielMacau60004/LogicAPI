@@ -2,6 +2,10 @@ package com.logic.exps;
 
 import com.logic.api.IFormula;
 import com.logic.exps.asts.IASTExp;
+import com.logic.exps.asts.binary.ASTAnd;
+import com.logic.exps.asts.binary.ASTBiconditional;
+import com.logic.exps.asts.binary.ASTConditional;
+import com.logic.exps.asts.binary.ASTOr;
 import com.logic.exps.asts.others.ASTBottom;
 import com.logic.exps.asts.others.ASTLiteral;
 import com.logic.exps.asts.others.ASTPred;
@@ -16,9 +20,10 @@ public class ExpUtils {
     public static final IFormula BOTF = FOLWFFChecker.check(new ASTBottom());
 
     public static IASTExp negate(IASTExp exp) {
-        if (exp instanceof ASTPred || exp instanceof ASTParenthesis || exp instanceof ASTNot)
-            return new ASTNot(exp);
-        return new ASTNot(new ASTParenthesis(exp));
+        if (exp instanceof ASTOr || exp instanceof ASTAnd || exp instanceof ASTConditional
+                || exp instanceof ASTBiconditional)
+            return new ASTNot(new ASTParenthesis(exp));
+        return new ASTNot(exp);
     }
 
     public static IASTExp invert(IASTExp exp) {

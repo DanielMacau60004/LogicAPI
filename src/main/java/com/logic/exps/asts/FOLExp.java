@@ -102,7 +102,9 @@ public class FOLExp implements IFOLFormula {
 
     @Override
     public boolean isAFreeVariable(ASTVariable variable) {
-        return isAVariable(variable) && isAnUnboundedVariable(variable);
+        if(hasGenerics())
+            return isAnUnboundedVariable(variable) || !isAVariable(variable);
+        return isAnUnboundedVariable(variable);
     }
 
     @Override

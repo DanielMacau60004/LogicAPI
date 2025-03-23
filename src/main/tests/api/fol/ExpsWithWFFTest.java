@@ -28,7 +28,10 @@ public class ExpsWithWFFTest {
             "'∃x (P(x) ∧ ∀y Father(x, y))', 'x,y', ''",
             "'∀x (L(x) → (P(f(x)) ∧ Q(y)))', 'x', 'y'",
             "'∀x (L(x) → (P(dani) ∧ Q(y))) ∧ ∀y (L(x) → (P(dani) ∧ Q(y)))','x,y', 'x,y'",
-            "'∀x ∃y φ', 'x,y', ''"
+            "'∀x ∃y φ', 'x,y', ''",
+            "'∀x φ ∧ ψ ','',''",
+            "'ψ ∧ ∀x φ','',''",
+            "'∀y ∀x ∃z ψ ∧ (∀x φ ∧ ψ)','',''"
     })
     void test(String expression, String boundedStr, String unboundedStr) {
         AtomicReference<IFOLFormula> exp = new AtomicReference<>();
@@ -74,6 +77,10 @@ public class ExpsWithWFFTest {
         List<AASTTerm> terms = new ArrayList<>();
         fol.iterateTerms().forEachRemaining(terms::add);
         System.out.println("Terms: " + terms);
+
+        List<ASTVariable> variables = new ArrayList<>();
+        fol.iterateVariables().forEachRemaining(variables::add);
+        System.out.println("Variables: " + variables);
     }
 
     @ParameterizedTest

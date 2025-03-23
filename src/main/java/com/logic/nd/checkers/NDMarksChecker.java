@@ -219,9 +219,12 @@ public class NDMarksChecker implements INDVisitor<Void, Env<Integer, IASTExp>> {
         env.endScope();
 
         IASTExp exp = hypotheses.get(r.getM());
-        if(exp == null) return null;
+        ASTVariable x = (ASTVariable) exi.getLeft();
+        IFOLFormula exiF = (IFOLFormula) formulas.get(exi);
+        //When the hypothesis is not used or involves generics, we will always assume that the mapping is the current variable
+        if (exp == null)
+            exp = exi.getRight();
 
-        ASTVariable x =  (ASTVariable) exi.getLeft();
         IASTExp psi = ExpUtils.removeParenthesis(exi.getRight());
         IFOLFormula psiXY = (IFOLFormula) formulas.get(exp);
 
@@ -229,7 +232,7 @@ public class NDMarksChecker implements INDVisitor<Void, Env<Integer, IASTExp>> {
         variables.add(x); //It can be itself
         psiXY.iterateVariables().forEachRemaining(variables::add);
 
-        for(ASTVariable var : variables) {
+        for (ASTVariable var : variables) {
             if (FOLReplaceExps.replace(psi, x, var).equals(psiXY.getFormula())) {
                 r.setMapping(var);
                 break;
