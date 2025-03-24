@@ -98,12 +98,6 @@ IASTExp parsePL() : {
     e = atomicsPL() (e = operationsPL(e))? (<DOT> | <EOF>) { return e; }
 }
 
-private IASTExp operationsSingle() : {
-    IASTExp e1, e2;
-} {
-    e1 = atomicsPL() {return operationsPL(e1); }
-}
-
 private IASTExp operationsPL(IASTExp e1) : {
     IASTExp e2;
 } {
