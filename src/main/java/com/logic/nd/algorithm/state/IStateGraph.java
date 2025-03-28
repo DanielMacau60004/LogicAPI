@@ -1,8 +1,6 @@
-package com.logic.nd.algorithm.state.strategies;
+package com.logic.nd.algorithm.state;
 
 import com.logic.api.IFormula;
-import com.logic.nd.algorithm.state.StateEdge;
-import com.logic.nd.algorithm.state.StateNode;
 
 import java.util.Set;
 

@@ -1,7 +1,6 @@
 package com.logic.nd.algorithm.state;
 
 import com.logic.api.IFormula;
-import com.logic.nd.algorithm.state.strategies.IStateGraph;
 import com.logic.nd.algorithm.transition.ITransitionGraph;
 
 import java.util.HashMap;

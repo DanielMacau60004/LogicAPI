@@ -235,11 +235,6 @@ public class NDPLTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            /*"¬¬¬p → ¬p",
-            "(a → ¬¬a) ∧ (¬¬a → a)",
-            "⊥ → a",
-            "¬⊥",
-            "a ∧ b, a ∧ a",*/
             "a ∨ ¬a"
     })
     void testSingle(String premisesAndExpression) throws Exception {
@@ -250,14 +245,15 @@ public class NDPLTest {
         for (int i = 0; i < parts.length - 1; i++) {
             premises.add(LogicAPI.parsePL(parts[i].trim()));
         }
-//[⊥, 1] [a ∨ ¬a. [¬E] [⊥. [∨IL] [a ∨ ¬a. [¬I, 2] [¬a. [¬E] [⊥. [∨IR] [a ∨ ¬a. [H, 2] [a.]] [H, 1] [¬(a ∨ ¬a).]]]] [H, 1] [¬(a ∨ ¬a).]]]
+
         Assertions.assertDoesNotThrow(() -> {
             INDProof proof = new AlgoProofPLBuilder(LogicAPI.parsePL(expression))
                     .addPremises(premises)
                     .setAlgoSettingsBuilder(
                             new AlgoSettingsBuilder().setTrimStrategy(new SizeTrimStrategy())
-                                    .setInitialState(new AlgoProofStateBuilder(LogicAPI.parsePL("a ∨ ¬a"))
-                                            .addHypothesis(LogicAPI.parsePL("¬(a ∨ ¬a)"))))
+                                    .setInitialState(new AlgoProofStateBuilder(LogicAPI.parsePL("⊥"))
+                                            .addHypothesis(LogicAPI.parsePL("¬(a ∨ ¬a)"))
+                                            .addHypothesis(LogicAPI.parsePL("¬a"))))
                     .build();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);

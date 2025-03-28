@@ -8,7 +8,7 @@ import com.logic.nd.ERule;
 import com.logic.nd.algorithm.state.StateGraph;
 import com.logic.nd.algorithm.state.StateGraphSettings;
 import com.logic.nd.algorithm.state.StateSolution;
-import com.logic.nd.algorithm.state.strategies.IStateGraph;
+import com.logic.nd.algorithm.state.IStateGraph;
 import com.logic.nd.algorithm.transition.ITransitionGraph;
 import com.logic.nd.algorithm.transition.TransitionGraphFOL;
 

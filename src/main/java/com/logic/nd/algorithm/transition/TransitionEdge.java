@@ -73,5 +73,4 @@ public class TransitionEdge {
         return Objects.hash(rule, transitions);
     }
 
-
 }

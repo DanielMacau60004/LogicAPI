@@ -10,10 +10,7 @@ import com.logic.exps.asts.unary.ASTNot;
 import com.logic.exps.checkers.PLWFFChecker;
 import com.logic.nd.ERule;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class TransitionGraphPL implements ITransitionGraph {
 

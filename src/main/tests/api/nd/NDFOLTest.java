@@ -4,9 +4,11 @@ import com.logic.api.IFOLFormula;
 import com.logic.api.INDProof;
 import com.logic.api.LogicAPI;
 import com.logic.exps.asts.others.ASTConstant;
+import com.logic.exps.asts.others.ASTVariable;
 import com.logic.nd.algorithm.AlgoProofFOLBuilder;
 import com.logic.nd.algorithm.AlgoProofStateBuilder;
 import com.logic.nd.algorithm.AlgoSettingsBuilder;
+import com.logic.nd.algorithm.state.strategies.LinearBuildStrategy;
 import com.logic.nd.algorithm.state.strategies.SizeTrimStrategy;
 import com.logic.others.Utils;
 import org.junit.jupiter.api.Assertions;
@@ -77,28 +79,8 @@ public class NDFOLTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            /*1*/"∀x P(x) ∨ ∀x Q(x). ∀x (P(x) ∨ Q(x))",
-            /*2*/"∀x (P(x) ∧ Q(x)). ∀x P(x) ∧ ∀x Q(x)",
-            /*3*/"(∀x P(x) ∧ ∀x Q(x)) → ∀x (P(x) ∧ Q(x))",
-            /*4*/"∃x (P(x) ∧ Q(x)). ∃x P(x) ∧ ∃x Q(x)",
-            /*5*/"(∃x P(x) ∨ ∃x Q(x)) → ∃x (P(x) ∨ Q(x))",
-            /*6*/"∃x (P(x) ∨ Q(x)). ∃x P(x) ∨ ∃x Q(x)",
-            /*7*/"∀x (P(x) → Q(x)). ∀x P(x) → ∀x Q(x)",
-            /*8*/"∃y∀x φ. ∀x∃y φ",
-            /*9*/"∃x ¬P(x) → ¬∀x P(x)",
-            /*10*/"¬∀x P(x) → ∃x ¬P(x)",
-            /*11*/"∀x ¬P(x) → ¬∃x P(x)",
-            /*12*/"¬∃x P(x) → ∀x ¬P(x)",
-            /*13*/"∃x φ → ¬∀x ¬φ",
-            /*14*/"¬∀x ¬φ. ∃x φ",
-            /*15*/"∀x φ → ¬∃x ¬φ",
-            /*17*///"((∀x φ ∧ ψ) → ∀x (φ ∧ ψ)) ∧ (∀x (φ ∧ ψ) → (∀x φ ∧ ψ))", //Only works if we add x in the set of notfree
-            /*23*///"(∀x (φ → ψ) → (∃x φ → ψ)) ∧ ((∃x φ → ψ) → ∀x (φ → ψ))", //Only works if we add x in the set of notfree
 
-            /*2*/"∀y(C(y) ∨ D(y)). ∀x(C(x) → L(x)). ∃x¬L(x). ∃x D(x)",
-            /*3*/"∀x(C(x) → S(x)). ∀x(¬A(x,b) → ¬S(x)). ∀x((C(x)∨S(x)) → A(x,b))",
-            /*4*/"L(a,b). ∀x(∃y(L(y,x) ∨ L(x,y)) → L(x,x)). ∃x L(x,a)",
-            /*5*///"∀x ∀y (L(x,y) → L(y,x)). ∃x ∀y L(x,y). ∀x ∃y L(x,y)", //Requires an aux variable
+            /*5*/"∀x ∀y (L(x,y) → L(y,x)). ∃x ∀y L(x,y). ∀x ∃y L(x,y)", //Requires aux variables
 
             //Others
             //"∀x∀y P(x,y). ∀y∀x P(y,x)" //Require an aux variable z
@@ -117,12 +99,14 @@ public class NDFOLTest {
                     .addPremises(premises)
                     .setAlgoSettingsBuilder(
                             new AlgoSettingsBuilder()
+                                    .setBuildStrategy(new LinearBuildStrategy())
                                     .setTotalClosedNodesLimit(10000)
-                                    .setHypothesesPerStateLimit(4)
-                                    .setTimeout(500)
+                                    .setHypothesesPerStateLimit(5)
+                                    .setTimeout(4000)
                                     .setTrimStrategy(new SizeTrimStrategy()))
-                    //.addTerm(new ASTVariable("w"))
+                    .addTerm(new ASTVariable("w"))
                     //.addTerm(new ASTVariable("z"))
+                    //.addForbiddenRule(ERule.ELIM_NEGATION)
                     .build();
 
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());

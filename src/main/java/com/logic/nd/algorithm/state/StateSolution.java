@@ -3,7 +3,6 @@ package com.logic.nd.algorithm.state;
 import com.logic.api.IFormula;
 import com.logic.api.INDProof;
 import com.logic.exps.asts.IASTExp;
-import com.logic.nd.algorithm.state.strategies.IStateGraph;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.binary.ASTEExist;
 import com.logic.nd.asts.binary.ASTEImp;
