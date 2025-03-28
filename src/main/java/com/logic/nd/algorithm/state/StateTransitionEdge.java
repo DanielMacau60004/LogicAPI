@@ -19,4 +19,9 @@ public class StateTransitionEdge {
     public StateNode getNode() {
         return node;
     }
+
+    @Override
+    public String toString() {
+        return node.toString();
+    }
 }

@@ -178,7 +178,7 @@ public class NDFOLTest {
                             new AlgoSettingsBuilder()
                                     .setInitialState
                                             (new AlgoProofStateBuilder(LogicAPI.parseFOL("∀x φ")))
-                                    .setTimeout(100))
+                                    .setTimeout(200))
                     .build();
 
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());

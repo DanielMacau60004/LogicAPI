@@ -8,6 +8,10 @@ public class Env<K, T> {
     private final Map<K, T> table;
     private Env<K, T> prev;
 
+    public Env(Map<K, T> table) {
+        this.table = table;
+    }
+
     public Env() {
         table = new LinkedHashMap<>();
     }

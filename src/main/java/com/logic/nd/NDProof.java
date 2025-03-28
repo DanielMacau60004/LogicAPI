@@ -7,6 +7,7 @@ import com.logic.others.Utils;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 public class NDProof implements INDProof {
 
@@ -42,6 +43,11 @@ public class NDProof implements INDProof {
     @Override
     public int size() {
         return size;
+    }
+
+    @Override
+    public boolean prove(Set<IFormula> premises, IFormula conclusion) {
+        return premises.containsAll(this.premises.keySet()) && this.conclusion.equals(conclusion);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.logic.api;
 
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * The {@code INDProof} interface represents a natural deduction (ND) proof.
@@ -13,6 +14,7 @@ import java.util.Iterator;
  *     <li>Iterating over its premises.</li>
  *     <li>Measuring the height (depth) of the proof tree.</li>
  *     <li>Determining the total number of steps (size) in the proof.</li>
+ *     <li>Checking whether a given set of premises can derive a specific conclusion.</li>
  * </ul>
  *
  * <p>
@@ -21,7 +23,7 @@ import java.util.Iterator;
  * </p>
  *
  * @author Daniel Macau
- * @version 1.0
+ * @version 1.1
  * @since 23-03-2025
  */
 public interface INDProof {
@@ -59,5 +61,18 @@ public interface INDProof {
      * @return An integer representing the total number of steps in the proof.
      */
     int size();
-}
 
+    /**
+     * Attempts to prove a given conclusion from a set of premises using natural deduction.
+     *
+     * <p>
+     * This method determines whether the given premises logically lead to the conclusion
+     * according to the rules of natural deduction.
+     * </p>
+     *
+     * @param premises  A set of {@code IFormula} representing the assumptions or starting points of the proof.
+     * @param conclusion The {@code IFormula} representing the statement to be proven.
+     * @return {@code true} if the conclusion can be derived from the premises, {@code false} otherwise.
+     */
+    boolean prove(Set<IFormula> premises, IFormula conclusion);
+}

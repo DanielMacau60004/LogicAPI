@@ -12,7 +12,7 @@ import com.logic.nd.interpreters.NDInterpreter;
 import com.logic.parser.Parser;
 
 import java.io.ByteArrayInputStream;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The {@code LogicAPI} class provides utility methods for parsing and verifying logical expressions and natural deduction proofs.

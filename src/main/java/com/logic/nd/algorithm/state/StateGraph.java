@@ -24,8 +24,8 @@ public class StateGraph implements IStateGraph {
     }
 
     @Override
-    public IFormula getInitialState() {
-        return settings.getState().getExp();
+    public StateNode getInitialState() {
+        return settings.getState();
     }
 
     @Override
@@ -55,8 +55,8 @@ public class StateGraph implements IStateGraph {
         String str = "";
         str += "Total nodes: " + tree.size() + "\n";
         str += "Total edges: " + tree.values().stream().filter(Objects::nonNull).count() + "\n";
-        //for (Map.Entry<StateNode, Set<StateEdge>> entry : graph.entrySet())
-        //    str += entry.getKey() + " edges:"+ entry.getValue() + ": \n";
+        for (Map.Entry<StateNode, StateEdge> entry : tree.entrySet())
+            str += entry.getKey() + " edges:"+ entry.getValue() + ": \n";
         return str;
     }
 

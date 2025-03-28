@@ -7,7 +7,7 @@ import com.logic.nd.algorithm.state.StateNode;
 import java.util.Set;
 
 public interface IStateGraph {
-    IFormula getInitialState();
+    StateNode getInitialState();
 
     Set<IFormula> getPremises();
 
