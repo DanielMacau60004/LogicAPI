@@ -32,5 +32,4 @@ public enum ERule {
     public String toString() {
         return Utils.getToken(Parser.tokenImage[kind].replace("\"", ""));
     }
-
 }

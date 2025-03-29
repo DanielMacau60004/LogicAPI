@@ -6,6 +6,7 @@ import com.logic.nd.algorithm.state.StateNode;
 import com.logic.nd.algorithm.transition.ITransitionGraph;
 import com.logic.nd.algorithm.transition.TransitionEdge;
 import com.logic.nd.algorithm.transition.TransitionNode;
+import com.logic.others.Utils;
 
 import java.util.*;
 
@@ -35,10 +36,12 @@ public class LinearBuildStrategy implements IBuildStrategy {
         while (!explore.isEmpty()) {
             StateNode state = explore.poll();
 
-            if ((start - System.currentTimeMillis()) < 0 || state.getHeight() > settings.getHeightLimit() ||
-                    closed.size() == settings.getTotalClosedNodesLimit()
-                    || state.getHypotheses().size() > settings.getHypothesesPerStateLimit())
+            if ((start - System.currentTimeMillis()) < 0 || closed.size() == settings.getTotalClosedNodesLimit())
                 break;
+
+            if(state.getHeight() > settings.getHeightLimit() ||
+                    state.getHypotheses().size() > settings.getHypothesesPerStateLimit())
+                continue;
 
             if (graph.containsKey(state))
                 continue;

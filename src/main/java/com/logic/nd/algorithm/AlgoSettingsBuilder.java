@@ -14,8 +14,8 @@ public class AlgoSettingsBuilder {
     private AlgoProofStateBuilder state;
 
     private int heightLimit = 20;
-    private int totalClosedNodesLimit = 2000;
-    private int hypothesesPerStateLimit = 5;
+    private int totalClosedNodes = 2000;
+    private int hypothesesPerState = 5;
 
     private long timeout = 5000; //In milliseconds
 
@@ -32,13 +32,13 @@ public class AlgoSettingsBuilder {
         return this;
     }
 
-    public AlgoSettingsBuilder setTotalClosedNodesLimit(int totalClosedNodesLimit) {
-        this.totalClosedNodesLimit = totalClosedNodesLimit;
+    public AlgoSettingsBuilder setTotalClosedNodes(int totalClosedNodes) {
+        this.totalClosedNodes = totalClosedNodes;
         return this;
     }
 
-    public AlgoSettingsBuilder setHypothesesPerStateLimit(int hypothesesPerStateLimit) {
-        this.hypothesesPerStateLimit = hypothesesPerStateLimit;
+    public AlgoSettingsBuilder setHypothesesPerState(int hypothesesPerState) {
+        this.hypothesesPerState = hypothesesPerState;
         return this;
     }
 
@@ -60,8 +60,8 @@ public class AlgoSettingsBuilder {
     public StateGraphSettings build(IFormula conclusion, Set<IFormula> premises) {
         if (state == null)
             state = new AlgoProofStateBuilder(conclusion);
-        return new StateGraphSettings(state.build(premises), heightLimit, totalClosedNodesLimit,
-                hypothesesPerStateLimit, timeout, buildStrategy, trimStrategy);
+        return new StateGraphSettings(state.build(premises), heightLimit, totalClosedNodes,
+                hypothesesPerState, timeout, buildStrategy, trimStrategy);
     }
 
 }

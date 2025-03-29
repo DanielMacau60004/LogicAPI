@@ -17,6 +17,7 @@ import com.logic.nd.checkers.NDWWFChecker;
 import com.logic.nd.checkers.NDWWFExpsChecker;
 import com.logic.nd.interpreters.NDInterpreter;
 import com.logic.others.Env;
+import com.logic.others.Utils;
 
 import java.util.List;
 import java.util.Map;
@@ -43,8 +44,8 @@ public class StateSolution {
         //TODO will cause conflict with premises marks, they might not start with 1
         mark = 1;
         Env<IFormula, Integer> marks = new Env<>();
-        for (IFormula e : graph.getInitialState().getHypotheses()) marks.bind(e, mark++);
         for (IFormula e : graph.getPremises()) marks.bind(e, mark++);
+        for (IFormula e : graph.getInitialState().getHypotheses()) marks.bind(e, mark++);
 
         IASTND proof = rule(graph.getInitialState(), marks);
 
