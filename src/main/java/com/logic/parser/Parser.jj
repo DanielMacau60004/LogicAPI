@@ -13,6 +13,7 @@ import com.logic.exps.asts.binary.*;
 import com.logic.exps.asts.unary.*;
 import com.logic.exps.asts.others.*;
 
+import com.logic.exps.exceptions.*;
 import com.logic.nd.asts.*;
 import com.logic.nd.asts.binary.*;
 import com.logic.nd.asts.unary.*;
@@ -43,7 +44,7 @@ PARSER_END(Parser)
   | < OR: "∨" >
   | < CONDITIONAL: "→" >
   | < BICONDITIONAL: "↔" >
-  | < GREEK : ("φ" | "δ" | "ψ" | "α" | "β" | "γ")(["0"-"9"])* >
+  | < GENERIC : ("φ" | "δ" | "ψ" | "α" | "β" | "γ")(["0"-"9"])* >
   | < DOT : "." >
   | < LRPAR : "[" >
   | < RRPAR : "]" >
@@ -51,7 +52,6 @@ PARSER_END(Parser)
   | < RBRA : "}" >
   | < COMMA : "," >
   | < NUMBER : (["0"-"9"])+ >
-  | < PROVE: "prove">
   | < CONSEQUENCE: "⊢">
   | < COLON: ":">
 }
@@ -71,11 +71,11 @@ PARSER_END(Parser)
 <ND> TOKEN : {
     < INEG: "¬I" >
   | < ENEG: "¬E" >
-  | < ELAND: "∧EL" >
-  | < ERAND: "∧ER" >
+  | < ELAND: "∧El" >
+  | < ERAND: "∧Er" >
   | < IAND: "∧I" >
-  | < ILOR: "∨IL" >
-  | < IROR: "∨IR" >
+  | < ILOR: "∨Il" >
+  | < IROR: "∨Ir" >
   | < EOR: "∨E" >
   | < ICOND: "→I" >
   | < ECOND: "→E" >
@@ -84,7 +84,6 @@ PARSER_END(Parser)
   | < IEXIST: "∃I" >
   | < EEXIST: "∃E" >
   | < HYPOTHESIS: "H" >
-  | < PREMISSE: "P" >
 }
 
 /*
@@ -92,20 +91,27 @@ PARSER_END(Parser)
 */
 
 IASTExp parsePL() : {
-    IASTExp e;
+  IASTExp e, e1;
 } {
-    { token_source.curLexState = PL;}
-    e = atomicsPL() (e = operationsPL(e))? (<DOT> | <EOF>) { return e; }
+  { token_source.curLexState = PL; }
+  e = atomicsPL() (
+    e1 = operationsPL(e) (
+      e = operationsPL(e1) { throw new AmbiguousException(e1, e); }
+      | (<DOT> | <EOF>) { return e1; }
+    )
+    | (<DOT> | <EOF>) { return e; }
+  )
 }
 
 private IASTExp operationsPL(IASTExp e1) : {
-    IASTExp e2;
+  IASTExp e2;
 } {
-        <AND> e2 = atomicsPL() { return new ASTAnd(e1, e2); }
-      | <OR> e2 = atomicsPL() { return new ASTOr(e1, e2); }
-      | <CONDITIONAL> e2 = atomicsPL() { return new ASTConditional(e1, e2); }
-      | <BICONDITIONAL> e2 = atomicsPL() { return new ASTBiconditional(e1, e2); }
+    <AND> e2 = atomicsPL() { return new ASTAnd(e1, e2); }
+  | <OR> e2 = atomicsPL() { return new ASTOr(e1, e2); }
+  | <CONDITIONAL> e2 = atomicsPL() { return new ASTConditional(e1, e2); }
+  | <BICONDITIONAL> e2 = atomicsPL() { return new ASTBiconditional(e1, e2); }
 }
+
 
 private IASTExp atomicsPL() : {
     Token t;
@@ -114,9 +120,11 @@ private IASTExp atomicsPL() : {
     <TOP> { return new ASTTop(); }
   | <BOTTOM> { return new ASTBottom(); }
   | <NOT> e = atomicsPL() { return new ASTNot(e); }
-  | <LPAR> e = atomicsPL() e = operationsPL(e) <RPAR> { return new ASTParenthesis(e); }
+  | <LPAR> e = atomicsPL() e = operationsPL(e)
+    (<RPAR> { return new ASTParenthesis(e); }
+    | {throw new MissingParenthesisException(e, getToken(0));})
   | t = <LITERAL> { return new ASTLiteral(t.image); }
-  | t = <GREEK> { return new ASTArbitrary(t.image); }
+  | t = <GENERIC> { return new ASTArbitrary(t.image); }
 }
 
 /*
@@ -124,10 +132,16 @@ private IASTExp atomicsPL() : {
 */
 
 IASTExp parseFOL() : {
-    IASTExp e;
+  IASTExp e, e1;
 } {
-{ token_source.curLexState = FOL; }
-    e = atomicsFOL() (e = operationsFOL(e))? (<DOT> | <EOF>) { return e; }
+  { token_source.curLexState = FOL; }
+  e = atomicsFOL() (
+    e1 = operationsFOL(e) (
+      e = operationsFOL(e1) { throw new AmbiguousException(e1, e); }
+      | (<DOT> | <EOF>) { return e1; }
+    )
+    | (<DOT> | <EOF>) { return e; }
+  )
 }
 
 private IASTExp operationsFOL(IASTExp e1) : {
@@ -147,8 +161,10 @@ private IASTExp atomicsFOL() : {
     <TOP> { return new ASTTop(); }
   | <BOTTOM> { return new ASTBottom(); }
   | <NOT> e = atomicsFOL() { return new ASTNot(e); }
-  | <LPAR> e = atomicsFOL() e = operationsFOL(e) <RPAR> { return new ASTParenthesis(e); }
-  | t = <GREEK> { return new ASTArbitrary(t.image); }
+  | <LPAR> e = atomicsFOL() e = operationsFOL(e)
+    (<RPAR> { return new ASTParenthesis(e); }
+    | {throw new MissingParenthesisException(e, getToken(0));})
+  | t = <GENERIC> { return new ASTArbitrary(t.image); }
   | <EXISTENTIAL> t = <VARIABLE> {e = new ASTVariable(t.image);} e1 = atomicsFOL() { return new ASTExistential(e, e1); }
   | <UNIVERSAL> t = <VARIABLE> {e = new ASTVariable(t.image);} e1 = atomicsFOL() { return new ASTUniversal(e, e1); }
   | name = <PREDICATE> (e = predicateFOL(name.image) {return  e;} | {return new ASTLiteral(name.image); })
@@ -158,7 +174,9 @@ private IASTExp predicateFOL(String name) : {
     IASTExp e;
     ASTPred pred = new ASTPred(name);
 } {
-    <LPAR> e = termFOL() { pred.addTerm(e); } ( <COMMA> e = termFOL() { pred.addTerm(e); } )* <RPAR> {return pred; }
+    <LPAR> e = termFOL() { pred.addTerm(e); } ( <COMMA> e = termFOL() { pred.addTerm(e); } )*
+        (<RPAR> { return pred; }
+        | {throw new MissingParenthesisException(e, getToken(0));})
 }
 
 private IASTExp termFOL() : {
@@ -174,7 +192,9 @@ private IASTExp functionFOL(String name) : {
     IASTExp e;
     ASTFun fun = new ASTFun(name);
 } {
-    <LPAR> e = termFOL() { fun.addTerm(e); } ( <COMMA> e = termFOL() { fun.addTerm(e); } )* <RPAR> { return fun; }
+    <LPAR> e = termFOL() { fun.addTerm(e); } (LOOKAHEAD(2) <COMMA> e = termFOL() { fun.addTerm(e); } )*
+        (<RPAR> { return fun; }
+        | {throw new MissingParenthesisException(e, getToken(0));})
 }
 
 /*
@@ -191,7 +211,7 @@ IASTND parseNDPL() : {
 private IASTND proofNDPL() : {
      IASTExp exp;
      IASTND n1, n2, n3;
-     Token m, n;
+     Token m = null, n = null;
      token_source.curLexState = ND;
 } {
 
@@ -202,17 +222,17 @@ private IASTND proofNDPL() : {
         | <ECOND> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() n2 = proofNDPL() <RRPAR> { return new ASTEImp(n1, n2, exp); }
         | <ILOR> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTILDis(n1, exp); }
         | <IROR> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR> { return new ASTIRDis(n1, exp); }
-        | <INEG> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR>
-        { return new ASTINeg(n1, exp, Integer.parseInt(m.toString())); }
+        | <INEG> <COMMA> [m = <NUMBER>] <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR>
+        { return new ASTINeg(n1, exp, m != null ? m.toString() : null); }
         | <ENEG> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() n2 = proofNDPL() <RRPAR> { return new ASTENeg(n1, n2, exp); }
-        | <EOR> <COMMA> m = <NUMBER> <COMMA> n = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() n2 = proofNDPL() n3 = proofNDPL() <RRPAR>
-            { return new ASTEDisj(n1, n2, n3, exp, Integer.parseInt(m.toString()), Integer.parseInt(n.toString()));}
-        | <ICOND> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR>
-        {return new ASTIImp(n1, exp, Integer.parseInt(m.toString())); }
-        | <BOTTOM> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR>
-        {return new ASTAbsurdity(n1, exp, Integer.parseInt(m.toString())); }
-        | <HYPOTHESIS> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parsePL() <RRPAR>
-        {return new ASTHypothesis(exp, Integer.parseInt(m.toString()));}
+        | <EOR> <COMMA> [m = <NUMBER>] <COMMA> [n = <NUMBER>] <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() n2 = proofNDPL() n3 = proofNDPL() <RRPAR>
+            { return new ASTEDis(n1, n2, n3, exp, m != null ? m.toString() : null, n != null ? n.toString() : null);}
+        | <ICOND> <COMMA> [m = <NUMBER>] <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR>
+        {return new ASTIImp(n1, exp, m != null ? m.toString() : null); }
+        | <BOTTOM> <COMMA> [m = <NUMBER>] <RRPAR> <LRPAR> exp = parsePL() n1 = proofNDPL() <RRPAR>
+        {return new ASTAbsurdity(n1, exp, m != null ? m.toString() : null); }
+        | <HYPOTHESIS> <COMMA> [m = <NUMBER>] <RRPAR> <LRPAR> exp = parsePL() <RRPAR>
+        {return new ASTHypothesis(exp, m != null ? m.toString() : null);}
     ) | {throw new RuntimeException("Incomplete proof!");}
 
 }
@@ -231,7 +251,7 @@ IASTND parseNDFOL() : {
 private IASTND proofNDFOL() : {
      IASTExp exp;
      IASTND n1, n2, n3;
-     Token m, n;
+     Token m = null, n = null;
      token_source.curLexState = ND;
 } {
 
@@ -242,22 +262,22 @@ private IASTND proofNDFOL() : {
         | <ECOND> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() n2 = proofNDFOL() <RRPAR> { return new ASTEImp(n1, n2, exp); }
         | <ILOR> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR> { return new ASTILDis(n1, exp); }
         | <IROR> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR> { return new ASTIRDis(n1, exp); }
-        | <INEG> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR>
-        { return new ASTINeg(n1, exp, Integer.parseInt(m.toString())); }
+        | <INEG> <COMMA> [m = <NUMBER>] <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR>
+        { return new ASTINeg(n1, exp, m != null ? m.toString() : null); }
         | <ENEG> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() n2 = proofNDFOL() <RRPAR> { return new ASTENeg(n1, n2, exp); }
-        | <EOR> <COMMA> m = <NUMBER> <COMMA> n = <NUMBER> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() n2 = proofNDFOL() n3 = proofNDFOL() <RRPAR>
-            { return new ASTEDisj(n1, n2, n3, exp, Integer.parseInt(m.toString()), Integer.parseInt(n.toString()));}
-        | <ICOND> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR>
-        {return new ASTIImp(n1, exp, Integer.parseInt(m.toString())); }
-        | <BOTTOM> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR>
-        {return new ASTAbsurdity(n1, exp, Integer.parseInt(m.toString())); }
+        | <EOR> <COMMA> [m = <NUMBER>] <COMMA> [n = <NUMBER>] <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() n2 = proofNDFOL() n3 = proofNDFOL() <RRPAR>
+            { return new ASTEDis(n1, n2, n3, exp, m != null ? m.toString() : null, n != null ? n.toString() : null);}
+        | <ICOND> <COMMA> [m = <NUMBER>] <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR>
+        {return new ASTIImp(n1, exp, m != null ? m.toString() : null); }
+        | <BOTTOM> <COMMA> [m = <NUMBER>] <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR>
+        {return new ASTAbsurdity(n1, exp, m != null ? m.toString() : null); }
         | <EUNI> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR> { return new ASTEUni(n1, exp); }
         | <IEXIST> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR> { return new ASTIExist(n1, exp); }
         | <IUNI> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() <RRPAR> { return new ASTIUni(n1, exp); }
-        | <EEXIST> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() n2 = proofNDFOL() <RRPAR>
-        { return new ASTEExist(n1, n2, exp, Integer.parseInt(m.toString())); }
-        | <HYPOTHESIS> <COMMA> m = <NUMBER> <RRPAR> <LRPAR> exp = parseFOL() <RRPAR>
-        {return new ASTHypothesis(exp, Integer.parseInt(m.toString()));}
+        | <EEXIST> <COMMA> [m = <NUMBER>] <RRPAR> <LRPAR> exp = parseFOL() n1 = proofNDFOL() n2 = proofNDFOL() <RRPAR>
+        { return new ASTEExist(n1, n2, exp, m != null ? m.toString() : null); }
+        | <HYPOTHESIS> <COMMA> [m = <NUMBER>] <RRPAR> <LRPAR> exp = parseFOL() <RRPAR>
+        {return new ASTHypothesis(exp, m != null ? m.toString() : null);}
     ) | {throw new RuntimeException("Incomplete proof!");}
 
 }

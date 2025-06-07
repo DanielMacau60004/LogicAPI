@@ -1,12 +1,14 @@
 package api.nd;
 
+import com.logic.api.IFormula;
 import com.logic.api.INDProof;
 import com.logic.api.IPLFormula;
 import com.logic.api.LogicAPI;
 import com.logic.nd.algorithm.AlgoProofPLBuilder;
-import com.logic.nd.algorithm.AlgoProofStateBuilder;
+import com.logic.nd.algorithm.AlgoProofPLProblemBuilder;
 import com.logic.nd.algorithm.AlgoSettingsBuilder;
-import com.logic.nd.algorithm.state.strategies.SizeTrimStrategy;
+import com.logic.nd.algorithm.state.strategies.HeightTrimStrategy;
+import com.logic.others.Utils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -115,12 +117,18 @@ public class NDPLTest {
         }
 
         Assertions.assertDoesNotThrow(() -> {
-            INDProof proof = new AlgoProofPLBuilder(LogicAPI.parsePL(expression))
-                    .addPremises(premises)
+            INDProof proof = new AlgoProofPLBuilder(
+                    new AlgoProofPLProblemBuilder(LogicAPI.parsePL(expression))
+                            .addPremises(premises))
                     .build();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
+
+            Set<IFormula> premisesProof = new HashSet<>();
+            proof.getPremises().forEachRemaining(premisesProof::add);
+            Assertions.assertEquals(premises, premisesProof);
         });
+
     }
 
 
@@ -171,11 +179,16 @@ public class NDPLTest {
         }
 
         Assertions.assertDoesNotThrow(() -> {
-            INDProof proof = new AlgoProofPLBuilder(LogicAPI.parsePL(expression))
-                    .addPremises(premises)
+            INDProof proof = new AlgoProofPLBuilder(
+                    new AlgoProofPLProblemBuilder(LogicAPI.parsePL(expression))
+                            .addPremises(premises))
                     .build();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
+
+            Set<IFormula> premisesProof = new HashSet<>();
+            proof.getPremises().forEachRemaining(premisesProof::add);
+            Assertions.assertEquals(premises, premisesProof);
         });
     }
 
@@ -224,11 +237,22 @@ public class NDPLTest {
         }
 
         Assertions.assertDoesNotThrow(() -> {
-            INDProof proof = new AlgoProofPLBuilder(LogicAPI.parsePL(expression))
-                    .addPremises(premises)
+            INDProof proof = new AlgoProofPLBuilder(
+                    new AlgoProofPLProblemBuilder(LogicAPI.parsePL(expression))
+                            .addPremises(premises))
+                    .setAlgoSettingsBuilder(new AlgoSettingsBuilder()
+                                    .setTrimStrategy(new HeightTrimStrategy())
+                            /*.setTimeout(10000000)
+                            .setHeightLimit(100000)
+                            .setHypothesesPerState(1000000)
+                            .setTotalClosedNodes(10000000))*/)
                     .build();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
+
+            Set<IFormula> premisesProof = new HashSet<>();
+            proof.getPremises().forEachRemaining(premisesProof::add);
+            Assertions.assertEquals(premises, premisesProof);
         });
     }
 
@@ -247,18 +271,82 @@ public class NDPLTest {
         }
 
         Assertions.assertDoesNotThrow(() -> {
-            INDProof proof = new AlgoProofPLBuilder(LogicAPI.parsePL(expression))
-                    .addPremises(premises)
+            INDProof proof = new AlgoProofPLBuilder(
+                    new AlgoProofPLProblemBuilder(LogicAPI.parsePL(expression))
+                            .addPremises(premises))
                     .setAlgoSettingsBuilder(
-                            new AlgoSettingsBuilder().setTrimStrategy(new SizeTrimStrategy())
-                                    .setInitialState(new AlgoProofStateBuilder(LogicAPI.parsePL("⊥"))
-                                            .addHypothesis(LogicAPI.parsePL("¬(a ∨ ¬a)"))
-                                            .addHypothesis(LogicAPI.parsePL("¬a"))))
+                            new AlgoSettingsBuilder()
+                            //.setTrimStrategy(new SizeTrimStrategy())
+                            //.setBuildStrategy(new LinearBuildStrategy())
+                            //.setInitialState(new AlgoProofStateBuilder(LogicAPI.parsePL("⊥"))
+                            //        .addHypothesis(LogicAPI.parsePL("¬(a ∨ ¬a)"))
+                            //        .addHypothesis(LogicAPI.parsePL("¬a")))
+                    )
                     .build();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
+
+            Set<IFormula> premisesProof = new HashSet<>();
+            proof.getPremises().forEachRemaining(premisesProof::add);
+            Assertions.assertEquals(premises, premisesProof);
         });
     }
 
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "[→I, 1] [(a ∨ a) → a. [∨E, 3, 3] [a. [H, 1] [a ∨ a.] [H, 3] [a.] [H, 3] [a.]]]",
+            "[→I, 1] [(a ∨ a) → a. [∨E, , 3] [a. [H, 1] [a ∨ a.] [H, 3] [a.] [H, 3] [a.]]]",
+            "[→I, 1] [(a ∨ a) → a. [∨E, , ] [a. [H, 1] [a ∨ a.] [H, 2] [a.] [H, 3] [a.]]]"
+    })
+    void testSingle1(String exp) {
+
+        Assertions.assertDoesNotThrow(() -> {
+            INDProof proof = LogicAPI.parseNDPLProof(exp);
+            System.out.print("{");
+            proof.getPremises().forEachRemaining(i -> System.out.print(Utils.getToken(i + ".")));
+            System.out.println("} |= " + proof.getConclusion());
+            //System.out.println("Size: " + proof.size() + " Height: " + proof.height());
+            //System.out.println(proof);
+        });
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "(p ∧ q) → (r ∨ s), (p → r) ∨ (q → s)",
+            "((p → q) → (¬p ∨ q)) ∧ ((¬p ∨ q) → (p → q))",
+            "(((p ∧ q) ∨ (p ∧ ¬q)) ∨ (¬p ∧ q)) ∨ (¬p ∧ ¬q)",
+            "a → ¬¬ a ",
+            "(((p → (q ∨ s)) ∧ ((p ∧ r) → s)) ∧ ((s ∧ t) → (p ∨ ¬q))) → (((p ∧ (q → r)) → s) ∧ (((q ∧ s) ∧ t) → p))",
+            "((p ∨ q) ∨ (r ∨ s)) → ((p ∨ s) ∨ (r ∨ q))"
+    })
+    void testSpecific(String premisesAndExpression) throws Exception {
+        String[] parts = premisesAndExpression.split(",");
+        String expression = parts[parts.length - 1].trim();
+
+        Set<IPLFormula> premises = new HashSet<>();
+        for (int i = 0; i < parts.length - 1; i++) {
+            premises.add(LogicAPI.parsePL(parts[i].trim()));
+        }
+
+        Assertions.assertDoesNotThrow(() -> {
+            INDProof proof = new AlgoProofPLBuilder(
+                    new AlgoProofPLProblemBuilder(LogicAPI.parsePL(expression))
+                            .addPremises(premises))
+                    .setAlgoSettingsBuilder(
+                            new AlgoSettingsBuilder()
+                                    .setHypothesesPerState(4)
+                                    .setTotalClosedNodes(Integer.MAX_VALUE)
+                                    .setTrimStrategy(new HeightTrimStrategy())
+                    )
+                    .build();
+            System.out.println("Size: " + proof.size() + " Height: " + proof.height());
+            System.out.println(proof);
+
+            Set<IFormula> premisesProof = new HashSet<>();
+            proof.getPremises().forEachRemaining(premisesProof::add);
+            Assertions.assertEquals(premises, premisesProof);
+        });
+    }
 
 }

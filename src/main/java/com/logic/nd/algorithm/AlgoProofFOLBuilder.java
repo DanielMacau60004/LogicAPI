@@ -1,47 +1,31 @@
 package com.logic.nd.algorithm;
 
-import com.logic.api.IFOLFormula;
 import com.logic.api.IFormula;
 import com.logic.api.INDProof;
 import com.logic.exps.asts.others.AASTTerm;
 import com.logic.nd.ERule;
-import com.logic.nd.algorithm.state.StateGraph;
+import com.logic.nd.algorithm.state.StateGraphFOL;
 import com.logic.nd.algorithm.state.StateGraphSettings;
 import com.logic.nd.algorithm.state.StateSolution;
 import com.logic.nd.algorithm.state.IStateGraph;
 import com.logic.nd.algorithm.transition.ITransitionGraph;
 import com.logic.nd.algorithm.transition.TransitionGraphFOL;
+import com.logic.others.Utils;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class AlgoProofFOLBuilder {
 
-    private final IFOLFormula conclusion;
-    private final Set<IFormula> premises;
+    private final AlgoProofFOLProblemBuilder problem;
+    private AlgoProofFOLStateBuilder initialState;
+
     private final Set<ERule> forbiddenRules;
-    private final Set<AASTTerm> terms;
     private AlgoSettingsBuilder algoSettingsBuilder = new AlgoSettingsBuilder();
 
-    public AlgoProofFOLBuilder(IFOLFormula conclusion) {
-        this.conclusion = conclusion;
-        this.premises = new HashSet<>();
+    public AlgoProofFOLBuilder(AlgoProofFOLProblemBuilder problem) {
+        this.problem = problem;
         this.forbiddenRules = new HashSet<>();
-        this.terms = new HashSet<>();
-
-        conclusion.iterateVariables().forEachRemaining(terms::add);
-    }
-
-    public AlgoProofFOLBuilder addPremise(IFOLFormula premise) {
-        this.premises.add(premise);
-        premise.iterateTerms().forEachRemaining(terms::add);
-        return this;
-    }
-
-    public AlgoProofFOLBuilder addPremises(Set<IFOLFormula> premises) {
-        this.premises.addAll(premises);
-        premises.forEach(premise -> premise.iterateTerms().forEachRemaining(terms::add));
-        return this;
     }
 
     public AlgoProofFOLBuilder addForbiddenRule(ERule forbiddenRule) {
@@ -54,13 +38,8 @@ public class AlgoProofFOLBuilder {
         return this;
     }
 
-    public AlgoProofFOLBuilder addTerm(AASTTerm term) {
-        this.terms.add(term);
-        return this;
-    }
-
-    public AlgoProofFOLBuilder addTerms(Set<AASTTerm> terms) {
-        this.terms.addAll(terms);
+    public AlgoProofFOLBuilder setInitialState(AlgoProofFOLStateBuilder initialState) {
+        this.initialState = initialState;
         return this;
     }
 
@@ -70,11 +49,22 @@ public class AlgoProofFOLBuilder {
     }
 
     public INDProof build() {
-        StateGraphSettings s = algoSettingsBuilder.build(conclusion, premises);
-        ITransitionGraph tg = new TransitionGraphFOL(conclusion, premises, forbiddenRules, terms);
+        if(initialState == null)
+            initialState = problem;
+
+        Set<AASTTerm> terms = new HashSet<>(problem.terms);
+        terms.addAll(initialState.terms);
+
+        StateGraphSettings s = algoSettingsBuilder.build();
+        Set<IFormula> assumptions = new HashSet<>(problem.premises);
+        assumptions.addAll(problem.hypotheses);
+        assumptions.addAll(initialState.hypotheses);
+        assumptions.add(initialState.state);
+
+        ITransitionGraph tg = new TransitionGraphFOL(problem.state, assumptions, forbiddenRules, terms);
         tg.build();
 
-        IStateGraph sg = new StateGraph(tg, s);
+        IStateGraph sg = new StateGraphFOL(problem, initialState, tg, s);
         sg.build();
 
         return new StateSolution(sg, true).findSolution();

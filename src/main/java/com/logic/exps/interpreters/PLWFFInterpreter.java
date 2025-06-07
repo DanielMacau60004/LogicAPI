@@ -1,4 +1,4 @@
-package com.logic.exps.checkers;
+package com.logic.exps.interpreters;
 
 import com.logic.api.IPLFormula;
 import com.logic.exps.asts.IASTExp;
@@ -12,19 +12,19 @@ import com.logic.exps.asts.unary.ASTParenthesis;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class PLWFFChecker implements IExpsVisitor<Void, Void> {
+public class PLWFFInterpreter implements IExpsVisitor<Void, Void> {
 
     public static final String ERROR_MESSAGE = "PL expressions only!";
     final Set<ASTLiteral> literals;
     final Set<ASTArbitrary> generics;
 
-    PLWFFChecker() {
+    PLWFFInterpreter() {
         literals = new LinkedHashSet<>();
         generics = new LinkedHashSet<>();
     }
 
     public static IPLFormula check(IASTExp exp) {
-        PLWFFChecker checker = new PLWFFChecker();
+        PLWFFInterpreter checker = new PLWFFInterpreter();
         exp.accept(checker, null);
 
         return new PLExp(exp, checker.literals, checker.generics);

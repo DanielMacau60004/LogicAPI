@@ -3,6 +3,9 @@ package com.logic;
 import com.logic.api.INDProof;
 import com.logic.api.LogicAPI;
 import com.logic.exps.asts.IASTExp;
+import com.logic.feedback.FeedbackException;
+import com.logic.feedback.FeedbackLevel;
+import com.logic.nd.exceptions.NDException;
 import com.logic.others.Utils;
 import com.logic.parser.Parser;
 
@@ -11,6 +14,7 @@ import java.io.ByteArrayInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Set;
 
 public class Main {
 
@@ -36,6 +40,7 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception {
+
         System.out.println("Evaluating:");
 
         //TransitionGraph t = new TransitionGraph(
@@ -44,15 +49,35 @@ public class Main {
 
         //System.out.println(s.findSolution());
 
-        ByteArrayInputStream stream = readFile("src/main/java/com/logic/code.logic");
-        String result = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
+        try {
+            ByteArrayInputStream stream = readFile("src/main/java/com/logic/code.logic");
+            String result = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
 
-        INDProof proofObj = LogicAPI.parseNDFOLProof(result);
+            INDProof proofObj = LogicAPI.parseNDPLProof(result);
 
-        System.out.print("{");
-        proofObj.getPremises().forEachRemaining(i -> System.out.print(Utils.getToken(i + ".")));
-        System.out.println("} |= " + proofObj.getConclusion());
-        System.out.println(Utils.getToken(proofObj + ""));
+            System.out.print("{");
+            proofObj.getPremises().forEachRemaining(i -> System.out.print(Utils.getToken(i + ".")));
+            System.out.println("} |= " + proofObj.getConclusion());
+            System.out.println(Utils.getToken(proofObj + ""));
+
+            LogicAPI.checkNDProblem(proofObj,
+                    Set.of(/*LogicAPI.parsePL("p ∧ q")*/),
+                    LogicAPI.parsePL("(a ∨ a) → a"));
+
+        }catch (NDException e) {
+            System.out.println(e.getFeedback(FeedbackLevel.SOLUTION));
+        }
+
+        /*try{
+            System.out.println(LogicAPI.parseFOL(""));
+        }catch (FeedbackException e) {
+            for(FeedbackLevel l : FeedbackLevel.values()) {
+                System.out.println(l.name()+":\n"+e.getFeedback(l)+"\n");
+            }
+        }*/
+        //System.out.println(LogicAPI.parsePL("a ∨ (c ∨ d)."));
+        //System.out.println(LogicAPI.parsePL("(a ∨ c) ∨ d."));
+
 
         //ByteArrayInputStream stream = new ByteArrayInputStream((proof).getBytes());
         //System.out.println(new Parser(stream).parseNDPL());

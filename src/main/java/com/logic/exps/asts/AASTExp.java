@@ -1,6 +1,10 @@
 package com.logic.exps.asts;
 
+import com.logic.feedback.FeedbackException;
 import com.logic.parser.Parser;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class AASTExp implements IASTExp {
 

@@ -8,9 +8,10 @@ import com.logic.exps.asts.binary.ASTExistential;
 import com.logic.exps.asts.binary.ASTUniversal;
 import com.logic.exps.asts.others.AASTTerm;
 import com.logic.exps.asts.others.ASTVariable;
-import com.logic.exps.checkers.FOLWFFChecker;
+import com.logic.exps.interpreters.FOLWFFInterpreter;
 import com.logic.exps.interpreters.FOLReplaceExps;
 import com.logic.nd.ERule;
+import com.logic.others.Utils;
 
 import java.util.*;
 
@@ -19,9 +20,9 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
     private final Set<ASTExistential> existentials;
     private final Set<AASTTerm> terms;
 
-    public TransitionGraphFOL(IFOLFormula conclusion, Set<IFormula> premisses, Set<ERule> forbiddenRules,
+    public TransitionGraphFOL(IFOLFormula conclusion, Set<IFormula> assumptions, Set<ERule> forbiddenRules,
                               Set<AASTTerm> terms) {
-        super(conclusion, premisses, forbiddenRules);
+        super(conclusion, assumptions, forbiddenRules);
         this.terms = terms;
 
         existentials = new HashSet<>();
@@ -37,7 +38,7 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
 
     @Override
     protected IFOLFormula getFormula(IASTExp exp) {
-        formulas.putIfAbsent(exp, FOLWFFChecker.check(exp));
+        formulas.putIfAbsent(exp, FOLWFFInterpreter.check(exp));
         return (IFOLFormula) formulas.get(exp);
     }
 
@@ -55,7 +56,7 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
         for (AASTTerm term : terms) {
             IASTExp psiXT = FOLReplaceExps.replace(psi, xVar, term);
 
-            if ((term instanceof ASTVariable t && !getFormula(psiXT).isAFreeVariable(t)))
+            if ((term instanceof ASTVariable t && !getFormula(psiXT).isFreeVariable(t)))
                 continue;
 
             addEdge(exi, new TransitionEdge(ERule.INTRO_EXISTENTIAL)
@@ -70,8 +71,7 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
         for (AASTTerm term : terms) {
             IASTExp psiXT = FOLReplaceExps.replace(psi, xVar, term);
 
-            if ((term instanceof ASTVariable t && !getFormula(psiXT).isAFreeVariable(t)) ||
-                    !FOLReplaceExps.replace(psiXT, term, xVar).equals(psi))
+            if ((term instanceof ASTVariable t && !getFormula(psi).isFreeVariable(t)))
                 continue;
 
             addEdge(psiXT, new TransitionEdge(ERule.ELIM_UNIVERSAL)
@@ -88,8 +88,9 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
                 continue;
 
             IASTExp psiXY = FOLReplaceExps.replace(psi, xVar, yVar);
-            if ((!uni.getLeft().equals(yVar) && getFormula(psi).isAFreeVariable(yVar)))
-                return;
+            if ((!uni.getLeft().equals(yVar) && getFormula(psi).appearsFreeVariable(yVar)) ||
+                    !FOLReplaceExps.replace(psiXY, yVar, xVar).equals(psi))
+                continue;
 
             addEdge(uni, new TransitionEdge(ERule.INTRO_UNIVERSAL)
                     .addTransition(getFormula(psiXY), null, yVar), true);
@@ -106,8 +107,8 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
                 continue;
 
             IASTExp psiXY = FOLReplaceExps.replace(psi, xVar, yVar);
-            if ((getFormula(exp).isAFreeVariable(yVar))
-                    || (!exi.getLeft().equals(yVar) && (getFormula(psi).isAFreeVariable(yVar))) ||
+            if ((getFormula(exp).appearsFreeVariable(yVar))
+                    || (!exi.getLeft().equals(yVar) && (getFormula(psi).appearsFreeVariable(yVar))) ||
                     !FOLReplaceExps.replace(psiXY, t, xVar).equals(psi))
                 continue;
 
@@ -134,6 +135,7 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
+        str.append("Formulas: ").append(Utils.getToken(formulas.values().toString())).append("\n");
         str.append("Total nodes: ").append(graph.size()).append("\n");
         str.append("Total edges: ").append(graph.values().stream().mapToInt(Set::size).sum()).append("\n");
         str.append("Disjunctions: ").append(disjunctions).append("\n");

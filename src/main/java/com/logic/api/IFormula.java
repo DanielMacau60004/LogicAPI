@@ -30,7 +30,7 @@ public interface IFormula {
      *
      * @return The expression ({@code IASTExp}) that defines this formula.
      */
-    IASTExp getFormula();
+    IASTExp getAST();
 
     /**
      * Returns an iterator over the generic (arbitrary) elements present in this formula.

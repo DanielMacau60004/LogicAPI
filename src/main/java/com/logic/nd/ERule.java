@@ -20,7 +20,8 @@ public enum ERule {
     ELIM_UNIVERSAL(ParserConstants.EUNI),
     INTRO_EXISTENTIAL(ParserConstants.IEXIST),
     ELIM_EXISTENTIAL(ParserConstants.EEXIST),
-    ABSURDITY(ParserConstants.BOTTOM);
+    ABSURDITY(ParserConstants.BOTTOM),
+    HYPOTHESIS(ParserConstants.HYPOTHESIS);
 
     private final int kind;
 

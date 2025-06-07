@@ -4,14 +4,13 @@ import com.logic.nd.asts.binary.ASTEExist;
 import com.logic.nd.asts.binary.ASTEImp;
 import com.logic.nd.asts.binary.ASTENeg;
 import com.logic.nd.asts.binary.ASTIConj;
-import com.logic.nd.asts.others.ASTEDisj;
+import com.logic.nd.asts.others.ASTEDis;
 import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
 
 public interface INDVisitor<T, E> {
 
     T visit(ASTHypothesis h, E env);
-
 
     T visit(ASTIImp r, E env);
 
@@ -29,7 +28,7 @@ public interface INDVisitor<T, E> {
 
     T visit(ASTIConj r, E env);
 
-    T visit(ASTEDisj r, E env);
+    T visit(ASTEDis r, E env);
 
     T visit(ASTEImp r, E env);
 

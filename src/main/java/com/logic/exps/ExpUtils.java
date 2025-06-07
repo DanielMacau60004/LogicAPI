@@ -9,12 +9,12 @@ import com.logic.exps.asts.binary.ASTOr;
 import com.logic.exps.asts.others.ASTBottom;
 import com.logic.exps.asts.unary.ASTNot;
 import com.logic.exps.asts.unary.ASTParenthesis;
-import com.logic.exps.checkers.FOLWFFChecker;
+import com.logic.exps.interpreters.FOLWFFInterpreter;
 
 public class ExpUtils {
 
     public static final IASTExp BOT = new ASTBottom();
-    public static final IFormula BOTF = FOLWFFChecker.check(new ASTBottom());
+    public static final IFormula BOTF = FOLWFFInterpreter.check(new ASTBottom());
 
     public static IASTExp negate(IASTExp exp) {
         if (exp instanceof ASTOr || exp instanceof ASTAnd || exp instanceof ASTConditional

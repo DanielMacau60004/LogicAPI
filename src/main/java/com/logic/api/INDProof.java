@@ -1,7 +1,9 @@
 package com.logic.api;
 
+import com.logic.nd.asts.IASTND;
+
 import java.util.Iterator;
-import java.util.Set;
+import java.util.Map;
 
 /**
  * The {@code INDProof} interface represents a natural deduction (ND) proof.
@@ -35,6 +37,8 @@ public interface INDProof {
      */
     IFormula getConclusion();
 
+    Iterator<Map.Entry<String, IFormula>> getHypotheses();
+
     /**
      * Returns an iterator over the premises of this proof.
      *
@@ -62,17 +66,5 @@ public interface INDProof {
      */
     int size();
 
-    /**
-     * Attempts to prove a given conclusion from a set of premises using natural deduction.
-     *
-     * <p>
-     * This method determines whether the given premises logically lead to the conclusion
-     * according to the rules of natural deduction.
-     * </p>
-     *
-     * @param premises  A set of {@code IFormula} representing the assumptions or starting points of the proof.
-     * @param conclusion The {@code IFormula} representing the statement to be proven.
-     * @return {@code true} if the conclusion can be derived from the premises, {@code false} otherwise.
-     */
-    boolean prove(Set<IFormula> premises, IFormula conclusion);
+    IASTND getAST();
 }

@@ -1,25 +1,27 @@
 package com.logic.nd.algorithm.state.strategies;
 
-import com.logic.nd.algorithm.state.StateEdge;
-import com.logic.nd.algorithm.state.StateGraphSettings;
-import com.logic.nd.algorithm.state.StateNode;
+import com.logic.nd.algorithm.state.*;
 import com.logic.nd.algorithm.transition.ITransitionGraph;
 import com.logic.nd.algorithm.transition.TransitionEdge;
 import com.logic.nd.algorithm.transition.TransitionNode;
-import com.logic.others.Utils;
 
 import java.util.*;
+
 
 public class LinearBuildStrategy implements IBuildStrategy {
 
     private final Map<StateNode, StateNode> nodes;
+
     private final Map<StateNode, Set<StateEdge>> graph;
     private final Queue<StateNode> closed;
     private final Queue<StateNode> explore;
     private final Map<StateNode, Set<StateEdge>> inverted;
 
+    private int explored = 0;
+
     public LinearBuildStrategy() {
         nodes = new HashMap<>();
+
         graph = new HashMap<>();
         closed = new LinkedList<>();
         explore = new LinkedList<>();
@@ -27,9 +29,8 @@ public class LinearBuildStrategy implements IBuildStrategy {
     }
 
     @Override
-    public void build(ITransitionGraph transitionGraph, StateGraphSettings settings) {
-
-        explore.add(settings.getState());
+    public void build(StateNode initialNode, ITransitionGraph transitionGraph, StateGraphSettings settings) {
+        explore.add(initialNode);
 
         long start = System.currentTimeMillis() + settings.getTimeout();
 
@@ -39,8 +40,8 @@ public class LinearBuildStrategy implements IBuildStrategy {
             if ((start - System.currentTimeMillis()) < 0 || closed.size() == settings.getTotalClosedNodesLimit())
                 break;
 
-            if(state.getHeight() > settings.getHeightLimit() ||
-                    state.getHypotheses().size() > settings.getHypothesesPerStateLimit())
+            if (state.getHeight() > settings.getHeightLimit() ||
+                    state.numberOfHypotheses() > settings.getHypothesesPerStateLimit())
                 continue;
 
             if (graph.containsKey(state))
@@ -48,13 +49,17 @@ public class LinearBuildStrategy implements IBuildStrategy {
 
             Set<StateEdge> edges = new HashSet<>();
             graph.put(state, edges);
+            explored++;
 
             if (state.isClosed()) {
                 closed.add(state);
                 continue;
             }
 
-            for (TransitionEdge edge : transitionGraph.getEdges(state.getExp().getFormula())) {
+            if(explored >= settings.getTotalNodesLimit())
+                break;
+
+            for (TransitionEdge edge : transitionGraph.getEdges(state.getExp().getAST())) {
                 StateEdge e = new StateEdge(edge.getRule());
                 for (TransitionNode transition : edge.getTransitions()) {
                     StateNode newState = state.transit(transition.getTo(), transition.getProduces(),
@@ -68,12 +73,14 @@ public class LinearBuildStrategy implements IBuildStrategy {
                     inverted.computeIfAbsent(newState, k -> new HashSet<>())
                             .add(new StateEdge(edge.getRule(), state, null));
 
-                    explore.add(newState);
+                    if (!graph.containsKey(newState))
+                        explore.add(newState);
                 }
 
                 edges.add(e);
             }
         }
+
     }
 
     @Override

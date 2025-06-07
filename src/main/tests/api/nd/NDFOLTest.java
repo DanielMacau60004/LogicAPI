@@ -1,14 +1,15 @@
 package api.nd;
 
 import com.logic.api.IFOLFormula;
+import com.logic.api.IFormula;
 import com.logic.api.INDProof;
 import com.logic.api.LogicAPI;
-import com.logic.exps.asts.others.ASTConstant;
 import com.logic.exps.asts.others.ASTVariable;
 import com.logic.nd.algorithm.AlgoProofFOLBuilder;
-import com.logic.nd.algorithm.AlgoProofStateBuilder;
+import com.logic.nd.algorithm.AlgoProofFOLProblemBuilder;
+import com.logic.nd.algorithm.AlgoProofFOLStateBuilder;
 import com.logic.nd.algorithm.AlgoSettingsBuilder;
-import com.logic.nd.algorithm.state.strategies.SizeTrimStrategy;
+import com.logic.nd.algorithm.state.strategies.HeightTrimStrategy;
 import com.logic.others.Utils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -45,6 +46,17 @@ public class NDFOLTest {
             " [∀E] [φ. [∃E,1] [∀x φ. [H,2] [∃y ∀x φ.] [H,1] [∀x φ.]]]"
     })
     void testFail(String proof) {
+        Throwable thrown = Assertions.assertThrows(Throwable.class, () -> {
+            LogicAPI.parseNDFOLProof(proof);
+        });
+        System.out.println(Utils.getToken(thrown.getMessage()));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            " [∃E,2] [∃z(Par(z) ∧ P(z)). [H,1] [∃x (Par(x) ∧ P(y)).] [∃I] [∃z (Par(z) ∧ P(z)). [H,2] [Par(y) ∧ P(y).]]]",
+    })
+    void testFailSingle1(String proof) {
         Throwable thrown = Assertions.assertThrows(Throwable.class, () -> {
             LogicAPI.parseNDFOLProof(proof);
         });
@@ -96,10 +108,10 @@ public class NDFOLTest {
             /*17*///"((∀x φ ∧ ψ) → ∀x (φ ∧ ψ)) ∧ (∀x (φ ∧ ψ) → (∀x φ ∧ ψ))", //Only works if we add x in the set of notfree
             /*23*///"(∀x (φ → ψ) → (∃x φ → ψ)) ∧ ((∃x φ → ψ) → ∀x (φ → ψ))", //Only works if we add x in the set of notfree
 
-            /*2*/"∀y(C(y) ∨ D(y)). ∀x(C(x) → L(x)). ∃x¬L(x). ∃x D(x)",
+            /*2*///"∀y(C(y) ∨ D(y)). ∀x(C(x) → L(x)). ∃x¬L(x). ∃x D(x)",
             /*3*/"∀x(C(x) → S(x)). ∀x(¬A(x,b) → ¬S(x)). ∀x((C(x)∨S(x)) → A(x,b))",
             /*4*/"L(a,b). ∀x(∃y(L(y,x) ∨ L(x,y)) → L(x,x)). ∃x L(x,a)",
-            /*5*/"∀x ∀y (L(x,y) → L(y,x)). ∃x ∀y L(x,y). ∀x ∃y L(x,y)", //Requires aux variables
+            /*5*///"∀x ∀y (L(x,y) → L(y,x)). ∃x ∀y L(x,y). ∀x ∃y L(x,y)", //Requires aux variables
 
             //Others
             //"∀x∀y P(x,y). ∀y∀x P(y,x)" //Require an aux variable z
@@ -114,21 +126,27 @@ public class NDFOLTest {
         }
 
         Assertions.assertDoesNotThrow(() -> {
-            INDProof proof = new AlgoProofFOLBuilder(LogicAPI.parseFOL(expression))
-                    .addPremises(premises)
+            INDProof proof = new AlgoProofFOLBuilder(
+                    new AlgoProofFOLProblemBuilder(LogicAPI.parseFOL(expression))
+                            .addPremises(premises)
+                            .addTerm(new ASTVariable("w")))
                     .setAlgoSettingsBuilder(
                             new AlgoSettingsBuilder()
                                     .setTotalClosedNodes(10000)
-                                    .setHypothesesPerState(3)
-                                    .setTimeout(500)
-                                    .setTrimStrategy(new SizeTrimStrategy()))
-                    .addTerm(new ASTVariable("w"))
+                                    .setHypothesesPerState(4)
+                                    .setTimeout(1000)
+                                    .setTrimStrategy(new HeightTrimStrategy()))
                     //.addTerm(new ASTVariable("z"))
                     //.addForbiddenRule(ERule.ELIM_NEGATION)
                     .build();
 
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
+
+            Set<IFormula> premisesProof = new HashSet<>();
+            proof.getPremises().forEachRemaining(premisesProof::add);
+            System.out.println(Utils.getToken(premisesProof + ": " + premises));
+            Assertions.assertEquals(premises, premisesProof);
         });
     }
 
@@ -146,17 +164,29 @@ public class NDFOLTest {
         }
 
         Assertions.assertDoesNotThrow(() -> {
-            INDProof proof = new AlgoProofFOLBuilder(LogicAPI.parseFOL(expression))
-                    .addPremises(premises)
+            INDProof proof = new AlgoProofFOLBuilder(
+                    new AlgoProofFOLProblemBuilder(LogicAPI.parseFOL(expression))
+                            .addPremises(premises)
+                            .addTerm(new ASTVariable("b"))
+                            .addTerm(new ASTVariable("c")))
                     .setAlgoSettingsBuilder(
                             new AlgoSettingsBuilder()
-                                    .setTimeout(1000))
-                    .addTerm(new ASTConstant("b"))
-                    .addTerm(new ASTConstant("c"))
+                                    .setTrimStrategy(new HeightTrimStrategy())
+                                    .setTotalClosedNodes(20000)
+                                    .setHypothesesPerState(5)
+                                    .setHeightLimit(50)
+                                    //.setInitialState(
+                                    //        new AlgoProofStateBuilder(LogicAPI.parseFOL("P(a) → Q(b)"))
+                                    //                .addHypothesis(LogicAPI.parseFOL("Q(b)")))
+                                    .setTimeout(2000))
                     .build();
 
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
+
+            Set<IFormula> premisesProof = new HashSet<>();
+            proof.getPremises().forEachRemaining(premisesProof::add);
+            Assertions.assertEquals(premises, premisesProof);
         });
     }
 
@@ -174,17 +204,19 @@ public class NDFOLTest {
         }
 
         Assertions.assertThrows(Throwable.class, () -> {
-            INDProof proof = new AlgoProofFOLBuilder(LogicAPI.parseFOL(expression))
-                    .addPremises(premises)
-                    .setAlgoSettingsBuilder(
-                            new AlgoSettingsBuilder()
-                                    .setInitialState
-                                            (new AlgoProofStateBuilder(LogicAPI.parseFOL("∀x φ")))
-                                    .setTimeout(200))
+            INDProof proof = new AlgoProofFOLBuilder(
+                    new AlgoProofFOLProblemBuilder(LogicAPI.parseFOL(expression))
+                            .addPremises(premises))
+                    .setInitialState(new AlgoProofFOLStateBuilder(LogicAPI.parseFOL("∀x φ")))
+                    .setAlgoSettingsBuilder(new AlgoSettingsBuilder().setTimeout(200))
                     .build();
 
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
+
+            Set<IFormula> premisesProof = new HashSet<>();
+            proof.getPremises().forEachRemaining(premisesProof::add);
+            Assertions.assertEquals(premises, premisesProof);
         });
     }
 
@@ -202,8 +234,9 @@ public class NDFOLTest {
         }
 
         Assertions.assertDoesNotThrow(() -> {
-            INDProof proof = new AlgoProofFOLBuilder(LogicAPI.parseFOL(expression))
-                    .addPremises(premises)
+            INDProof proof = new AlgoProofFOLBuilder(
+                    new AlgoProofFOLProblemBuilder(LogicAPI.parseFOL(expression))
+                            .addPremises(premises))
                     .setAlgoSettingsBuilder(
                             new AlgoSettingsBuilder()
                                     .setTimeout(1000))
@@ -211,6 +244,10 @@ public class NDFOLTest {
 
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
+
+            Set<IFormula> premisesProof = new HashSet<>();
+            proof.getPremises().forEachRemaining(premisesProof::add);
+            Assertions.assertEquals(premises, premisesProof);
         });
     }
 
@@ -227,27 +264,149 @@ public class NDFOLTest {
             premises.add(LogicAPI.parseFOL(parts[i].trim()));
         }
         Assertions.assertDoesNotThrow(() -> {
-            INDProof proof = new AlgoProofFOLBuilder(LogicAPI.parseFOL(expression))
-                    .addPremises(premises)
+            INDProof proof = new AlgoProofFOLBuilder(
+                    new AlgoProofFOLProblemBuilder(LogicAPI.parseFOL(expression))
+                            .addPremises(premises)
+                            .addTerm(new ASTVariable("w"))
+                            .addTerm(new ASTVariable("z")))
+                    .setInitialState(new AlgoProofFOLStateBuilder(LogicAPI.parseFOL("∃y L(w,y)"))
+                            .addHypothesis(LogicAPI.parseFOL("∀y L(z,y)")))
                     .setAlgoSettingsBuilder(
                             new AlgoSettingsBuilder()
                                     //.setBuildStrategy(new LinearBuildStrategy())
                                     .setTotalClosedNodes(10000)
                                     .setHypothesesPerState(5)
                                     .setTimeout(100)
-                                    .setTrimStrategy(new SizeTrimStrategy())
-                                    .setInitialState(
-                                            new AlgoProofStateBuilder(LogicAPI.parseFOL("∃y L(w,y)"))
-                                                    .addHypothesis(LogicAPI.parseFOL("∀y L(z,y)"))
-                                    )
+                                    .setTrimStrategy(new HeightTrimStrategy())
                     )
-                    .addTerm(new ASTVariable("w"))
-                    .addTerm(new ASTVariable("z"))
                     //.addForbiddenRule(ERule.ELIM_NEGATION)
                     .build();
 
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
+
+
         });
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "¬∃x P(x). ∀x ¬P(x)",
+            "∃x ¬P(x). ¬∀x P(x)",
+            "¬∀x P(x). ∃x ¬P(x)",
+            "∀x ¬P(x). ¬∃x P(x)",
+            "∀x(∃y P(y) → Q(x)). ∀x ∃y(P(y) → Q(x))",
+            "∀x ¬∀y (P(x,y) → Q(x,y)). ∀x ∃y P(x,y)",
+            "∀x (P(x,x) ∨ ∀y Q(x,y)). ∀x(∃y P(x,y) ∨ Q(x,x))",
+            "∀y(C(y) ∨ D(y)). ∀x(C(x) → L(x)). ∃x¬L(x). ∃x D(x)",
+            "∀x ∀y (L(x,y) → L(y,x)). ∃x ∀y L(x,y). ∀x ∃y L(x,y)"
+    })
+    void testAlgorithmWithNoExtra1(String premisesAndExpression) throws Exception {
+        String[] parts = premisesAndExpression.split("\\.");
+        String expression = parts[parts.length - 1].trim();
+
+        Set<IFOLFormula> premises = new HashSet<>();
+        for (int i = 0; i < parts.length - 1; i++) {
+            premises.add(LogicAPI.parseFOL(parts[i].trim()));
+        }
+
+        Assertions.assertDoesNotThrow(() -> {
+            INDProof proof = new AlgoProofFOLBuilder(
+                    new AlgoProofFOLProblemBuilder(LogicAPI.parseFOL(expression))
+                            .addPremises(premises)
+                            .addTerm(new ASTVariable("a")))
+                    .setAlgoSettingsBuilder(
+                            new AlgoSettingsBuilder()
+                                    .setTimeout(2000)
+                                    .setTotalClosedNodes(4000))
+                    //.addTerm(new ASTVariable("b"))
+                    //.addForbiddenRule(ERule.ABSURDITY)
+                    //.addForbiddenRule(ERule.ELIM_EXISTENTIAL)
+                    //.addForbiddenRule(ERule.ELIM_NEGATION)
+                    .build();
+
+            System.out.println("Size: " + proof.size() + " Height: " + proof.height());
+            System.out.println(proof);
+
+            Set<IFormula> premisesProof = new HashSet<>();
+            proof.getPremises().forEachRemaining(premisesProof::add);
+            Assertions.assertEquals(premises, premisesProof);
+        });
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "∀x ∀y P(x,y). ∀y ∀x P(y,x)"
+    })
+    void testAlgorithmWithNoExtra2(String premisesAndExpression) throws Exception {
+        String[] parts = premisesAndExpression.split("\\.");
+        String expression = parts[parts.length - 1].trim();
+
+        Set<IFOLFormula> premises = new HashSet<>();
+        for (int i = 0; i < parts.length - 1; i++) {
+            premises.add(LogicAPI.parseFOL(parts[i].trim()));
+        }
+
+        Assertions.assertDoesNotThrow(() -> {
+            INDProof proof = new AlgoProofFOLBuilder(
+                    new AlgoProofFOLProblemBuilder(LogicAPI.parseFOL(expression))
+                            .addPremises(premises)
+                            .addTerm(new ASTVariable("z")))
+                    .setAlgoSettingsBuilder(
+                            new AlgoSettingsBuilder()
+                                    .setTimeout(2000)
+                                    .setTotalClosedNodes(4000))
+                    .build();
+
+            System.out.println("Size: " + proof.size() + " Height: " + proof.height());
+            System.out.println(proof);
+
+            Set<IFormula> premisesProof = new HashSet<>();
+            proof.getPremises().forEachRemaining(premisesProof::add);
+            Assertions.assertEquals(premises, premisesProof);
+        });
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "¬∃x P(x). ∀x ¬P(x)",
+            "∃x ¬P(x). ¬∀x P(x)",
+            "¬∀x P(x). ∃x ¬P(x)",
+            "∀x ¬P(x). ¬∃x P(x)",
+            "∀x (∃y P(y) → Q(x)). ∀x ∃y (P(y) → Q(x))",
+            "∀x ¬∀y (P(x,y) → Q(x,y)). ∀x ∃y P(x,y)",
+            "∀x (P(x,x) ∨ ∀y Q(x,y)). ∀x(∃y P(x,y) ∨ Q(x,x))"
+    })
+    void testAlgorithmWithNoExtra3(String premisesAndExpression) throws Exception {
+        String[] parts = premisesAndExpression.split("\\.");
+        String expression = parts[parts.length - 1].trim();
+
+        Set<IFOLFormula> premises = new HashSet<>();
+        for (int i = 0; i < parts.length - 1; i++) {
+            premises.add(LogicAPI.parseFOL(parts[i].trim()));
+        }
+
+        Assertions.assertDoesNotThrow(() -> {
+            INDProof proof = new AlgoProofFOLBuilder(
+                    new AlgoProofFOLProblemBuilder(LogicAPI.parseFOL(expression))
+                            .addPremises(premises))
+                    .setAlgoSettingsBuilder(
+                            new AlgoSettingsBuilder()
+                                    .setTimeout(25000)
+                                    .setTotalClosedNodes(10000))
+                    //.addTerm(new ASTVariable("a"))
+                    //.addTerm(new ASTVariable("b"))
+                    .build();
+
+            System.out.println("Size: " + proof.size() + " Height: " + proof.height());
+            System.out.println(proof);
+
+            Set<IFormula> premisesProof = new HashSet<>();
+            proof.getPremises().forEachRemaining(premisesProof::add);
+            Assertions.assertEquals(premises, premisesProof);
+        });
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.logic.exps.checkers;
+package com.logic.exps.interpreters;
 
 import com.logic.api.IFOLFormula;
 import com.logic.exps.asts.FOLExp;
@@ -8,6 +8,8 @@ import com.logic.exps.asts.binary.*;
 import com.logic.exps.asts.others.*;
 import com.logic.exps.asts.unary.ASTNot;
 import com.logic.exps.asts.unary.ASTParenthesis;
+import com.logic.exps.exceptions.FunctionArityException;
+import com.logic.exps.exceptions.PredicateArityException;
 import com.logic.others.Env;
 
 import java.util.HashMap;
@@ -15,10 +17,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, ASTVariable>> {
-
-    public static final String ERROR_MESSAGE_FUNCTION = "Function %s was declared with different arities: %d and %d!";
-    public static final String ERROR_MESSAGE_PREDICATE = "Predicate %s was declared with different arities: %d and %d!";
+public class FOLWFFInterpreter implements IExpsVisitor<Void, Env<String, ASTVariable>> {
 
     final Map<String, Integer> functionsMap;
     final Map<String, Integer> predicatesMap;
@@ -31,7 +30,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, ASTVariable
 
     final Map<ASTArbitrary, Set<ASTVariable>> generics;
 
-    FOLWFFChecker() {
+    FOLWFFInterpreter() {
         functionsMap = new HashMap<>();
         predicatesMap = new HashMap<>();
 
@@ -44,7 +43,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, ASTVariable
     }
 
     public static IFOLFormula check(IASTExp exp) {
-        FOLWFFChecker checker = new FOLWFFChecker();
+        FOLWFFInterpreter checker = new FOLWFFInterpreter();
         Env<String, ASTVariable> env = new Env<>();
         exp.accept(checker, env);
 
@@ -79,7 +78,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, ASTVariable
             functionsMap.put(e.getName(), 0);
             functions.add(e);
         } else if (size != 0)
-            throw new RuntimeException(String.format(ERROR_MESSAGE_FUNCTION, e.getName(), size, 0));
+            throw new FunctionArityException(e.getName(), size, 0);
 
         return null;
     }
@@ -92,7 +91,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, ASTVariable
             predicatesMap.put(e.getName(), 0);
             predicates.add(e);
         } else if (size != 0)
-            throw new RuntimeException(String.format(ERROR_MESSAGE_PREDICATE, e.getName(), size, 0));
+            throw new PredicateArityException(e.getName(), size, 0);
 
         return null;
     }
@@ -109,7 +108,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, ASTVariable
 
     @Override
     public Void visit(ASTVariable e, Env<String, ASTVariable> env) {
-        if (env.find(e.getName()) != null)
+        if (env.findParent(e.getName()) != null)
             boundedVariables.add(e);
         else unboundedVariables.add(e);
 
@@ -159,7 +158,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, ASTVariable
             functionsMap.put(e.getName(), arity);
             functions.add(e);
         } else if (size != arity)
-            throw new RuntimeException(String.format(ERROR_MESSAGE_FUNCTION, e.getName(), size, arity));
+            throw new FunctionArityException(e.getName(), size, arity);
 
         e.getTerms().forEach(t -> t.accept(this, env));
         return null;
@@ -174,7 +173,7 @@ public class FOLWFFChecker implements IExpsVisitor<Void, Env<String, ASTVariable
             predicatesMap.put(e.getName(), arity);
             predicates.add(e);
         } else if (size != arity)
-            throw new RuntimeException(String.format(ERROR_MESSAGE_PREDICATE, e.getName(), size, arity));
+            throw new PredicateArityException(e.getName(), size, arity);
 
         e.getTerms().forEach(t -> t.accept(this, env));
         return null;

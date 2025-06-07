@@ -7,8 +7,9 @@ import com.logic.exps.asts.binary.ASTAnd;
 import com.logic.exps.asts.binary.ASTConditional;
 import com.logic.exps.asts.binary.ASTOr;
 import com.logic.exps.asts.unary.ASTNot;
-import com.logic.exps.checkers.PLWFFChecker;
+import com.logic.exps.interpreters.PLWFFInterpreter;
 import com.logic.nd.ERule;
+import com.logic.others.Utils;
 
 import java.util.*;
 
@@ -31,6 +32,7 @@ public class TransitionGraphPL implements ITransitionGraph {
         this.forbiddenRules = forbiddenRules;
 
         formulas = new HashMap<>();
+
         this.explored = new HashMap<>();
 
         graph = new HashMap<>();
@@ -41,8 +43,8 @@ public class TransitionGraphPL implements ITransitionGraph {
     public void build() {
         //Add all nodes necessary to generate the sub nodes
         addNode(ExpUtils.BOT, true);
-        addNode(conclusion.getFormula(), true);
-        premisses.forEach(p -> addNode(p.getFormula(), true));
+        addNode(conclusion.getAST(), true);
+        premisses.forEach(p -> addNode(p.getAST(), true));
 
         //Add the disjunction rules to each node
         if (!forbiddenRules.contains(ERule.ELIM_DISJUNCTION))
@@ -50,7 +52,7 @@ public class TransitionGraphPL implements ITransitionGraph {
     }
 
     protected IFormula getFormula(IASTExp exp) {
-        formulas.putIfAbsent(exp, PLWFFChecker.check(exp));
+        formulas.putIfAbsent(exp, PLWFFInterpreter.check(exp));
         return formulas.get(exp);
     }
 
@@ -60,6 +62,7 @@ public class TransitionGraphPL implements ITransitionGraph {
 
         explored.put(node, canGen);
         graph.put(node, new HashSet<>());
+        getFormula(node);
         if (!node.equals(conclusion) && node instanceof ASTOr or)
             disjunctions.add(or);
 
@@ -72,8 +75,9 @@ public class TransitionGraphPL implements ITransitionGraph {
     protected void addEdge(IASTExp from, TransitionEdge edge, boolean canGen) {
         if (forbiddenRules.contains(edge.getRule())) return;
 
-        addNode(from, true);
-        edge.getTransitions().forEach(t -> addNode(t.getTo().getFormula(), canGen));
+        addNode(from, canGen);
+        edge.getTransitions().forEach(t -> addNode(t.getTo().getAST(), canGen));
+
         graph.get(from).add(edge);
     }
 
@@ -88,12 +92,8 @@ public class TransitionGraphPL implements ITransitionGraph {
                         .addTransition(getFormula(exp))
                         .addTransition(neg)
                 , false);
-    }
 
-    private void implicationIRule(ASTConditional imp) {
-        IFormula right = getFormula(ExpUtils.removeParenthesis(imp.getRight()));
-        IFormula left = getFormula(ExpUtils.removeParenthesis(imp.getLeft()));
-        addEdge(imp, new TransitionEdge(ERule.INTRO_IMPLICATION, right, left), true);
+        addEdge(neg.getAST(), new TransitionEdge(ERule.INTRO_NEGATION, ExpUtils.BOTF, getFormula(exp)), false);
     }
 
     private void negationIRule(ASTNot not) {
@@ -104,6 +104,12 @@ public class TransitionGraphPL implements ITransitionGraph {
                         .addTransition(getFormula(not))
                         .addTransition(notNeg)
                 , true);
+    }
+
+    private void implicationIRule(ASTConditional imp) {
+        IFormula right = getFormula(ExpUtils.removeParenthesis(imp.getRight()));
+        IFormula left = getFormula(ExpUtils.removeParenthesis(imp.getLeft()));
+        addEdge(imp, new TransitionEdge(ERule.INTRO_IMPLICATION, right, left), true);
     }
 
     private void disjunctionIRule(ASTOr or) {
@@ -184,8 +190,14 @@ public class TransitionGraphPL implements ITransitionGraph {
     }
 
     @Override
+    public Set<IFormula> getFormulas() {
+        return new HashSet<>(formulas.values());
+    }
+
+    @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
+        str.append("Formulas: ").append(Utils.getToken(formulas.values().toString())).append("\n");
         str.append("Total nodes: ").append(graph.size()).append("\n");
         str.append("Total edges: ").append(graph.values().stream().mapToInt(Set::size).sum()).append("\n");
         str.append("Disjunctions: ").append(disjunctions).append("\n");

@@ -12,14 +12,16 @@ import java.util.Set;
 public class NDProof implements INDProof {
 
     private final IFormula conclusion;
-    private final Map<IFormula, Integer> premises;
+    private final Set<IFormula> premises;
+    private final Map<String, IFormula> hypotheses;
     private final IASTND proof;
     private final int height;
     private final int size;
 
-    public NDProof(IFormula conclusion, Map<IFormula, Integer> premises, IASTND proof, int height, int size) {
+    public NDProof(IFormula conclusion, Set<IFormula> premises, Map<String, IFormula> hypotheses, IASTND proof, int height, int size) {
         this.conclusion = conclusion;
         this.premises = premises;
+        this.hypotheses = hypotheses;
         this.proof = proof;
         this.height = height;
         this.size = size;
@@ -31,8 +33,13 @@ public class NDProof implements INDProof {
     }
 
     @Override
+    public Iterator<Map.Entry<String, IFormula>> getHypotheses() {
+        return hypotheses.entrySet().iterator();
+    }
+
+    @Override
     public Iterator<IFormula> getPremises() {
-        return premises.keySet().iterator();
+        return premises.iterator();
     }
 
     @Override
@@ -46,8 +53,8 @@ public class NDProof implements INDProof {
     }
 
     @Override
-    public boolean prove(Set<IFormula> premises, IFormula conclusion) {
-        return premises.containsAll(this.premises.keySet()) && this.conclusion.equals(conclusion);
+    public IASTND getAST() {
+        return this.proof;
     }
 
     @Override

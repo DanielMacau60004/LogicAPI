@@ -8,7 +8,7 @@ import com.logic.exps.asts.binary.*;
 import com.logic.exps.asts.others.AASTTerm;
 import com.logic.exps.asts.others.ASTVariable;
 import com.logic.exps.asts.unary.ASTNot;
-import com.logic.exps.checkers.FOLWFFChecker;
+import com.logic.exps.interpreters.FOLWFFInterpreter;
 import com.logic.exps.interpreters.FOLReplaceExps;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
@@ -16,13 +16,13 @@ import com.logic.nd.asts.binary.ASTEExist;
 import com.logic.nd.asts.binary.ASTEImp;
 import com.logic.nd.asts.binary.ASTENeg;
 import com.logic.nd.asts.binary.ASTIConj;
-import com.logic.nd.asts.others.ASTEDisj;
+import com.logic.nd.asts.others.ASTEDis;
 import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
+import com.logic.nd.exceptions.InvalidMappingException;
+import com.logic.nd.exceptions.rules.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class NDWWFChecker implements INDVisitor<Void, Void> {
 
@@ -44,124 +44,146 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
     @Override
     public Void visit(ASTIImp r, Void env) {
+        if(r.hasErrors()) return null;
         IASTExp exp = r.getConclusion();
 
-        if (!(exp instanceof ASTConditional cond))
-            throw new RuntimeException("The introduction of the implication rule is incorrectly typed!\n " +
-                    "The conclusion should be an implication, but you provided: " + exp + "!");
+        if (!(exp instanceof ASTConditional cond)) {
+            r.appendErrors(new IImpException(r));
+            return null;
+        }
 
         IASTExp right = ExpUtils.removeParenthesis(cond.getRight());
 
-        if (!right.equals(r.getHyp().getConclusion()))
-            throw new RuntimeException("The introduction of the implication rule is incorrectly typed!\n " +
-                    "The hypothesis is not the same as the right-hand side of the implication!");
+        if (!right.equals(r.getHyp().getConclusion())) {
+            r.appendErrors(new IImpException(r, cond));
+            return null;
+        }
 
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTINeg r, Void env) {
+        if(r.hasErrors()) return null;
         IASTExp exp = r.getConclusion();
 
-        if (!(exp instanceof ASTNot))
-            throw new RuntimeException("The introduction of the negation rule is incorrectly typed!\n " +
-                    "The conclusion should be a negation, but you provided: " + exp + "!");
+        if (!(exp instanceof ASTNot neg)) {
+            r.appendErrors(new INegException(r));
+            return null;
+        }
 
-        if (!r.getHyp().getConclusion().equals(ExpUtils.BOT))
-            throw new RuntimeException("The introduction of the negation rule is incorrectly typed!\n " +
-                    "The hypothesis should be " + ExpUtils.BOT + "!");
+        if (!r.getHyp().getConclusion().equals(ExpUtils.BOT)) {
+            r.appendErrors(new INegException(r, neg));
+            return null;
+        }
 
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTERConj r, Void env) {
+        if(r.hasErrors()) return null;
         IASTExp exp = r.getConclusion();
 
-        if (!(r.getHyp().getConclusion() instanceof ASTAnd and))
-            throw new RuntimeException("The elimination of the conjunction right rule is incorrectly typed!\n " +
-                    "The hypothesis should be a conjunction, but you provided: " + r.getHyp() + "!");
+        if (!(r.getHyp().getConclusion() instanceof ASTAnd and)) {
+            r.appendErrors(new ERConjException(r));
+            return null;
+        }
 
         IASTExp left = ExpUtils.removeParenthesis(and.getLeft());
-        if (!left.equals(exp))
-            throw new RuntimeException("The elimination of the conjunction right rule is incorrectly typed!\n " +
-                    "The conclusion is not the same as the left-hand side of the conjunction!");
+        if (!left.equals(exp)) {
+            r.appendErrors(new ERConjException(r, and));
+            return null;
+        }
 
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTELConj r, Void env) {
+        if(r.hasErrors()) return null;
         IASTExp exp = r.getConclusion();
 
-        if (!(r.getHyp().getConclusion() instanceof ASTAnd and))
-            throw new RuntimeException("The elimination of the conjunction left rule is incorrectly typed!\n " +
-                    "The hypothesis should be a conjunction, but you provided: " + r.getHyp() + "!");
+        if (!(r.getHyp().getConclusion() instanceof ASTAnd and)) {
+            r.appendErrors(new ELConjException(r));
+            return null;
+        }
 
         IASTExp right = ExpUtils.removeParenthesis(and.getRight());
-        if (!right.equals(exp))
-            throw new RuntimeException("The elimination of the conjunction left rule is incorrectly typed!\n " +
-                    "The conclusion is not the same as the right-hand side of the conjunction!");
+        if (!right.equals(exp)) {
+            r.appendErrors(new ELConjException(r, and));
+            return null;
+        }
 
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTIRDis r, Void env) {
+        if(r.hasErrors()) return null;
         IASTExp exp = r.getConclusion();
 
-        if (!(exp instanceof ASTOr or))
-            throw new RuntimeException("The introduction of the disjunction right rule is incorrectly typed!\n " +
-                    "The conclusion should be a disjunction, but you provided: " + exp + "!");
+        if (!(exp instanceof ASTOr or)) {
+            r.appendErrors(new IRDisException(r));
+            return null;
+        }
 
         IASTExp left = ExpUtils.removeParenthesis(or.getLeft());
-        if (!left.equals(r.getHyp().getConclusion()))
-            throw new RuntimeException("The introduction of the disjunction right rule is incorrectly typed!\n " +
-                    "The hypothesis is not the same as the left-hand side of the disjunction!");
+        if (!left.equals(r.getHyp().getConclusion())) {
+            r.appendErrors(new IRDisException(r, or));
+            return null;
+        }
 
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTILDis r, Void env) {
+        if(r.hasErrors()) return null;
         IASTExp exp = r.getConclusion();
 
-        if (!(exp instanceof ASTOr or))
-            throw new RuntimeException("The introduction of the disjunction left rule is incorrectly typed!\n " +
-                    "The conclusion should be a disjunction, but you provided: " + exp + "!");
+        if (!(exp instanceof ASTOr or)) {
+            r.appendErrors(new ILDisException(r));
+            return null;
+        }
 
         IASTExp right = ExpUtils.removeParenthesis(or.getRight());
-        if (!right.equals(r.getHyp().getConclusion()))
-            throw new RuntimeException("The introduction of the disjunction left rule is incorrectly typed!\n " +
-                    "The hypothesis is not the same as the right-hand side of the disjunction!");
+        if (!right.equals(r.getHyp().getConclusion())) {
+            r.appendErrors(new ILDisException(r, or));
+            return null;
+        }
 
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTAbsurdity r, Void env) {
-
-        if (!r.getHyp().getConclusion().equals(ExpUtils.BOT))
-            throw new RuntimeException("The absurdity rule is incorrectly typed!\n " +
-                    "The hypothesis should be a disjunction, but you provided: " + r.getHyp() + "!");
+        if(r.hasErrors()) return null;
+        if (!r.getHyp().getConclusion().equals(ExpUtils.BOT)) {
+            r.appendErrors(new AbsurdityException());
+            return null;
+        }
 
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTIConj r, Void env) {
+        if(r.hasErrors()) return null;
         IASTExp exp = r.getConclusion();
 
-        if (!(exp instanceof ASTAnd and))
-            throw new RuntimeException("The introduction of the conjunction rule is incorrectly typed!\n " +
-                    "The conclusion should be a conjunction, but you provided: " + exp + "!");
+        if (!(exp instanceof ASTAnd and)) {
+            r.appendErrors(new IConjException(r));
+            return null;
+        }
 
         IASTExp left = ExpUtils.removeParenthesis(and.getLeft());
         IASTExp right = ExpUtils.removeParenthesis(and.getRight());
 
-        if (!left.equals(r.getHyp1().getConclusion()) || !right.equals(r.getHyp2().getConclusion()))
-            throw new RuntimeException("The introduction of the conjunction rule is incorrectly typed!\n " +
-                    "The conjunction of the hypotheses is different from the conclusion!");
+        if (!left.equals(r.getHyp1().getConclusion()) || !right.equals(r.getHyp2().getConclusion())) {
+            r.appendErrors(new IConjException(r, and));
+            return null;
+        }
 
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
@@ -170,22 +192,22 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
     }
 
     @Override
-    public Void visit(ASTEDisj r, Void env) {
+    public Void visit(ASTEDis r, Void env) {
+        if(r.hasErrors()) return null;
         IASTExp exp = r.getConclusion();
 
-        if (!(r.getHyp1().getConclusion() instanceof ASTOr or))
-            throw new RuntimeException("The elimination of the disjunction rule is incorrectly typed!\n " +
-                    "The first hypothesis should be a disjunction, but you provided: " + r.getHyp1() + "!");
+        if (!(r.getHyp1().getConclusion() instanceof ASTOr or)) {
+            r.appendErrors(new EDisException(r));
+            return null;
+        }
 
         IASTExp left = ExpUtils.removeParenthesis(r.getHyp2().getConclusion());
         IASTExp right = ExpUtils.removeParenthesis(r.getHyp3().getConclusion());
 
-        if (!exp.equals(left))
-            throw new RuntimeException("The elimination of the disjunction rule is incorrectly typed!\n " +
-                    "The second hypothesis is different from the conclusion!");
-        if (!exp.equals(right))
-            throw new RuntimeException("The elimination of the disjunction rule is incorrectly typed!\n " +
-                    "The third hypothesis is different from the conclusion!");
+        if (!exp.equals(left) || !exp.equals(right)) {
+            r.appendErrors(new EDisException(r, or));
+            return null;
+        }
 
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
@@ -196,18 +218,21 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
     @Override
     public Void visit(ASTEImp r, Void env) {
+        if(r.hasErrors()) return null;
         IASTExp exp = r.getConclusion();
 
         IASTExp other = r.getHyp1().getConclusion();
-        if (!(r.getHyp2().getConclusion() instanceof ASTConditional imp))
-            throw new RuntimeException("The elimination of the implication rule is incorrectly typed!\n" +
-                    "The second hypothesis should be an implication, but you provided: " + r.getHyp2() + "!");
+        if (!(r.getHyp2().getConclusion() instanceof ASTConditional imp)) {
+            r.appendErrors(new EImpException(r));
+            return null;
+        }
 
         IASTExp left = ExpUtils.removeParenthesis(imp.getLeft());
         IASTExp right = ExpUtils.removeParenthesis(imp.getRight());
-        if (!left.equals(other) || !right.equals(exp))
-            throw new RuntimeException("The elimination of the implication rule is incorrectly typed!\n" +
-                    "The first hypothesis and the conclusion should form the implication in the second hypothesis!");
+        if (!left.equals(other) || !right.equals(exp)) {
+            r.appendErrors(new EImpException(r, imp));
+            return null;
+        }
 
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
@@ -217,16 +242,21 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
     @Override
     public Void visit(ASTENeg r, Void env) {
+        if(r.hasErrors()) return null;
         IASTExp exp = r.getConclusion();
 
-        if (!exp.equals(ExpUtils.BOT))
-            throw new RuntimeException("The elimination of the negation rule is incorrectly typed!\n" +
-                    "The conclusion should be " + ExpUtils.BOT + "!");
+        if (!exp.equals(ExpUtils.BOT)) {
+            r.appendErrors(new ENegException(r));
+            return null;
+        }
 
-        if (!r.getHyp1().getConclusion().equals(ExpUtils.invert(r.getHyp2().getConclusion())) &&
-                !r.getHyp2().getConclusion().equals(ExpUtils.invert(r.getHyp1().getConclusion())))
-            throw new RuntimeException("The elimination of the negation rule is incorrectly typed!\n" +
-                    "The hypotheses should be negations of each other!");
+        IASTExp leftNot = ExpUtils.invert(r.getHyp2().getConclusion());
+        IASTExp rightNot = ExpUtils.invert(r.getHyp1().getConclusion());
+        if (!r.getHyp1().getConclusion().equals(leftNot) &&
+                !r.getHyp2().getConclusion().equals(rightNot)) {
+            r.appendErrors(new ENegException(r, leftNot, rightNot));
+            return null;
+        }
 
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
@@ -236,9 +266,11 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
     @Override
     public Void visit(ASTEUni r, Void env) {
-        if (!(r.getHyp().getConclusion() instanceof ASTUniversal uni))
-            throw new RuntimeException("The elimination of the universal rule is incorrectly typed!\n" +
-                    "The hypothesis should be an universal, but you provided: " + r.getHyp() + "!");
+        if(r.hasErrors()) return null;
+        if (!(r.getHyp().getConclusion() instanceof ASTUniversal uni)) {
+            r.appendErrors(new EUniException(r));
+            return null;
+        }
 
         //Find mapping
         ASTVariable x = (ASTVariable) uni.getLeft();
@@ -249,28 +281,35 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         terms.add(x);
         psiXT.iterateTerms().forEachRemaining(terms::add);
 
+        Set<IASTExp> outcomes = new HashSet<>();
         if (r.getMapping() == null)
             for (AASTTerm term : terms) {
-                if (FOLReplaceExps.replace(psi, x, term).equals(psiXT.getFormula())) {
+
+                IASTExp cExp = FOLReplaceExps.replace(psi, x, term);
+                outcomes.add(cExp);
+                if (cExp.equals(psiXT.getAST())) {
                     r.setMapping(term);
                     break;
                 }
             }
 
-        if (r.getMapping() == null)
-            throw new RuntimeException("The elimination of the universal rule is incorrectly typed!\n" +
-                    "There is no mapping of " + x + " in " + psi + " that can produce " + psiXT + "!");
+        if (r.getMapping() == null) {
+            r.appendErrors(new InvalidMappingException(x, psi, psiXT.getAST(), outcomes));
+            return null;
+        }
 
-        formulas.put(psi, FOLWFFChecker.check(psi));
+        formulas.put(psi, FOLWFFInterpreter.check(psi));
 
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTIExist r, Void env) {
-        if (!(r.getConclusion() instanceof ASTExistential exi))
-            throw new RuntimeException("The introduction of the existential rule is incorrectly typed!\n" +
-                    "The conclusion should be an existential, but you provided: " + r.getConclusion() + "!");
+        if(r.hasErrors()) return null;
+        if (!(r.getConclusion() instanceof ASTExistential exi)) {
+            r.appendErrors(new IExistException(r));
+            return null;
+        }
 
         //Find mapping
         ASTVariable x = (ASTVariable) exi.getLeft();
@@ -281,28 +320,35 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         terms.add(x);
         psiXT.iterateTerms().forEachRemaining(terms::add);
 
+        Set<IASTExp> outcomes = new HashSet<>();
         if (r.getMapping() == null)
             for (AASTTerm term : terms) {
-                if (FOLReplaceExps.replace(psi, x, term).equals(psiXT.getFormula())) {
+
+                IASTExp cExp = FOLReplaceExps.replace(psi, x, term);
+                outcomes.add(cExp);
+                if (cExp.equals(psiXT.getAST())) {
                     r.setMapping(term);
                     break;
                 }
             }
 
-        if (r.getMapping() == null)
-            throw new RuntimeException("The introduction of the existential rule is incorrectly typed!\n" +
-                    "There is no mapping of " + x + " in " + psi + " that can produce " + psiXT + "!");
+        if (r.getMapping() == null) {
+            r.appendErrors(new InvalidMappingException(x, psi, psiXT.getAST(), outcomes));
+            return null;
+        }
 
-        formulas.put(psi, FOLWFFChecker.check(psi));
+        formulas.put(psi, FOLWFFInterpreter.check(psi));
 
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTIUni r, Void env) {
-        if (!(r.getConclusion() instanceof ASTUniversal uni))
-            throw new RuntimeException("The introduction of the universal rule is incorrectly typed!\n" +
-                    "The conclusion should be an universal, but you provided: " + r.getConclusion() + "!");
+        if(r.hasErrors()) return null;
+        if (!(r.getConclusion() instanceof ASTUniversal uni)) {
+            r.appendErrors(new IUniException(r));
+            return null;
+        }
 
         //Find mapping
         ASTVariable x = (ASTVariable) uni.getLeft();
@@ -313,35 +359,43 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         variables.add(x); //It can be itself
         psiXY.iterateVariables().forEachRemaining(variables::add);
 
+        Set<IASTExp> outcomes = new HashSet<>();
         if (r.getMapping() == null)
             for (ASTVariable var : variables) {
-                if (FOLReplaceExps.replace(psi, x, var).equals(psiXY.getFormula())) {
+
+                IASTExp cExp = FOLReplaceExps.replace(psi, x, var);
+                outcomes.add(cExp);
+                if (cExp.equals(psiXY.getAST())) {
                     r.setMapping(var);
                     break;
                 }
             }
 
-        if (r.getMapping() == null)
-            throw new RuntimeException("The introduction of the universal rule is incorrectly typed!\n" +
-                    "There is no mapping of " + x + " in " + psi + " that can produce " + psiXY + "!");
+        if (r.getMapping() == null) {
+            r.appendErrors(new InvalidMappingException(x, psi, psiXY.getAST(), outcomes));
+            return null;
+        }
 
-        formulas.put(psi, FOLWFFChecker.check(psi));
+        formulas.put(psi, FOLWFFInterpreter.check(psi));
 
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTEExist r, Void env) {
-        if (!(r.getHyp1().getConclusion() instanceof ASTExistential exist))
-            throw new RuntimeException("The elimination of the existential rule is incorrectly typed!\n" +
-                    "The first hypothesis should be an existential, but you provided: " + r.getConclusion() + "!");
+        if(r.hasErrors()) return null;
+        if (!(r.getHyp1().getConclusion() instanceof ASTExistential exist)) {
+            r.appendErrors(new EExistException(r));
+            return null;
+        }
 
-        if (!r.getConclusion().equals(r.getHyp2().getConclusion()))
-            throw new RuntimeException("The elimination of the existential rule is incorrectly typed!\n" +
-                    "The second hypothesis and the conclusion should be the same!");
+        if (!r.getConclusion().equals(r.getHyp2().getConclusion())) {
+            r.appendErrors(new EExistException(r, exist));
+            return null;
+        }
 
         IASTExp exp = ExpUtils.removeParenthesis(exist.getRight());
-        formulas.put(exp, FOLWFFChecker.check(exp));
+        formulas.put(exp, FOLWFFInterpreter.check(exp));
 
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
