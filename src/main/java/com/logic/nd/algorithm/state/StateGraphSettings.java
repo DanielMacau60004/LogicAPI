@@ -1,14 +1,17 @@
 package com.logic.nd.algorithm.state;
 
+import com.logic.api.IFormula;
+import com.logic.nd.algorithm.AlgoProofFOLStateBuilder;
 import com.logic.nd.algorithm.state.strategies.IBuildStrategy;
 import com.logic.nd.algorithm.state.strategies.ITrimStrategy;
 
-public class StateGraphSettings {
+import java.util.Set;
 
-    private final StateNode state;
+public class StateGraphSettings {
 
     private final int heightLimit;
     private final int totalClosedNodesLimit;
+    private final int totalNodesLimit;
     private final int hypothesesPerStateLimit;
 
     private final long timeout;
@@ -16,26 +19,25 @@ public class StateGraphSettings {
     private final IBuildStrategy buildStrategy;
     private final ITrimStrategy trimStrategy;
 
-    public StateGraphSettings(StateNode state, int heightLimit, int totalClosedNodesLimit,
+    public StateGraphSettings(int heightLimit, int totalClosedNodesLimit, int totalNodesLimit,
                               int hypothesesPerStateLimit, long timeout, IBuildStrategy buildStrategy,
                               ITrimStrategy trimStrategy) {
 
-        this.state = state;
         this.heightLimit = heightLimit;
+        this.totalNodesLimit = totalNodesLimit;
         this.totalClosedNodesLimit = totalClosedNodesLimit;
         this.hypothesesPerStateLimit = hypothesesPerStateLimit;
         this.timeout = timeout;
         this.buildStrategy = buildStrategy;
         this.trimStrategy = trimStrategy;
-
-    }
-
-    public StateNode getState() {
-        return state;
     }
 
     public int getHeightLimit() {
         return heightLimit;
+    }
+
+    public int getTotalNodesLimit() {
+        return totalNodesLimit;
     }
 
     public int getTotalClosedNodesLimit() {

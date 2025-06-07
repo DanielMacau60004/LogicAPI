@@ -2,12 +2,11 @@ package com.logic.nd.algorithm;
 
 import com.logic.api.IFormula;
 import com.logic.api.INDProof;
-import com.logic.api.IPLFormula;
 import com.logic.nd.ERule;
-import com.logic.nd.algorithm.state.StateGraph;
+import com.logic.nd.algorithm.state.IStateGraph;
+import com.logic.nd.algorithm.state.StateGraphPL;
 import com.logic.nd.algorithm.state.StateGraphSettings;
 import com.logic.nd.algorithm.state.StateSolution;
-import com.logic.nd.algorithm.state.IStateGraph;
 import com.logic.nd.algorithm.transition.ITransitionGraph;
 import com.logic.nd.algorithm.transition.TransitionGraphPL;
 import com.logic.others.Utils;
@@ -17,26 +16,15 @@ import java.util.Set;
 
 public class AlgoProofPLBuilder {
 
-    private final IPLFormula conclusion;
-    private final Set<IFormula> premises;
+    private final AlgoProofPLProblemBuilder problem;
+    private AlgoProofPLStateBuilder initialState;
+
     private final Set<ERule> forbiddenRules;
     private AlgoSettingsBuilder algoSettingsBuilder = new AlgoSettingsBuilder();
 
-    public AlgoProofPLBuilder(IPLFormula conclusion) {
-        this.conclusion = conclusion;
-        this.premises = new HashSet<>();
+    public AlgoProofPLBuilder(AlgoProofPLProblemBuilder problem) {
+        this.problem = problem;
         this.forbiddenRules = new HashSet<>();
-
-    }
-
-    public AlgoProofPLBuilder addPremise(IPLFormula premise) {
-        this.premises.add(premise);
-        return this;
-    }
-
-    public AlgoProofPLBuilder addPremises(Set<IPLFormula> premises) {
-        this.premises.addAll(premises);
-        return this;
     }
 
     public AlgoProofPLBuilder addForbiddenRule(ERule forbiddenRule) {
@@ -49,6 +37,11 @@ public class AlgoProofPLBuilder {
         return this;
     }
 
+    public AlgoProofPLBuilder setInitialState(AlgoProofPLStateBuilder initialState) {
+        this.initialState = initialState;
+        return this;
+    }
+
     public AlgoProofPLBuilder setAlgoSettingsBuilder(AlgoSettingsBuilder algoSettingsBuilder) {
         this.algoSettingsBuilder = algoSettingsBuilder;
         return this;
@@ -56,12 +49,24 @@ public class AlgoProofPLBuilder {
 
 
     public INDProof build() {
-        StateGraphSettings s = algoSettingsBuilder.build(conclusion, premises);
-        ITransitionGraph tg = new TransitionGraphPL(conclusion, premises, forbiddenRules);
+        if (initialState == null)
+            initialState = problem;
+
+        StateGraphSettings s = algoSettingsBuilder.build();
+        Set<IFormula> assumptions = new HashSet<>(problem.premises);
+        assumptions.addAll(problem.hypotheses);
+        assumptions.addAll(initialState.hypotheses);
+        assumptions.add(initialState.state);
+
+        ITransitionGraph tg = new TransitionGraphPL(problem.state, assumptions, forbiddenRules);
         tg.build();
 
-        IStateGraph sg = new StateGraph(tg, s);
+        //System.out.println(Utils.getToken(tg.toString()));
+
+        IStateGraph sg = new StateGraphPL(problem, initialState, tg, s);
         sg.build();
+
+        System.out.println(Utils.getToken(sg.toString()));
 
         return new StateSolution(sg, false).findSolution();
     }

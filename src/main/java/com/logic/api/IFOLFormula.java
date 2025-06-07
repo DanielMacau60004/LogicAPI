@@ -106,7 +106,9 @@ public interface IFOLFormula extends IFormula {
      * @param variable The variable to check.
      * @return {@code true} if the variable is free, {@code false} otherwise.
      */
-    boolean isAFreeVariable(ASTVariable variable);
+    boolean appearsFreeVariable(ASTVariable variable);
+
+    boolean isFreeVariable(ASTVariable variable);
 
     /**
      * Returns an iterator over all unbounded (free) variables in this formula.
