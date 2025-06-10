@@ -15,7 +15,7 @@ public class LinearBuildStrategy implements IBuildStrategy {
     private final Map<StateNode, Set<StateEdge>> graph;
     private final Queue<StateNode> closed;
     private final Queue<StateNode> explore;
-    private final Map<StateNode, Set<StateEdge>> inverted;
+    private final Map<StateNode, Set<StateNode>> inverted;
 
     private int explored = 0;
 
@@ -70,8 +70,7 @@ public class LinearBuildStrategy implements IBuildStrategy {
 
                     e.addTransition(newState, transition.getProduces());
 
-                    inverted.computeIfAbsent(newState, k -> new HashSet<>())
-                            .add(new StateEdge(edge.getRule(), state, null));
+                    inverted.computeIfAbsent(newState, k -> new HashSet<>()).add(state);
 
                     if (!graph.containsKey(newState))
                         explore.add(newState);
@@ -89,7 +88,7 @@ public class LinearBuildStrategy implements IBuildStrategy {
     }
 
     @Override
-    public Map<StateNode, Set<StateEdge>> getInvertedGraph() {
+    public Map<StateNode, Set<StateNode>> getInvertedGraph() {
         return inverted;
     }
 

@@ -12,10 +12,9 @@ public class StateNode {
 
     private final int exp;
     private final BitSet hypotheses;
+    private final BitSet noFree;
     private boolean isClosed;
     private int height;
-
-    private final BitSet noFree;
 
     public StateNode(Integer exp, BitSet hypotheses, int height, BitSet noFree, BitGraphHandler handler) {
         this(exp, hypotheses, null, height, noFree, handler);

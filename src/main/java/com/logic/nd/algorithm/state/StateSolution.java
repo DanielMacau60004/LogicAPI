@@ -43,6 +43,8 @@ public class StateSolution {
         if (node == null || !node.isClosed())
             throw new RuntimeException("Solution not found!");
 
+        System.out.println(node.getHeight());
+
         IASTND proof = rule(node, marks);
         if (proof == null)
             throw new RuntimeException("Solution not found!");

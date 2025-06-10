@@ -2,7 +2,6 @@ package com.logic.nd.algorithm.state.strategies;
 
 import com.logic.nd.algorithm.state.StateEdge;
 import com.logic.nd.algorithm.state.StateNode;
-import com.logic.nd.algorithm.state.StateTransitionEdge;
 
 import java.util.*;
 
@@ -14,7 +13,7 @@ public class WidthTrimStrategy implements ITrimStrategy {
     public Map<StateNode, StateEdge> trim(IBuildStrategy buildStrategy) {
         Queue<StateNode> explore = buildStrategy.getClosedNodes();
         Map<StateNode, Set<StateEdge>> graph = buildStrategy.getGraph();
-        Map<StateNode, Set<StateEdge>> inverted = buildStrategy.getInvertedGraph();
+        Map<StateNode, Set<StateNode>> inverted = buildStrategy.getInvertedGraph();
 
         Map<StateNode, StateEdge> tree = new HashMap<>();
         Set<StateNode> explored = new HashSet<>();
@@ -28,18 +27,16 @@ public class WidthTrimStrategy implements ITrimStrategy {
             explored.add(state);
 
             if (inverted.get(state) != null) {
-                for (StateEdge prev : inverted.get(state)) {
-                    for (StateTransitionEdge to : prev.getTransitions()) {
-                        Set<StateEdge> edges = graph.get(to.getNode());
-                        if (edges != null) {
+                for (StateNode to : inverted.get(state)) {
+                    Set<StateEdge> edges = graph.get(to);
+                    if (edges != null) {
 
-                            Optional<StateEdge> e = edges.stream().filter(StateEdge::isClosed).findFirst();
-                            if (e.isPresent()) {
-                                explore.add(to.getNode());
+                        Optional<StateEdge> e = edges.stream().filter(StateEdge::isClosed).findFirst();
+                        if (e.isPresent()) {
+                            explore.add(to);
 
-                                if (!tree.containsKey(to.getNode()))
-                                    tree.put(to.getNode(), e.get());
-                            }
+                            if (!tree.containsKey(to))
+                                tree.put(to, e.get());
                         }
                     }
                 }

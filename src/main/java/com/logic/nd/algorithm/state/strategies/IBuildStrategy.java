@@ -13,7 +13,7 @@ public interface IBuildStrategy {
 
     Map<StateNode, Set<StateEdge>> getGraph();
 
-    Map<StateNode, Set<StateEdge>> getInvertedGraph();
+    Map<StateNode, Set<StateNode>> getInvertedGraph();
 
     Queue<StateNode> getClosedNodes();
 

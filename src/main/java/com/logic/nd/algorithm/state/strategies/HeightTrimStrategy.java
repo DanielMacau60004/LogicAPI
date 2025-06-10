@@ -2,10 +2,11 @@ package com.logic.nd.algorithm.state.strategies;
 
 import com.logic.nd.algorithm.state.StateEdge;
 import com.logic.nd.algorithm.state.StateNode;
-import com.logic.nd.algorithm.state.StateTransitionEdge;
-import com.logic.others.Utils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
 
 public class HeightTrimStrategy implements ITrimStrategy {
 
@@ -15,7 +16,7 @@ public class HeightTrimStrategy implements ITrimStrategy {
     public Map<StateNode, StateEdge> trim(IBuildStrategy buildStrategy) {
         Queue<StateNode> explore = buildStrategy.getClosedNodes();
         Map<StateNode, Set<StateEdge>> graph = buildStrategy.getGraph();
-        Map<StateNode, Set<StateEdge>> inverted = buildStrategy.getInvertedGraph();
+        Map<StateNode, Set<StateNode>> inverted = buildStrategy.getInvertedGraph();
 
         Map<StateNode, StateEdge> tree = new HashMap<>();
         Map<StateNode, Integer> explored = new HashMap<>();
@@ -32,26 +33,24 @@ public class HeightTrimStrategy implements ITrimStrategy {
             explored.put(state, state.getHeight());
 
             if (inverted.get(state) != null) {
-                for (StateEdge prev : inverted.get(state)) {
-                    for (StateTransitionEdge to : prev.getTransitions()) {
-                        Set<StateEdge> edges = graph.get(to.getNode());
-                        if (edges != null) {
-                            edges.removeIf(e -> {
-                                if (!e.isClosed()) return false;
+                for (StateNode to : inverted.get(state)) {
+                    Set<StateEdge> edges = graph.get(to);
+                    if (edges != null) {
+                        edges.removeIf(e -> {
+                            if (!e.isClosed()) return false;
 
-                                //Ignore node because there is a smaller path to that node
-                                StateNode toNode = to.getNode();
-                                if (toNode.getHeight() > 0 && toNode.getHeight() <= e.height()) return true;
+                            //Ignore node because there is a smaller path to that node
+                            if (to.getHeight() > 0 && to.getHeight() <= e.height() + 1) return true;
 
-                                toNode.setHeight(e.height() + 1);
+                            to.setHeight(e.height() + 1);
 
-                                explore.add(toNode);
-                                tree.put(toNode, e);
+                            explore.add(to);
+                            tree.put(to, e);
 
-                                return true;
-                            });
-                        }
+                            return true;
+                        });
                     }
+
                 }
             }
         }

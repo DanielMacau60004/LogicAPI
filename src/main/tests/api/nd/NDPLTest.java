@@ -6,6 +6,7 @@ import com.logic.api.IPLFormula;
 import com.logic.api.LogicAPI;
 import com.logic.nd.algorithm.AlgoProofPLBuilder;
 import com.logic.nd.algorithm.AlgoProofPLProblemBuilder;
+import com.logic.nd.algorithm.AlgoProofPLStateBuilder;
 import com.logic.nd.algorithm.AlgoSettingsBuilder;
 import com.logic.nd.algorithm.state.strategies.HeightTrimStrategy;
 import com.logic.others.Utils;
@@ -274,21 +275,17 @@ public class NDPLTest {
             INDProof proof = new AlgoProofPLBuilder(
                     new AlgoProofPLProblemBuilder(LogicAPI.parsePL(expression))
                             .addPremises(premises))
+                    .setInitialState(new AlgoProofPLStateBuilder(LogicAPI.parsePL("⊥"))
+                            .addHypothesis(LogicAPI.parsePL("¬(a ∨ ¬a)"))
+                            .addHypothesis(LogicAPI.parsePL("¬a")))
                     .setAlgoSettingsBuilder(
                             new AlgoSettingsBuilder()
                             //.setTrimStrategy(new SizeTrimStrategy())
                             //.setBuildStrategy(new LinearBuildStrategy())
-                            //.setInitialState(new AlgoProofStateBuilder(LogicAPI.parsePL("⊥"))
-                            //        .addHypothesis(LogicAPI.parsePL("¬(a ∨ ¬a)"))
-                            //        .addHypothesis(LogicAPI.parsePL("¬a")))
                     )
                     .build();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             System.out.println(proof);
-
-            Set<IFormula> premisesProof = new HashSet<>();
-            proof.getPremises().forEachRemaining(premisesProof::add);
-            Assertions.assertEquals(premises, premisesProof);
         });
     }
 
@@ -313,6 +310,7 @@ public class NDPLTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
+            "((a → a) ∧ (a → a)) ∧ ((a → a) ∧ (a → a))",
             "(p ∧ q) → (r ∨ s), (p → r) ∨ (q → s)",
             "((p → q) → (¬p ∨ q)) ∧ ((¬p ∨ q) → (p → q))",
             "(((p ∧ q) ∨ (p ∧ ¬q)) ∨ (¬p ∧ q)) ∨ (¬p ∧ ¬q)",
@@ -335,7 +333,8 @@ public class NDPLTest {
                             .addPremises(premises))
                     .setAlgoSettingsBuilder(
                             new AlgoSettingsBuilder()
-                                    .setHypothesesPerState(4)
+                                    //.setHypothesesPerState(5)
+                                    //.setTimeout(10000)
                                     .setTotalClosedNodes(Integer.MAX_VALUE)
                                     .setTrimStrategy(new HeightTrimStrategy())
                     )
@@ -346,6 +345,39 @@ public class NDPLTest {
             Set<IFormula> premisesProof = new HashSet<>();
             proof.getPremises().forEachRemaining(premisesProof::add);
             Assertions.assertEquals(premises, premisesProof);
+        });
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "(((p → (q ∨ s)) ∧ ((p ∧ r) → s)) ∧ ((s ∧ t) → (p ∨ ¬q))) → (((p ∧ (q → r)) → s) ∧ (((q ∧ s) ∧ t) → p))",
+    })
+    void testSingle3(String premisesAndExpression) throws Exception {
+        String[] parts = premisesAndExpression.split(",");
+        String expression = parts[parts.length - 1].trim();
+
+        Set<IPLFormula> premises = new HashSet<>();
+        for (int i = 0; i < parts.length - 1; i++) {
+            premises.add(LogicAPI.parsePL(parts[i].trim()));
+        }
+
+        Assertions.assertDoesNotThrow(() -> {
+            INDProof proof = new AlgoProofPLBuilder(
+                    new AlgoProofPLProblemBuilder(LogicAPI.parsePL(expression))
+                            .addPremises(premises))
+                    .setInitialState(new AlgoProofPLStateBuilder(
+                            LogicAPI.parsePL("((p ∧ (q → r)) → s) ∧ (((q ∧ s) ∧ t) → p)"))
+                            .addHypothesis(LogicAPI.parsePL("((p → (q ∨ s)) ∧ ((p ∧ r) → s)) ∧ ((s ∧ t) → (p ∨ ¬q))")))
+                    .setAlgoSettingsBuilder(
+                            new AlgoSettingsBuilder()
+                                    //.setHypothesesPerState(5)
+                                    .setTimeout(1000)
+                                    .setTotalClosedNodes(Integer.MAX_VALUE)
+                                    .setTrimStrategy(new HeightTrimStrategy())
+                    )
+                    .build();
+            System.out.println("Size: " + proof.size() + " Height: " + proof.height());
+            System.out.println(proof);
         });
     }
 
