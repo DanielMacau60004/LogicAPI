@@ -1,6 +1,8 @@
 package com.logic.nd.algorithm.state.strategies;
 
-import com.logic.nd.algorithm.state.*;
+import com.logic.nd.algorithm.state.StateEdge;
+import com.logic.nd.algorithm.state.StateGraphSettings;
+import com.logic.nd.algorithm.state.StateNode;
 import com.logic.nd.algorithm.transition.ITransitionGraph;
 import com.logic.nd.algorithm.transition.TransitionEdge;
 import com.logic.nd.algorithm.transition.TransitionNode;
@@ -31,6 +33,8 @@ public class LinearBuildStrategy implements IBuildStrategy {
     @Override
     public void build(StateNode initialNode, ITransitionGraph transitionGraph, StateGraphSettings settings) {
         explore.add(initialNode);
+        nodes.put(initialNode, initialNode);
+        inverted.put(initialNode, new HashSet<>());
 
         long start = System.currentTimeMillis() + settings.getTimeout();
 
@@ -39,13 +43,6 @@ public class LinearBuildStrategy implements IBuildStrategy {
 
             if ((start - System.currentTimeMillis()) < 0 || closed.size() == settings.getTotalClosedNodesLimit())
                 break;
-
-            if (state.getHeight() > settings.getHeightLimit() ||
-                    state.numberOfHypotheses() > settings.getHypothesesPerStateLimit())
-                continue;
-
-            if (graph.containsKey(state))
-                continue;
 
             Set<StateEdge> edges = new HashSet<>();
             graph.put(state, edges);
@@ -56,29 +53,47 @@ public class LinearBuildStrategy implements IBuildStrategy {
                 continue;
             }
 
-            if(explored >= settings.getTotalNodesLimit())
+            if (explored >= settings.getTotalNodesLimit())
                 break;
+
+            if (state.getHeight() + 1 > settings.getHeightLimit())
+                continue;
 
             for (TransitionEdge edge : transitionGraph.getEdges(state.getExp().getAST())) {
                 StateEdge e = new StateEdge(edge.getRule());
+
+                if (edge.hasProduces() && state.numberOfHypotheses() + 1 > settings.getHypothesesPerStateLimit())
+                    continue;
+
                 for (TransitionNode transition : edge.getTransitions()) {
                     StateNode newState = state.transit(transition.getTo(), transition.getProduces(),
                             transition.getFree());
 
-                    StateNode finalNewState = newState;
-                    newState = nodes.computeIfAbsent(newState, k -> finalNewState);
+                    boolean contains = nodes.containsKey(newState);
+
+                    if (contains) {
+                        newState = nodes.get(newState);
+                        inverted.get(newState).add(state);
+                    } else {
+                        nodes.put(newState, newState);
+                        Set<StateNode> nodes = new HashSet<>();
+                        nodes.add(state);
+                        inverted.put(newState, nodes);
+
+                        //graph.put(newState, null);
+                        explore.add(newState);
+                    }
 
                     e.addTransition(newState, transition.getProduces());
 
-                    inverted.computeIfAbsent(newState, k -> new HashSet<>()).add(state);
-
-                    if (!graph.containsKey(newState))
-                        explore.add(newState);
                 }
 
                 edges.add(e);
             }
         }
+
+        System.out.println("Nodes: " + graph.size());
+        System.out.println(closed.size());
 
     }
 

@@ -1,25 +1,26 @@
 package com.logic.nd.exceptions.rules;
 
+import com.logic.exps.ExpUtils;
+import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.binary.ASTConditional;
 import com.logic.feedback.FeedbackLevel;
 import com.logic.feedback.FeedbackType;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.binary.ASTEImp;
 import com.logic.nd.asts.others.ASTHypothesis;
+import com.logic.nd.exceptions.EFeedbackPosition;
 import com.logic.nd.exceptions.NDRuleException;
+import com.logic.nd.exceptions.NDTextException;
 
 import java.util.List;
 
 public class EImpException extends NDRuleException {
 
     private final ASTEImp rule;
-    private ASTConditional imp;
+    private final ASTConditional imp;
 
     public EImpException(ASTEImp rule) {
-        super(FeedbackType.SEMANTIC_ERROR);
-
-        this.rule = rule;
-
+        this(rule, null);
     }
 
     public EImpException(ASTEImp rule, ASTConditional imp) {
@@ -29,17 +30,56 @@ public class EImpException extends NDRuleException {
     }
 
     protected String produceFeedback(FeedbackLevel level) {
+        String error = "Error in this rule!";
+
         return switch (level) {
             case NONE -> "";
-            case LOW -> "Invalid rule!";
-            case MEDIUM -> "Invalid hypothesis!";
-            case HIGH ->
-                    imp != null ? "The first hypothesis and the conclusion should form the implication in the second hypothesis!"
-                            : "The second hypothesis should be an implication!";
-            case SOLUTION ->
-                    imp != null ? "The first hypothesis and the conclusion should form the implication in the second hypothesis!" +
-                            "Consider one of these changes: \n"
-                            : "The second hypothesis should be an implication!";
+            case LOW -> "Invalid rule application!";
+            case MEDIUM -> {
+                if(imp == null) rule.getHyp2().appendErrors(
+                        new NDTextException(EFeedbackPosition.CONCLUSION, "Something is wrong!"));
+                else {
+                    IASTExp left = ExpUtils.removeParenthesis(imp.getLeft());
+                    IASTExp right = ExpUtils.removeParenthesis(imp.getRight());
+
+                    if(!rule.getHyp1().getConclusion().equals(left)) rule.getHyp1().appendErrors(
+                            new NDTextException(EFeedbackPosition.CONCLUSION, "Something is wrong!"));
+                    if(!rule.getConclusion().equals(right)) rule.appendErrors(
+                            new NDTextException(EFeedbackPosition.CONCLUSION, "Something is wrong!"));
+                }
+                yield error;
+            }
+            case HIGH -> {
+                if(imp == null) rule.getHyp2().appendErrors(
+                        new NDTextException(EFeedbackPosition.CONCLUSION, "This must be an implication!"));
+                else {
+                    IASTExp left = ExpUtils.removeParenthesis(imp.getLeft());
+                    IASTExp right = ExpUtils.removeParenthesis(imp.getRight());
+
+                    if(!rule.getHyp1().getConclusion().equals(left)) rule.getHyp1().appendErrors(
+                            new NDTextException(EFeedbackPosition.CONCLUSION, "This must be "+left+"!"));
+                    if(!rule.getConclusion().equals(right)) rule.appendErrors(
+                            new NDTextException(EFeedbackPosition.CONCLUSION, "This must be "+right+"!"));
+                }
+                yield error;
+            }
+            case SOLUTION -> {
+                if(imp == null)
+                    rule.getHyp2().appendErrors(
+                        new NDTextException(EFeedbackPosition.CONCLUSION, "This must be an implication!"));
+                else {
+                    IASTExp left = ExpUtils.removeParenthesis(imp.getLeft());
+                    IASTExp right = ExpUtils.removeParenthesis(imp.getRight());
+
+                    if(!rule.getHyp1().getConclusion().equals(left)) rule.getHyp1().appendErrors(
+                            new NDTextException(EFeedbackPosition.CONCLUSION, "This must be "+left+"!"));
+                    if(!rule.getConclusion().equals(right)) rule.appendErrors(
+                            new NDTextException(EFeedbackPosition.CONCLUSION, "This must be "+right+"!"));
+                }
+
+                if(imp != null) error += "\nPossible solution:";
+                yield error;
+            }
 
         };
     }
@@ -47,13 +87,12 @@ public class EImpException extends NDRuleException {
     @Override
     public List<IASTND> getPreviews(FeedbackLevel level) {
         if (imp != null && level.equals(FeedbackLevel.SOLUTION)) {
+            IASTExp left = ExpUtils.removeParenthesis(imp.getLeft());
+            IASTExp right = ExpUtils.removeParenthesis(imp.getRight());
+
             return List.of(
-                    new ASTEImp(new ASTHypothesis(rule.getHyp1().getConclusion(), null),
-                            new ASTHypothesis(new ASTConditional(rule.getHyp1().getConclusion(), rule.getConclusion()), null),
-                            rule.getConclusion()),
-                    new ASTEImp(new ASTHypothesis(imp.getLeft(), null),
-                            new ASTHypothesis(rule.getHyp2().getConclusion(), null),
-                            imp.getRight()));
+                    new ASTEImp(new ASTHypothesis(left, null),
+                            new ASTHypothesis(imp, null), right));
         }
         return null;
     }

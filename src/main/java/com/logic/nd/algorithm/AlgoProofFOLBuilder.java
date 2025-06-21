@@ -56,12 +56,13 @@ public class AlgoProofFOLBuilder {
         terms.addAll(initialState.terms);
 
         StateGraphSettings s = algoSettingsBuilder.build();
-        Set<IFormula> assumptions = new HashSet<>(problem.premises);
-        assumptions.addAll(problem.hypotheses);
-        assumptions.addAll(initialState.hypotheses);
-        assumptions.add(initialState.state);
+        Set<IFormula> expressions = new HashSet<>(problem.premises);
+        expressions.add(problem.state);
+        expressions.addAll(problem.hypotheses);
+        expressions.addAll(initialState.hypotheses);
+        expressions.add(initialState.state);
 
-        ITransitionGraph tg = new TransitionGraphFOL(problem.state, assumptions, forbiddenRules, terms);
+        ITransitionGraph tg = new TransitionGraphFOL(expressions, forbiddenRules, terms);
         tg.build();
 
         IStateGraph sg = new StateGraphFOL(problem, initialState, tg, s);

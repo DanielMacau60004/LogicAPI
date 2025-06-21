@@ -48,7 +48,7 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, IASTExp>>
     public Void visit(ASTIImp r, Env<String, IASTExp> env) {
         if (r.hasErrors()) return null;
         env = env.beginScope();
-        if (r.getM() != null)
+        if (r.getCloseM() != null)
             env.bind(r.getM(), r.getCloseM());
         r.getHyp().accept(this, env);
         env.endScope();
@@ -59,7 +59,7 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, IASTExp>>
     public Void visit(ASTINeg r, Env<String, IASTExp> env) {
         if (r.hasErrors()) return null;
         env = env.beginScope();
-        if (r.getM() != null)
+        if (r.getCloseM() != null)
             env.bind(r.getM(), r.getCloseM());
         r.getHyp().accept(this, env);
         env.endScope();
@@ -94,7 +94,7 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, IASTExp>>
     public Void visit(ASTAbsurdity r, Env<String, IASTExp> env) {
         if (r.hasErrors()) return null;
         env = env.beginScope();
-        if (r.getM() != null)
+        if (r.getCloseM() != null)
             env.bind(r.getM(), r.getCloseM());
         r.getHyp().accept(this, env);
         env.endScope();
@@ -115,13 +115,13 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, IASTExp>>
         r.getHyp1().accept(this, env);
 
         env = env.beginScope();
-        if (r.getM() != null)
+        if (r.getCloseM() != null)
             env.bind(r.getM(), r.getCloseM());
         r.getHyp2().accept(this, env);
         env.endScope();
 
         env = env.beginScope();
-        if (r.getN() != null)
+        if (r.getCloseN() != null)
             env.bind(r.getN(), r.getCloseN());
         r.getHyp3().accept(this, env);
         env.endScope();
@@ -183,7 +183,7 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, IASTExp>>
             return null;
         }
 
-        for (Map.Entry<String, IASTExp> e : env.map().entrySet()) {
+        for (Map.Entry<String, IASTExp> e : env.mapParent().entrySet()) {
             IFOLFormula formula = (IFOLFormula) formulas.get(e.getValue());
 
             if (formula.appearsFreeVariable(r.getMapping())) {
@@ -212,7 +212,7 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, IASTExp>>
             return null;
         }
 
-        for (Map.Entry<String, IASTExp> e : env.map().entrySet()) {
+        for (Map.Entry<String, IASTExp> e : env.mapParent().entrySet()) {
             IFOLFormula formula = (IFOLFormula) formulas.get(e.getValue());
 
             if (!e.getValue().equals(r.getCloseM()) && formula != null && formula.appearsFreeVariable(r.getMapping())) {
@@ -224,7 +224,7 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, IASTExp>>
         r.getHyp1().accept(this, env);
 
         env = env.beginScope();
-        if (r.getM() != null)
+        if (r.getCloseM() != null)
             env.bind(r.getM(), r.getCloseM());
         r.getHyp2().accept(this, env);
         env.endScope();

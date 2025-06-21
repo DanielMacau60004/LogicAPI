@@ -25,8 +25,8 @@ public class ConclusionException extends NDRuleException {
         return switch (level) {
             case NONE -> "";
             case LOW, MEDIUM -> "This tree doesn't solve the problem!";
-            case HIGH, SOLUTION -> "This tree doesn't solve the problem! " +
-                    "You proved: " +
+            case HIGH, SOLUTION -> "This tree doesn't solve the problem!\n" +
+                    "You proved:\n" +
                     (premises != null && !premises.isEmpty()
                             ? "{"+premises.stream().map(Object::toString).collect(Collectors.joining(", "))+"} "
                             : "") +

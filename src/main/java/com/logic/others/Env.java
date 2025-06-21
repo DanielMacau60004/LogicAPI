@@ -1,9 +1,6 @@
 package com.logic.others;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Env<K, T> {
 
@@ -34,15 +31,28 @@ public class Env<K, T> {
         table.remove(id);
     }
 
-    public Map<K, T> map() {
-        return map(new LinkedHashMap<>());
+    public Map<K, T> mapParent() {
+        return mapParent(new LinkedHashMap<>());
     }
 
-    private Map<K, T> map(Map<K, T> map) {
+    private Map<K, T> mapParent(Map<K, T> map) {
         if (prev != null)
-            map = prev.map(map);
+            map = prev.mapParent(map);
         map.putAll(table); // Merge current table values
         return map;
+    }
+
+    public Map<K, T> mapChild() {
+        Map<K, T> map = new LinkedHashMap<>();
+        mapChild(map);
+        return map;
+    }
+
+    private void mapChild(Map<K, T> map) {
+        map.putAll(table);
+
+        for (Env<K, T> child : children)
+            child.mapChild(map);
     }
 
     public T findParent(K id) {
@@ -67,6 +77,25 @@ public class Env<K, T> {
         }
 
         return value;
+    }
+
+    public void removeAllChildren(K id) {
+        table.remove(id);
+        for (Env<K, T> child : children)
+            child.removeAllChildren(id);
+    }
+
+    public Set<K> getMatching(T value) {
+        Set<K> set = new HashSet<>();
+        getMatching(value, set);
+        return set;
+    }
+
+    private void getMatching(T value, Set<K> list) {
+        list.addAll(table.entrySet().stream().filter(k -> k.getValue().toString().equals(value.toString()))
+                .map(Map.Entry::getKey).toList());
+        if (prev != null)
+            prev.getMatching(value, list);
     }
 
     public Env<K, T> beginScope() {

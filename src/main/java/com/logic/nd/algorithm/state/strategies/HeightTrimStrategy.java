@@ -3,15 +3,12 @@ package com.logic.nd.algorithm.state.strategies;
 import com.logic.nd.algorithm.state.StateEdge;
 import com.logic.nd.algorithm.state.StateNode;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 public class HeightTrimStrategy implements ITrimStrategy {
 
-    //Can be slower than HeightTrimStrategy as is some cases require to pass thought the same node and edge multiple times
-    //The worst case is O(n^2)
+    //The final answer may differ, it always returns solutions with the lowest height possible
+    //It is faster time complexity O(E+N)
     @Override
     public Map<StateNode, StateEdge> trim(IBuildStrategy buildStrategy) {
         Queue<StateNode> explore = buildStrategy.getClosedNodes();
@@ -19,38 +16,29 @@ public class HeightTrimStrategy implements ITrimStrategy {
         Map<StateNode, Set<StateNode>> inverted = buildStrategy.getInvertedGraph();
 
         Map<StateNode, StateEdge> tree = new HashMap<>();
-        Map<StateNode, Integer> explored = new HashMap<>();
-
-        //Reset heights
-        graph.keySet().forEach(node -> node.setHeight(node.isClosed() ? 1 : -1));
+        Set<StateNode> explored = new HashSet<>();
 
         while (!explore.isEmpty()) {
             StateNode state = explore.poll();
             tree.putIfAbsent(state, null);
             state.setClosed();
 
-            if (explored.get(state) != null && explored.get(state) <= state.getHeight()) continue;
-            explored.put(state, state.getHeight());
+            if (explored.contains(state)) continue;
+            explored.add(state);
 
             if (inverted.get(state) != null) {
                 for (StateNode to : inverted.get(state)) {
                     Set<StateEdge> edges = graph.get(to);
                     if (edges != null) {
-                        edges.removeIf(e -> {
-                            if (!e.isClosed()) return false;
 
-                            //Ignore node because there is a smaller path to that node
-                            if (to.getHeight() > 0 && to.getHeight() <= e.height() + 1) return true;
-
-                            to.setHeight(e.height() + 1);
-
+                        Optional<StateEdge> e = edges.stream().filter(StateEdge::isClosed).findFirst();
+                        if (e.isPresent()) {
                             explore.add(to);
-                            tree.put(to, e);
 
-                            return true;
-                        });
+                            if (!tree.containsKey(to))
+                                tree.put(to, e.get());
+                        }
                     }
-
                 }
             }
         }

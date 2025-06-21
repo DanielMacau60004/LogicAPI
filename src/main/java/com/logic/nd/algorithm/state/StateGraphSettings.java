@@ -1,11 +1,8 @@
 package com.logic.nd.algorithm.state;
 
-import com.logic.api.IFormula;
-import com.logic.nd.algorithm.AlgoProofFOLStateBuilder;
 import com.logic.nd.algorithm.state.strategies.IBuildStrategy;
 import com.logic.nd.algorithm.state.strategies.ITrimStrategy;
 
-import java.util.Set;
 
 public class StateGraphSettings {
 

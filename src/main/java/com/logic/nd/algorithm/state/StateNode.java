@@ -10,28 +10,31 @@ public class StateNode {
 
     protected final BitGraphHandler handler; //TODO this is object does not change
 
-    private final int exp;
-    private final BitSet hypotheses;
-    private final BitSet noFree;
+    private final short exp;
+    private final BitArray assumptions;
+    private final BitArray noFree;
     private boolean isClosed;
     private int height;
+    private final int hash;
 
-    public StateNode(Integer exp, BitSet hypotheses, int height, BitSet noFree, BitGraphHandler handler) {
-        this(exp, hypotheses, null, height, noFree, handler);
+    public StateNode(Short exp, BitArray assumptions, int height, BitArray noFree, BitGraphHandler handler) {
+        this(exp, assumptions, null, height, noFree, handler);
     }
 
-    StateNode(Integer exp, BitSet hypotheses, Integer hypothesis, int height
-            , BitSet noFree, BitGraphHandler handler) {
+    StateNode(Short exp, BitArray assumptions, Short assumption, int height
+            , BitArray noFree, BitGraphHandler handler) {
         this.exp = exp;
-        this.hypotheses = hypotheses;
+        this.assumptions = assumptions;
         this.height = height;
         this.noFree = noFree;
         this.handler = handler;
 
-        if (hypothesis != null)
-            hypotheses.set(hypothesis);
+        if (assumption != null)
+            assumptions.set(assumption);
 
         resetClose();
+
+        hash = Objects.hash(assumptions, exp, noFree);
     }
 
     public int getHeight() {
@@ -55,46 +58,44 @@ public class StateNode {
     }
 
     public void resetClose() {
-        isClosed = (hypotheses.get(exp) || handler.getPremises().get(exp)) && (noFree == null || !noFree.get(exp));
+        isClosed = (assumptions.contains(exp) || handler.getPremises().contains(exp))
+                && (noFree == null || !noFree.contains(exp));
     }
 
     public Integer numberOfHypotheses() {
-        return hypotheses.cardinality();
+        return assumptions.length();
     }
 
-    public Set<IFormula> getHypotheses() {
-        return handler.fromBitSet(hypotheses);
+    public Set<IFormula> getAssumptions() {
+        return handler.fromBitSet(assumptions);
     }
 
-    public StateNode transit(IFormula exp, IFormula hypothesis, ASTVariable notFree) {
-        BitSet noFree = this.noFree;
+    public StateNode transit(IFormula exp, IFormula assumption, ASTVariable notFree) {
+        BitArray noFree = this.noFree;
 
         if (notFree != null) {
-            noFree = (BitSet) this.noFree.clone();
+            noFree = new BitArray(this.noFree);
 
-            List<Integer> toAdd = new LinkedList<>();
-            for (int i = hypotheses.nextSetBit(0); i >= 0; i = hypotheses.nextSetBit(i + 1))
+            for (short i : assumptions.getData())
                 if (((IFOLFormula) handler.get(i)).appearsFreeVariable(notFree))
-                    toAdd.add(i);
+                    noFree.set(i);
 
-            BitSet premises = handler.getPremises();
-            for (int i = premises.nextSetBit(0); i >= 0; i = premises.nextSetBit(i + 1))
+            BitArray premises = handler.getPremises();
+            for (short i : premises.getData())
                 if (((IFOLFormula) handler.get(i)).appearsFreeVariable(notFree))
-                    toAdd.add(i);
-
-            for (Integer i : toAdd) noFree.set(i);
+                    noFree.set(i);
         }
 
-        BitSet hypotheses = this.hypotheses;
-        if (hypothesis != null) {
-            hypotheses = (BitSet) this.hypotheses.clone();
-            hypotheses.set(handler.getIndex(hypothesis));
+        BitArray assumptions = this.assumptions;
+        if (assumption != null) {
+            assumptions = new BitArray(this.assumptions);
+            assumptions.set(handler.getIndex(assumption));
         }
 
-        if (hypothesis != null)
-            return new StateNode(handler.getIndex(exp), hypotheses, handler.getIndex(hypothesis),
+        if (assumption != null)
+            return new StateNode(handler.getIndex(exp), assumptions, handler.getIndex(assumption),
                     height + 1, noFree, handler);
-        return new StateNode(handler.getIndex(exp), hypotheses, height + 1, noFree, handler);
+        return new StateNode(handler.getIndex(exp), assumptions, height + 1, noFree, handler);
     }
 
     @Override
@@ -103,13 +104,13 @@ public class StateNode {
         if (o == null || getClass() != o.getClass()) return false;
 
         StateNode stateNode = (StateNode) o;
-        return Objects.equals(hypotheses, stateNode.hypotheses) && Objects.equals(exp, stateNode.exp)
+        return exp == stateNode.exp && Objects.equals(assumptions, stateNode.assumptions)
                 && Objects.equals(noFree, stateNode.noFree);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(hypotheses, exp, noFree);
+        return hash;
     }
 
 }

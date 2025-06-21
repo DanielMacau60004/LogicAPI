@@ -1,22 +1,21 @@
 package com.logic.nd.algorithm.state;
 
 import com.logic.api.IFormula;
-import com.logic.others.Utils;
 
 import java.util.*;
 
 public class BitGraphHandler {
 
-    private final Map<IFormula, Integer> indexedFormulas;
-    private final Map<Integer, IFormula> formulas;
+    private final Map<IFormula, Short> indexedFormulas;
+    private final Map<Short, IFormula> formulas;
 
-    private final BitSet premises;
+    private final BitArray premises;
 
     public BitGraphHandler(Set<IFormula> premises, Set<IFormula> formulas) {
         this.indexedFormulas  = new HashMap<>(formulas.size());
         this.formulas  = new HashMap<>(premises.size());
 
-        int index = 1;
+        short index = 1;
         for(IFormula formula : formulas) {
             this.indexedFormulas.put(formula, index);
             this.formulas.put(index++, formula);
@@ -25,24 +24,24 @@ public class BitGraphHandler {
         this.premises = toBitSet(premises);
     }
 
-    public Set<IFormula> fromBitSet(BitSet bitSet) {
+    public Set<IFormula> fromBitSet(BitArray bitArray) {
         Set<IFormula> result = new HashSet<>();
-        for (int i = bitSet.nextSetBit(0); i >= 0; i = bitSet.nextSetBit(i + 1)) {
+        for (short i : bitArray.getData()) {
             result.add(formulas.get(i));
         }
         return result;
     }
-    public BitSet toBitSet(Set<IFormula> set) {
-        BitSet bitSet = new BitSet(formulas.size());
-        for (IFormula f : set) {
-            bitSet.set(indexedFormulas.get(f));
-        }
-        return bitSet;
+    public BitArray toBitSet(Set<IFormula> set) {
+        BitArray bitArray = new BitArray();
+        for (IFormula f : set)
+            bitArray.set(indexedFormulas.get(f));
+
+        return bitArray;
     }
 
-    public BitSet getPremises() {return premises;}
+    public BitArray getPremises() {return premises;}
 
-    public int getIndex(IFormula formula) {return indexedFormulas.get(formula);}
-    public IFormula get(int index) {return formulas.get(index);}
+    public short getIndex(IFormula formula) {return indexedFormulas.get(formula);}
+    public IFormula get(short index) {return formulas.get(index);}
 
 }

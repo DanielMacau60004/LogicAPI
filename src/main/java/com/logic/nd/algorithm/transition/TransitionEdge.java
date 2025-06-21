@@ -12,6 +12,7 @@ public class TransitionEdge {
 
     private final ERule rule;
     private final List<TransitionNode> transitions;
+    private boolean produces;
 
     TransitionEdge(ERule rule, IFormula to, IFormula produces) {
         this(rule);
@@ -26,15 +27,22 @@ public class TransitionEdge {
     TransitionEdge(ERule rule) {
         this.rule = rule;
         this.transitions = new LinkedList<>();
+        this.produces = false;
+    }
+
+    public boolean hasProduces() {
+        return produces;
     }
 
     public TransitionEdge addTransition(IFormula to, IFormula produces, ASTVariable free) {
         transitions.add(new TransitionNode(to, produces, free));
+        this.produces = produces != null;
         return this;
     }
 
     public TransitionEdge addTransition(IFormula to, IFormula produces) {
         transitions.add(new TransitionNode(to, produces, null));
+        this.produces = produces != null;
         return this;
     }
 

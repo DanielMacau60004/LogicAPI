@@ -17,8 +17,7 @@ public class TransitionGraphPL implements ITransitionGraph {
 
     protected final Map<IASTExp, IFormula> formulas;
 
-    protected final IFormula conclusion;
-    protected final Set<IFormula> premisses;
+    protected final Set<IFormula> expressions;
     protected final Set<ERule> forbiddenRules;
 
     protected final Map<IASTExp, Set<TransitionEdge>> graph;
@@ -26,9 +25,8 @@ public class TransitionGraphPL implements ITransitionGraph {
 
     protected final Set<ASTOr> disjunctions;
 
-    public TransitionGraphPL(IFormula conclusion, Set<IFormula> premisses, Set<ERule> forbiddenRules) {
-        this.conclusion = conclusion;
-        this.premisses = premisses;
+    public TransitionGraphPL(Set<IFormula> expressions, Set<ERule> forbiddenRules) {
+        this.expressions = expressions;
         this.forbiddenRules = forbiddenRules;
 
         formulas = new HashMap<>();
@@ -43,8 +41,7 @@ public class TransitionGraphPL implements ITransitionGraph {
     public void build() {
         //Add all nodes necessary to generate the sub nodes
         addNode(ExpUtils.BOT, true);
-        addNode(conclusion.getAST(), true);
-        premisses.forEach(p -> addNode(p.getAST(), true));
+        expressions.forEach(p -> addNode(p.getAST(), true));
 
         //Add the disjunction rules to each node
         if (!forbiddenRules.contains(ERule.ELIM_DISJUNCTION))
@@ -63,7 +60,7 @@ public class TransitionGraphPL implements ITransitionGraph {
         explored.put(node, canGen);
         graph.put(node, new HashSet<>());
         getFormula(node);
-        if (!node.equals(conclusion) && node instanceof ASTOr or)
+        if (node instanceof ASTOr or)
             disjunctions.add(or);
 
         if (canGen) {

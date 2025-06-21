@@ -160,7 +160,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
     public Void visit(ASTAbsurdity r, Void env) {
         if(r.hasErrors()) return null;
         if (!r.getHyp().getConclusion().equals(ExpUtils.BOT)) {
-            r.appendErrors(new AbsurdityException());
+            r.appendErrors(new AbsurdityException(r));
             return null;
         }
 
@@ -246,7 +246,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         IASTExp exp = r.getConclusion();
 
         if (!exp.equals(ExpUtils.BOT)) {
-            r.appendErrors(new ENegException(r));
+            r.appendErrors(new ENegException(r, r.getHyp1().getConclusion()));
             return null;
         }
 
@@ -254,7 +254,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         IASTExp rightNot = ExpUtils.invert(r.getHyp1().getConclusion());
         if (!r.getHyp1().getConclusion().equals(leftNot) &&
                 !r.getHyp2().getConclusion().equals(rightNot)) {
-            r.appendErrors(new ENegException(r, leftNot, rightNot));
+            r.appendErrors(new ENegException(r, r.getHyp1().getConclusion()));
             return null;
         }
 

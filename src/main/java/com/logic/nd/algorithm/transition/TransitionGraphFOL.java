@@ -20,9 +20,9 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
     private final Set<ASTExistential> existentials;
     private final Set<AASTTerm> terms;
 
-    public TransitionGraphFOL(IFOLFormula conclusion, Set<IFormula> assumptions, Set<ERule> forbiddenRules,
+    public TransitionGraphFOL(Set<IFormula> expressions, Set<ERule> forbiddenRules,
                               Set<AASTTerm> terms) {
-        super(conclusion, assumptions, forbiddenRules);
+        super(expressions, forbiddenRules);
         this.terms = terms;
 
         existentials = new HashSet<>();
@@ -45,7 +45,7 @@ public class TransitionGraphFOL extends TransitionGraphPL implements ITransition
     protected void addNode(IASTExp node, boolean canGen) {
         super.addNode(node, canGen);
 
-        if (!node.equals(conclusion) && node instanceof ASTExistential exi)
+        if (node instanceof ASTExistential exi)
             existentials.add(exi);
     }
 

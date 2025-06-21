@@ -53,12 +53,13 @@ public class AlgoProofPLBuilder {
             initialState = problem;
 
         StateGraphSettings s = algoSettingsBuilder.build();
-        Set<IFormula> assumptions = new HashSet<>(problem.premises);
-        assumptions.addAll(problem.hypotheses);
-        assumptions.addAll(initialState.hypotheses);
-        assumptions.add(initialState.state);
+        Set<IFormula> expressions = new HashSet<>(problem.premises);
+        expressions.add(problem.state);
+        expressions.addAll(problem.hypotheses);
+        expressions.addAll(initialState.hypotheses);
+        expressions.add(initialState.state);
 
-        ITransitionGraph tg = new TransitionGraphPL(problem.state, assumptions, forbiddenRules);
+        ITransitionGraph tg = new TransitionGraphPL(expressions, forbiddenRules);
         tg.build();
 
         //System.out.println(Utils.getToken(tg.toString()));
@@ -66,7 +67,7 @@ public class AlgoProofPLBuilder {
         IStateGraph sg = new StateGraphPL(problem, initialState, tg, s);
         sg.build();
 
-        System.out.println(Utils.getToken(sg.toString()));
+        //System.out.println(Utils.getToken(sg.toString()));
 
         return new StateSolution(sg, false).findSolution();
     }

@@ -294,3 +294,31 @@
 
 
 [∀I] [∀x (∃y P(x,y) ∨ Q(x,x)). [∨E, 2, 3] [∃y P(x,y) ∨ Q(x,x). [∀E] [P(x,x) ∨ ∀y Q(x,y). [H, 1] [∀x (P(x,x) ∨ ∀y Q(x,y)).]] [∨Ir] [∃y P(x,y) ∨ Q(x,x). [∃I] [∃y P(x,y). [H, 2] [P(x,x).]]] [∨Il] [∃y P(x,y) ∨ Q(x,x). [∀E] [Q(x,x). [H, 3] [∀y Q(x,y).]]]]]
+
+
+
+[∀I] [∀x ∃y L(x,y).
+	[∃E,3] [∃y L(x,y).
+		[H,1] [∃x ∀y L(x,y).]
+		[∃I] [∃y L(x,y).
+			[→E] [L(x,a).
+				[∀E] [L(a,x).
+					[H,3] [∀y L(a,y).]]
+				[∀E] [L(a,x) → L(x,a).
+					[∀E] [∀y (L(a,y) → L(y,a)).
+						[H,2] [∀x ∀y (L(x,y) → L(y,x)).]]]]]]]
+
+
+[⊥,3] [∀x ∃y L(x,y).
+	[¬E] [⊥.
+		[∃E,4] [∀x ∃y L(x,y).
+			[H,1] [∃x ∀y L(x,y).]
+			[∀I] [∀x ∃y L(x,y).
+				[∃I] [∃y L(x,y).
+					[→E] [L(x,a).
+						[∀E] [L(a,x).
+							[H,4] [∀y L(a,y).]]
+						[∀E] [L(a,x) → L(x,a).
+							[∀E] [∀y (L(a,y) → L(y,a)).
+								[H,2] [∀x ∀y (L(x,y) → L(y,x)).]]]]]]]
+		[H,3] [¬∀x ∃y L(x,y).]]]

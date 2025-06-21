@@ -9,12 +9,23 @@ import java.util.List;
 
 public abstract class NDRuleException extends FeedbackException {
 
+    private final EFeedbackPosition position;
+
     public NDRuleException(FeedbackType type) {
         super(type);
+        this.position = EFeedbackPosition.RULE;
+    }
+
+    public NDRuleException(FeedbackType type, EFeedbackPosition position) {
+        super(type);
+        this.position = position;
     }
 
     public List<IASTND> getPreviews(FeedbackLevel level) {
         return null;
     }
 
+    public EFeedbackPosition getPosition() {
+        return position;
+    }
 }

@@ -99,8 +99,8 @@ public class FOLWFFInterpreter implements IExpsVisitor<Void, Env<String, ASTVari
     @Override
     public Void visit(ASTArbitrary e, Env<String, ASTVariable> env) {
         Set<ASTVariable> bounded = generics.get(e);
-        if (bounded != null) bounded.addAll(env.map().values());
-        else bounded = new HashSet<>(env.map().values());
+        if (bounded != null) bounded.addAll(env.mapParent().values());
+        else bounded = new HashSet<>(env.mapParent().values());
 
         generics.put(e, bounded);
         return null;

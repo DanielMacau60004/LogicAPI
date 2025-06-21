@@ -2,6 +2,7 @@ package com.logic.exps;
 
 import com.logic.api.IFOLFormula;
 import com.logic.api.IPLFormula;
+import com.logic.exps.asts.others.ASTLiteral;
 import com.logic.exps.interpreters.FOLWFFInterpreter;
 import com.logic.exps.interpreters.PLWFFInterpreter;
 import com.logic.exps.exceptions.ExpException;

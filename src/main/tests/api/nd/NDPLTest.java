@@ -9,6 +9,7 @@ import com.logic.nd.algorithm.AlgoProofPLProblemBuilder;
 import com.logic.nd.algorithm.AlgoProofPLStateBuilder;
 import com.logic.nd.algorithm.AlgoSettingsBuilder;
 import com.logic.nd.algorithm.state.strategies.HeightTrimStrategy;
+import com.logic.nd.algorithm.state.strategies.SizeTrimStrategy;
 import com.logic.others.Utils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -289,6 +290,36 @@ public class NDPLTest {
         });
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "a → ¬¬a"
+    })
+    void testSingle2(String premisesAndExpression) throws Exception {
+        String[] parts = premisesAndExpression.split(",");
+        String expression = parts[parts.length - 1].trim();
+
+        Set<IPLFormula> premises = new HashSet<>();
+        for (int i = 0; i < parts.length - 1; i++) {
+            premises.add(LogicAPI.parsePL(parts[i].trim()));
+        }
+
+        Assertions.assertDoesNotThrow(() -> {
+            INDProof proof = new AlgoProofPLBuilder(
+                    new AlgoProofPLProblemBuilder(LogicAPI.parsePL(expression))
+                            .addPremises(premises))
+                    .setInitialState(new AlgoProofPLStateBuilder(LogicAPI.parsePL("(¬a ∨ ¬¬a) → (a → ¬¬a)"))
+                            .addHypothesis(LogicAPI.parsePL("a")))
+                    .setAlgoSettingsBuilder(
+                            new AlgoSettingsBuilder()
+                            .setTrimStrategy(new SizeTrimStrategy())
+                            //.setBuildStrategy(new LinearBuildStrategy())
+                    )
+                    .build();
+            System.out.println("Size: " + proof.size() + " Height: " + proof.height());
+            System.out.println(proof);
+        });
+    }
+
 
     @ParameterizedTest
     @ValueSource(strings = {
@@ -316,7 +347,10 @@ public class NDPLTest {
             "(((p ∧ q) ∨ (p ∧ ¬q)) ∨ (¬p ∧ q)) ∨ (¬p ∧ ¬q)",
             "a → ¬¬ a ",
             "(((p → (q ∨ s)) ∧ ((p ∧ r) → s)) ∧ ((s ∧ t) → (p ∨ ¬q))) → (((p ∧ (q → r)) → s) ∧ (((q ∧ s) ∧ t) → p))",
-            "((p ∨ q) ∨ (r ∨ s)) → ((p ∨ s) ∨ (r ∨ q))"
+            "((p ∨ q) ∨ (r ∨ s)) → ((p ∨ s) ∨ (r ∨ q))",
+            "(s ∨ t) → (s → ¬t), (s → ¬t) → (t → k), s ∨ t, s ∨ k",
+            "(¬a ∨ ¬b) → ((c → (a ∧ b)) → ¬c)"
+
     })
     void testSpecific(String premisesAndExpression) throws Exception {
         String[] parts = premisesAndExpression.split(",");
@@ -334,9 +368,11 @@ public class NDPLTest {
                     .setAlgoSettingsBuilder(
                             new AlgoSettingsBuilder()
                                     //.setHypothesesPerState(5)
-                                    //.setTimeout(10000)
+                                    .setTimeout(1500)
+                                    //.setTimeout(Integer.MAX_VALUE)
+                                    .setHypothesesPerState(Integer.MAX_VALUE)
                                     .setTotalClosedNodes(Integer.MAX_VALUE)
-                                    .setTrimStrategy(new HeightTrimStrategy())
+                                    .setTrimStrategy(new SizeTrimStrategy())
                     )
                     .build();
             System.out.println("Size: " + proof.size() + " Height: " + proof.height());

@@ -1,13 +1,10 @@
 package com.logic.nd.algorithm;
 
-import com.logic.api.IFormula;
 import com.logic.nd.algorithm.state.StateGraphSettings;
 import com.logic.nd.algorithm.state.strategies.IBuildStrategy;
 import com.logic.nd.algorithm.state.strategies.ITrimStrategy;
 import com.logic.nd.algorithm.state.strategies.LinearBuildStrategy;
-import com.logic.nd.algorithm.state.strategies.WidthTrimStrategy;
-
-import java.util.Set;
+import com.logic.nd.algorithm.state.strategies.HeightTrimStrategy;
 
 public class AlgoSettingsBuilder {
 
@@ -19,7 +16,7 @@ public class AlgoSettingsBuilder {
     private long timeout = 5000; //In milliseconds
 
     private IBuildStrategy buildStrategy = new LinearBuildStrategy();
-    private ITrimStrategy trimStrategy = new WidthTrimStrategy();
+    private ITrimStrategy trimStrategy = new HeightTrimStrategy();
 
     public AlgoSettingsBuilder setHeightLimit(int heightLimit) {
         this.heightLimit = heightLimit;

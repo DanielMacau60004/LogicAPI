@@ -1,6 +1,5 @@
 package com.logic.nd.interpreters;
 
-import com.logic.api.IFOLFormula;
 import com.logic.api.IFormula;
 import com.logic.api.INDProof;
 import com.logic.exps.asts.IASTExp;
@@ -19,7 +18,6 @@ import com.logic.nd.exceptions.NDException;
 import com.logic.nd.exceptions.NDRuleException;
 import com.logic.nd.exceptions.PremiseException;
 import com.logic.others.Env;
-import com.logic.others.Utils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -63,7 +61,7 @@ public class NDInterpretProblem implements INDVisitor<Void, Env<String, IASTExp>
             return null;
 
         if (!premises.contains(h.getConclusion())) {
-            NDRuleException exception = new PremiseException(h.getConclusion(), premises);
+            NDRuleException exception = new PremiseException(h.getConclusion(), h.getM() != null, premises, env);
             h.appendErrors(exception);
             errors.add(exception);
         }

@@ -1,12 +1,16 @@
 package com.logic.nd.exceptions.rules;
 
+import com.logic.exps.ExpUtils;
+import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.binary.ASTAnd;
 import com.logic.feedback.FeedbackLevel;
 import com.logic.feedback.FeedbackType;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.ASTERConj;
+import com.logic.nd.exceptions.EFeedbackPosition;
 import com.logic.nd.exceptions.NDRuleException;
+import com.logic.nd.exceptions.NDTextException;
 
 import java.util.List;
 
@@ -27,16 +31,42 @@ public class ERConjException extends NDRuleException {
     }
 
     protected String produceFeedback(FeedbackLevel level) {
+        String error = "Error in this rule!";
         return switch (level) {
             case NONE -> "";
-            case LOW -> "Invalid rule!";
-            case MEDIUM -> "Invalid hypothesis!";
-            case HIGH -> and != null ? "The left-hand side of the conjunction is not the same as the conclusion!"
-                    : "The hypothesis should be a conjunction!";
-            case SOLUTION -> and != null ? "The left-hand side of the conjunction is not the same as the conclusion! " +
-                    "Consider changing these changes: "
-                    : "The hypothesis should be a conjunction!";
-
+            case LOW -> "Invalid rule application!";
+            case MEDIUM -> {
+                if(and == null) rule.getHyp().appendErrors(
+                        new NDTextException(EFeedbackPosition.CONCLUSION, "Something is wrong!"));
+                else {
+                    IASTExp left = ExpUtils.removeParenthesis(and.getLeft());
+                    if (left != rule.getConclusion()) rule.appendErrors(
+                            new NDTextException(EFeedbackPosition.CONCLUSION, "Something is wrong!"));
+                }
+                yield error;
+            }
+            case HIGH -> {
+                if(and == null) rule.getHyp().appendErrors(
+                        new NDTextException(EFeedbackPosition.CONCLUSION, "This must be a conjunction!"));
+                else {
+                    IASTExp left = ExpUtils.removeParenthesis(and.getLeft());
+                    if (left != rule.getConclusion()) rule.appendErrors(
+                            new NDTextException(EFeedbackPosition.CONCLUSION, "This must be " + left + "!"));
+                }
+                yield error;
+            }
+            case SOLUTION -> {
+                if(and == null)
+                    rule.getHyp().appendErrors(
+                            new NDTextException(EFeedbackPosition.CONCLUSION, "This must be a conjunction!"));
+                else {
+                    IASTExp left = ExpUtils.removeParenthesis(and.getLeft());
+                    if (left != rule.getConclusion()) rule.appendErrors(
+                            new NDTextException(EFeedbackPosition.CONCLUSION, "This must be " + left + "!"));
+                }
+                if(and != null) error += "\nPossible solution:";
+                yield error;
+            }
         };
     }
 
@@ -44,10 +74,8 @@ public class ERConjException extends NDRuleException {
     public List<IASTND> getPreviews(FeedbackLevel level) {
         if (and != null && level.equals(FeedbackLevel.SOLUTION)) {
             return List.of(
-                    new ASTERConj(new ASTHypothesis(new ASTAnd(rule.getConclusion(), and.getRight()),null),
-                            rule.getConclusion()),
-                    new ASTERConj(new ASTHypothesis(rule.getHyp().getConclusion(),null),
-                            and.getLeft()));
+                    new ASTERConj(new ASTHypothesis(and, null),
+                            ExpUtils.removeParenthesis(and.getLeft())));
         }
         return null;
     }

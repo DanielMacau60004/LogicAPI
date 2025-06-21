@@ -6,7 +6,9 @@ import com.logic.feedback.FeedbackType;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.others.ASTEDis;
 import com.logic.nd.asts.others.ASTHypothesis;
+import com.logic.nd.exceptions.EFeedbackPosition;
 import com.logic.nd.exceptions.NDRuleException;
+import com.logic.nd.exceptions.NDTextException;
 
 import java.util.List;
 
@@ -16,8 +18,7 @@ public class EDisException extends NDRuleException {
     private ASTOr or;
 
     public EDisException(ASTEDis rule) {
-        super(FeedbackType.SEMANTIC_ERROR);
-        this.rule = rule;
+        this(rule, null);
     }
 
     public EDisException(ASTEDis rule, ASTOr or) {
@@ -26,16 +27,37 @@ public class EDisException extends NDRuleException {
         this.rule = rule;
     }
 
+    private void appendSubErrors(String dis, String hyps) {
+        if (or == null)
+            rule.getHyp1().appendErrors(
+                    new NDTextException(EFeedbackPosition.CONCLUSION, dis));
+        if (!rule.getConclusion().equals(rule.getHyp2().getConclusion()))
+            rule.getHyp2().appendErrors(
+                    new NDTextException(EFeedbackPosition.CONCLUSION, hyps));
+        if (!rule.getConclusion().equals(rule.getHyp3().getConclusion()))
+            rule.getHyp3().appendErrors(
+                    new NDTextException(EFeedbackPosition.CONCLUSION, hyps));
+
+    }
+
     protected String produceFeedback(FeedbackLevel level) {
+        String error = "Error in this rule!";
         return switch (level) {
             case NONE -> "";
-            case LOW -> "Invalid rule!";
-            case MEDIUM -> "Invalid hypothesis!";
-            case HIGH -> or != null ? "The hypothesis is different from the conclusion!"
-                    : "The first hypothesis should be a disjunction!";
-            case SOLUTION -> or != null ? "The hypothesis is different from the conclusion! " +
-                    "Consider changing to: "
-                    : "The first hypothesis should be a disjunction!";
+            case LOW -> "Invalid rule application!";
+            case MEDIUM ->{
+                appendSubErrors("Something is wrong!", "Something is wrong!");
+                yield error;
+            }
+            case HIGH -> {
+                appendSubErrors("This must be a disjunction!", "This must be " + rule.getConclusion() + "!");
+                yield error;
+            }
+            case SOLUTION -> {
+                appendSubErrors("This must be a disjunction!", "This must be " + rule.getConclusion() + "!");
+                if(or != null) error += "\nPossible solution:";
+                yield error;
+            }
         };
     }
 

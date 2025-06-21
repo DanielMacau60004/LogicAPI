@@ -14,6 +14,7 @@ import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
 import com.logic.nd.exceptions.NDException;
 import com.logic.others.Env;
+import com.logic.others.Utils;
 
 import java.util.List;
 
@@ -37,13 +38,11 @@ public class StateSolution {
         mark = 1;
         Env<IFormula, String> marks = new Env<>();
         for (IFormula e : graph.getPremises()) marks.bind(e, String.valueOf(mark++));
-        for (IFormula e : graph.getInitialState().getHypotheses()) marks.bind(e, String.valueOf(mark++));
+        for (IFormula e : graph.getInitialState().getAssumptions()) marks.bind(e, String.valueOf(mark++));
 
         StateNode node = graph.getInitialState();
         if (node == null || !node.isClosed())
             throw new RuntimeException("Solution not found!");
-
-        System.out.println(node.getHeight());
 
         IASTND proof = rule(node, marks);
         if (proof == null)
