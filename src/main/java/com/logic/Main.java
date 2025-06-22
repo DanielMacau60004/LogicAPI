@@ -49,7 +49,7 @@ public class Main {
 
         //System.out.println(s.findSolution());
 
-        try {
+        /*try {
             ByteArrayInputStream stream = readFile("src/main/java/com/logic/code.logic");
             String result = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
 
@@ -61,12 +61,12 @@ public class Main {
             System.out.println(Utils.getToken(proofObj + ""));
 
             LogicAPI.checkNDProblem(proofObj,
-                    Set.of(/*LogicAPI.parsePL("p ∧ q")*/),
+                    Set.of(/*LogicAPI.parsePL("p ∧ q")),
                     LogicAPI.parsePL("(a ∨ a) → a"));
 
         }catch (NDException e) {
             System.out.println(e.getFeedback(FeedbackLevel.SOLUTION));
-        }
+        }*/
 
         /*try{
             System.out.println(LogicAPI.parseFOL(""));
@@ -78,6 +78,7 @@ public class Main {
         //System.out.println(LogicAPI.parsePL("a ∨ (c ∨ d)."));
         //System.out.println(LogicAPI.parsePL("(a ∨ c) ∨ d."));
 
+        System.out.println(LogicAPI.parseNDFOLProof("[∀I] [∀x P(x).[⊥,3] [P(x).[¬E] [⊥.[∃I] [∃x ¬P(x).[H,1] [¬P(x).]][H,2] [¬∃x ¬P(x).]]]]"));
 
         //ByteArrayInputStream stream = new ByteArrayInputStream((proof).getBytes());
         //System.out.println(new Parser(stream).parseNDPL());

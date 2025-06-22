@@ -19,8 +19,10 @@ import com.logic.nd.asts.binary.ASTIConj;
 import com.logic.nd.asts.others.ASTEDis;
 import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
-import com.logic.nd.exceptions.InvalidMappingException;
+import com.logic.nd.exceptions.sideconditions.EUniInvalidMappingException;
 import com.logic.nd.exceptions.rules.*;
+import com.logic.nd.exceptions.sideconditions.IExistInvalidMappingException;
+import com.logic.nd.exceptions.sideconditions.IUniInvalidMappingException;
 
 import java.util.*;
 
@@ -267,6 +269,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
     @Override
     public Void visit(ASTEUni r, Void env) {
         if(r.hasErrors()) return null;
+
         if (!(r.getHyp().getConclusion() instanceof ASTUniversal uni)) {
             r.appendErrors(new EUniException(r));
             return null;
@@ -294,7 +297,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
             }
 
         if (r.getMapping() == null) {
-            r.appendErrors(new InvalidMappingException(x, psi, psiXT.getAST(), outcomes));
+            r.appendErrors(new EUniInvalidMappingException(r,  x, psi, psiXT.getAST(), outcomes));
             return null;
         }
 
@@ -333,7 +336,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
             }
 
         if (r.getMapping() == null) {
-            r.appendErrors(new InvalidMappingException(x, psi, psiXT.getAST(), outcomes));
+            r.appendErrors(new IExistInvalidMappingException(r, x, psi, psiXT.getAST(), outcomes));
             return null;
         }
 
@@ -345,6 +348,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
     @Override
     public Void visit(ASTIUni r, Void env) {
         if(r.hasErrors()) return null;
+
         if (!(r.getConclusion() instanceof ASTUniversal uni)) {
             r.appendErrors(new IUniException(r));
             return null;
@@ -372,7 +376,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
             }
 
         if (r.getMapping() == null) {
-            r.appendErrors(new InvalidMappingException(x, psi, psiXY.getAST(), outcomes));
+            r.appendErrors(new IUniInvalidMappingException(r, x, psi, psiXY.getAST(), outcomes));
             return null;
         }
 

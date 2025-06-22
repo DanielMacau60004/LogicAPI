@@ -25,7 +25,8 @@ public class MarkAssignException extends NDRuleException {
             case NONE -> "";
             case LOW -> "Invalid mark!";
             case MEDIUM -> "Mark " + mark + " already assigned!";
-            case HIGH, SOLUTION-> "Mark " + mark + " assigned to " + exp + "!";
+            case HIGH-> "Mark " + mark + " assigned to " + exp + "!";
+            case SOLUTION-> "Mark " + mark + " assigned to " + exp + "!\nConsider assigning a different mark!";
         };
     }
 }

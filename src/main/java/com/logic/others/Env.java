@@ -85,17 +85,31 @@ public class Env<K, T> {
             child.removeAllChildren(id);
     }
 
-    public Set<K> getMatching(T value) {
+    public Set<K> getMatchingParent(T value) {
         Set<K> set = new HashSet<>();
-        getMatching(value, set);
+        getMatchingParent(value, set);
         return set;
     }
 
-    private void getMatching(T value, Set<K> list) {
-        list.addAll(table.entrySet().stream().filter(k -> k.getValue().toString().equals(value.toString()))
+    private void getMatchingParent(T value, Set<K> list) {
+        list.addAll(table.entrySet().stream().filter(k -> value.equals(k.getValue()))
                 .map(Map.Entry::getKey).toList());
         if (prev != null)
-            prev.getMatching(value, list);
+            prev.getMatchingParent(value, list);
+    }
+
+    public Set<K> getMatchingChild(T value) {
+        Set<K> set = new HashSet<>();
+        getMatchingChild(value, set);
+        return set;
+    }
+
+    private void getMatchingChild(T value, Set<K> list) {
+        list.addAll(table.entrySet().stream().filter(k -> value.equals(k.getValue()))
+                .map(Map.Entry::getKey).toList());
+
+        for (Env<K, T> child : children)
+            child.getMatchingChild(value, list);
     }
 
     public Env<K, T> beginScope() {

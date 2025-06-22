@@ -6,7 +6,9 @@ import com.logic.feedback.FeedbackType;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.binary.ASTEExist;
 import com.logic.nd.asts.others.ASTHypothesis;
+import com.logic.nd.exceptions.EFeedbackPosition;
 import com.logic.nd.exceptions.NDRuleException;
+import com.logic.nd.exceptions.NDTextException;
 
 import java.util.List;
 
@@ -27,12 +29,38 @@ public class EExistException extends NDRuleException {
     }
 
     protected String produceFeedback(FeedbackLevel level) {
+        String error = "Error in this rule!";
         return switch (level) {
             case NONE -> "";
-            case LOW -> "Invalid rule!";
-            case MEDIUM -> "Invalid hypothesis!";
-            case HIGH, SOLUTION -> exist != null ? "The second hypothesis and the conclusion should be the same"
-                    : "The first hypothesis should be an existential!";
+            case LOW -> "Invalid rule application!";
+            case MEDIUM -> {
+                if (exist == null) rule.getHyp1().appendErrors(
+                        new NDTextException(EFeedbackPosition.CONCLUSION, "Something is wrong!"));
+
+                if (!rule.getConclusion().equals(rule.getHyp2().getConclusion()))
+                    rule.appendErrors(
+                            new NDTextException(EFeedbackPosition.CONCLUSION, "Something is wrong!"));
+                yield error;
+            }
+            case HIGH -> {
+                if (exist == null) rule.getHyp1().appendErrors(
+                        new NDTextException(EFeedbackPosition.CONCLUSION, "This must be an existential!"));
+
+                if (!rule.getConclusion().equals(rule.getHyp2().getConclusion()))
+                    rule.appendErrors(
+                            new NDTextException(EFeedbackPosition.CONCLUSION, "This must be " + rule.getHyp2().getConclusion() + "!"));
+                yield error;
+            }
+            case SOLUTION -> {
+                if (exist == null) rule.getHyp1().appendErrors(
+                        new NDTextException(EFeedbackPosition.CONCLUSION, "This must be an existential!"));
+
+                if (!rule.getConclusion().equals(rule.getHyp2().getConclusion()))
+                    rule.appendErrors(
+                            new NDTextException(EFeedbackPosition.CONCLUSION, "This must be " + rule.getHyp2().getConclusion() + "!"));
+                if(exist != null) error += "\nPossible solution:";
+                yield error;
+            }
         };
     }
 

@@ -52,7 +52,7 @@ public class IRDisException extends NDRuleException {
                         new NDTextException(EFeedbackPosition.CONCLUSION, "This must be a conjunction!"));
                 else if (or.getLeft() != rule.getHyp().getConclusion()) rule.appendErrors(
                         new NDTextException(EFeedbackPosition.CONCLUSION, "This must be " +
-                                new ASTOr(or.getLeft(), hyp)+ "!"));
+                                new ASTOr(hyp,or.getRight())+ "!"));
                 yield error;
             }
             case SOLUTION -> {
@@ -61,7 +61,7 @@ public class IRDisException extends NDRuleException {
                             new NDTextException(EFeedbackPosition.CONCLUSION, "This must be a conjunction!"));
                 else if (or.getLeft() != rule.getHyp().getConclusion()) rule.appendErrors(
                         new NDTextException(EFeedbackPosition.CONCLUSION, "This must be " +
-                                new ASTOr(or.getLeft(), hyp)+ "!"));
+                                new ASTOr(hyp,or.getRight())+ "!"));
                 if (or != null) error += "\nPossible solution:";
                 yield error;
             }
@@ -74,9 +74,10 @@ public class IRDisException extends NDRuleException {
         if (or != null && level.equals(FeedbackLevel.SOLUTION)) {
             IASTExp hyp = rule.getHyp().getConclusion();
             if(!ExpUtils.isLiteral(hyp)) hyp = new ASTParenthesis(hyp);
+
             return List.of(
                     new ASTIRDis(new ASTHypothesis(rule.getHyp().getConclusion(), null),
-                            new ASTOr(or.getLeft(), hyp)));
+                            new ASTOr(hyp, or.getRight())));
         }
         return null;
     }

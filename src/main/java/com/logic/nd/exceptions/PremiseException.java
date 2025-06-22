@@ -42,8 +42,8 @@ public class PremiseException extends NDRuleException {
                 yield error;
             }
             case SOLUTION -> {
-                Set<String> possibleMarks = env.getMatching(premise);
-                if (!possibleMarks.isEmpty())
+                Set<String> possibleMarks = env.getMatchingParent(premise);
+                if (possibleMarks != null && !possibleMarks.isEmpty())
                     error += "\nConsider:";
                 else {
                     List<?> list = env.mapParent().entrySet().stream()
@@ -58,8 +58,10 @@ public class PremiseException extends NDRuleException {
 
     @Override
     public List<IASTND> getPreviews(FeedbackLevel level) {
+        Set<String> envMap = env.getMatchingParent(premise);
+
         if (level.equals(FeedbackLevel.SOLUTION)) {
-            Set<String> possibleMarks = env.getMatching(premise).stream()
+            Set<String> possibleMarks = envMap.stream()
                     .filter(Objects::nonNull)
                     .collect(Collectors.toSet());
             if (!possibleMarks.isEmpty())

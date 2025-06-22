@@ -9,7 +9,7 @@ import java.util.List;
 
 public abstract class NDRuleException extends FeedbackException {
 
-    private final EFeedbackPosition position;
+    protected EFeedbackPosition position;
 
     public NDRuleException(FeedbackType type) {
         super(type);

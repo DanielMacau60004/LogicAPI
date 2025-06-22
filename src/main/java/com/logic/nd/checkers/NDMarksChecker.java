@@ -22,7 +22,6 @@ import com.logic.nd.asts.unary.*;
 import com.logic.nd.exceptions.CloseMarkException;
 import com.logic.nd.exceptions.MarkAssignException;
 import com.logic.others.Env;
-import com.logic.others.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +54,7 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
         IASTExp hyp = h.getConclusion();
 
         if (hypotheses.containsKey(h.getM()) && !hypotheses.get(h.getM()).equals(hyp)) {
-            h.appendErrors(new MarkAssignException(h.getM(), hyp)); //TODO change the params
+            h.appendErrors(new MarkAssignException(h.getM(), hyp));
             return null;
         }
 
@@ -64,85 +63,6 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
 
         return null;
     }
-
-    /*@Override
-    public Void visit(ASTHypothesis h, Env<String, MarkEnv> env) {
-        if (h.hasErrors()) return null;
-
-        IASTExp hyp = h.getConclusion();
-        MarkEnv pair = env.findParent(h.getM());
-
-        if (pair != null) { // Hypothesis is assigned to a rule
-            IASTExp mark = pair.getExp();
-            IASTND rule = pair.getRule();
-
-            if (rule instanceof ASTEExist r && r.getCloseM() == null) {
-                ASTExistential exi = (ASTExistential) r.getHyp1().getConclusion();
-                ASTVariable x = (ASTVariable) exi.getLeft();
-
-                IASTExp psi = ExpUtils.removeParenthesis(exi.getRight());
-                IFOLFormula psiXY = (IFOLFormula) formulas.get(hyp);
-
-                List<ASTVariable> variables = new ArrayList<>();
-                variables.add(x); //It can be itself
-                psiXY.iterateVariables().forEachRemaining(variables::add);
-
-                IASTExp mappingEx = null;
-                for (ASTVariable var : variables) {
-                    mappingEx = FOLReplaceExps.replace(psi, x, var);
-                    if (mappingEx.equals(hyp)) {
-                        r.setMapping(var);
-                        break;
-                    }
-                }
-
-                if (mappingEx == null || hypotheses.containsKey(r.getM()) && !hypotheses.get(r.getM()).equals(mark)) {
-                    r.appendErrors(new CloseMarkException(r.getM(), hyp));
-                    return null;
-                }
-
-                mark = hyp;
-                r.setCloseM(mark);
-
-                if (r.getM() != null)
-                    hypotheses.put(r.getM(), mappingEx);
-            } else if (!mark.equals(hyp)) {
-
-                if (rule instanceof ASTEExist r) {
-                    ASTExistential exi = (ASTExistential) r.getHyp1().getConclusion();
-                    ASTVariable x = (ASTVariable) exi.getLeft();
-
-                    if (!mark.equals(FOLReplaceExps.replace(hyp, r.getMapping(), x))) {
-                        //Mark is assigned to a different expression
-                        h.appendErrors(new MarkAssignException(h.getM(), mark));
-                    }
-
-                    return null;
-                } else if (!mark.equals(hyp)) {
-                    //Mark is assigned to a different expression
-                    h.appendErrors(new MarkAssignException(h.getM(), mark));
-                    return null;
-                }
-                rule.appendErrors(new CloseMarkException(h.getM(), hyp));
-                return null;
-            }
-
-            pair.setClosed(mark);
-        } else if (h.getM() != null) { //Premise with mark
-            IASTExp premise = premises.get(h.getM());
-            if (premise != null && !premise.equals(hyp)) {
-                //Premise is assigned to a different expression
-                h.appendErrors(new MarkAssignException(h.getM(), premise));
-                return null;
-            }
-
-            premises.put(h.getM(), hyp);
-        } else if (!premises.containsValue(hyp)) { //Premise without mark
-            premises.put(hyp.toString(), hyp);
-        }
-
-        return null;
-    }*/
 
     @Override
     public Void visit(ASTIImp r, Env<String, IASTExp> env) {
@@ -157,15 +77,14 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
         if (r.getM() != null) {
             IASTExp refMark = env.findChild(r.getM());
 
-            if (refMark != null) {
-                if (!refMark.equals(mark)) {
-                    r.appendErrors(new CloseMarkException(r.getM(), mark));
-                    return null;
-                }
-
-                r.setCloseM(mark);
-                env.removeAllChildren(r.getM());
+            if ((hypotheses.containsKey(r.getM()) && !mark.equals(hypotheses.get(r.getM()))) ||
+                    (refMark != null && !mark.equals(refMark))) {
+                r.appendErrors(new CloseMarkException(r.getM(), mark, env));
+                return null;
             }
+
+            r.setCloseM(mark);
+            env.removeAllChildren(r.getM());
 
         }
 
@@ -187,14 +106,14 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
         if (r.getM() != null) {
             IASTExp refMark = env.findChild(r.getM());
 
-            if (refMark != null) {
-                if (!refMark.equals(mark)) {
-                    r.appendErrors(new CloseMarkException(r.getM(), mark));
-                    return null;
-                }
-                r.setCloseM(mark);
-                env.removeAllChildren(r.getM());
+            if ((hypotheses.containsKey(r.getM()) && !mark.equals(hypotheses.get(r.getM()))) ||
+                    (refMark != null && !mark.equals(refMark))) {
+                r.appendErrors(new CloseMarkException(r.getM(), mark, env));
+                return null;
             }
+
+            r.setCloseM(mark);
+            env.removeAllChildren(r.getM());
 
         }
 
@@ -239,14 +158,15 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
         if (r.getM() != null) {
             IASTExp refMark = env.findChild(r.getM());
 
-            if (refMark != null) {
-                if (!refMark.equals(mark)) {
-                    r.appendErrors(new CloseMarkException(r.getM(), mark));
-                    return null;
-                }
-                r.setCloseM(mark);
-                env.removeAllChildren(r.getM());
+            if ((hypotheses.containsKey(r.getM()) && !mark.equals(hypotheses.get(r.getM()))) ||
+                    (refMark != null && !mark.equals(refMark))) {
+                r.appendErrors(new CloseMarkException(r.getM(), mark, env));
+                return null;
             }
+
+            r.setCloseM(mark);
+            env.removeAllChildren(r.getM());
+
         }
 
         env.endScope();
@@ -277,14 +197,15 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
         if (r.getM() != null) {
             IASTExp refMark = env.findChild(r.getM());
 
-            if (refMark != null) {
-                if (!refMark.equals(left)) {
-                    r.appendErrors(new CloseMarkException(r.getM(), left));
-                    return null;
-                }
-                r.setCloseM(left);
-                env.removeAllChildren(r.getM());
+            if ((hypotheses.containsKey(r.getM()) && !left.equals(hypotheses.get(r.getM()))) ||
+                    (refMark != null && !left.equals(refMark))) {
+                r.appendErrors(new CloseMarkException(r.getM(), left, env));
+                return null;
             }
+
+            r.setCloseM(left);
+            env.removeAllChildren(r.getM());
+
         }
 
         env = env.endScope();
@@ -295,15 +216,15 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
         if (r.getN() != null) {
             IASTExp refMark = env.findChild(r.getN());
 
-            if (refMark != null) {
-                if (!refMark.equals(right)) {
-                    r.appendErrors(new CloseMarkException(r.getN(), right));
-                    return null;
-                }
-
-                r.setCloseN(right);
-                env.removeAllChildren(r.getN());
+            if ((hypotheses.containsKey(r.getN()) && !right.equals(hypotheses.get(r.getN()))) ||
+                    (refMark != null && !right.equals(refMark))) {
+                r.appendErrors(new CloseMarkException(r.getN(), right, env));
+                return null;
             }
+
+            r.setCloseN(right);
+            env.removeAllChildren(r.getN());
+
         }
 
         env.endScope();
@@ -359,6 +280,7 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
 
         if (r.getM() != null) {
             IASTExp refMark = env.findChild(r.getM());
+            IASTExp mappingEx = null;
 
             if (refMark != null) {
                 ASTVariable x = (ASTVariable) exi.getLeft();
@@ -369,7 +291,6 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
                 variables.add(x);
                 psiXY.iterateVariables().forEachRemaining(variables::add);
 
-                IASTExp mappingEx = null;
                 for (ASTVariable var : variables) {
                     mappingEx = FOLReplaceExps.replace(psi, x, var);
                     if (mappingEx.equals(refMark)) {
@@ -378,13 +299,13 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
                     }
                 }
 
-                if (mappingEx == null) {
-                    r.appendErrors(new CloseMarkException(r.getM(), mark));
-                    return null;
-                }
-
                 r.setCloseM(mappingEx);
                 env.removeAllChildren(r.getM());
+            }
+
+            if ((refMark != null && mappingEx == null)) {
+                r.appendErrors(new CloseMarkException(r.getM(), null, env));
+                return null;
             }
 
         }

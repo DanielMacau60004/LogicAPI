@@ -13,6 +13,7 @@ import com.logic.nd.asts.unary.ASTIRDis;
 import com.logic.nd.exceptions.EFeedbackPosition;
 import com.logic.nd.exceptions.NDRuleException;
 import com.logic.nd.exceptions.NDTextException;
+import com.logic.others.Utils;
 
 import java.util.List;
 
@@ -53,7 +54,7 @@ public class ILDisException extends NDRuleException {
                         new NDTextException(EFeedbackPosition.CONCLUSION, "This must be a conjunction!"));
                 else if (or.getRight() != rule.getHyp().getConclusion()) rule.appendErrors(
                         new NDTextException(EFeedbackPosition.CONCLUSION, "This must be " +
-                                new ASTOr(hyp,or.getRight())+ "!"));
+                                new ASTOr(or.getLeft(), hyp)+ "!"));
                 yield error;
             }
             case SOLUTION -> {
@@ -62,7 +63,7 @@ public class ILDisException extends NDRuleException {
                             new NDTextException(EFeedbackPosition.CONCLUSION, "This must be a conjunction!"));
                 else if (or.getRight() != rule.getHyp().getConclusion()) rule.appendErrors(
                         new NDTextException(EFeedbackPosition.CONCLUSION, "This must be " +
-                                new ASTOr(hyp,or.getRight())+ "!"));
+                                new ASTOr(or.getLeft(), hyp)+ "!"));
                 if (or != null) error += "\nPossible solution:";
                 yield error;
             }
@@ -78,7 +79,7 @@ public class ILDisException extends NDRuleException {
 
             return List.of(
                     new ASTIRDis(new ASTHypothesis(rule.getHyp().getConclusion(), null),
-                            new ASTOr(hyp, or.getRight())));
+                            new ASTOr(or.getLeft(), hyp)));
         }
         return null;
     }

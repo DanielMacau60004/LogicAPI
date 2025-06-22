@@ -16,14 +16,19 @@ import com.logic.nd.asts.binary.ASTIConj;
 import com.logic.nd.asts.others.ASTEDis;
 import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
+import com.logic.nd.exceptions.EFeedbackPosition;
+import com.logic.nd.exceptions.NDTextException;
+import com.logic.nd.exceptions.sideconditions.EUniNotFreeVariableException;
 import com.logic.nd.exceptions.sideconditions.FreeVariableException;
-import com.logic.nd.exceptions.sideconditions.NotFreeVariableException;
+import com.logic.nd.exceptions.sideconditions.IExistNotFreeVariableException;
 import com.logic.others.Env;
 import com.logic.others.Utils;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
-public class NDSideCondChecker implements INDVisitor<Void, Env<String, IASTExp>> {
+public class NDSideCondChecker implements INDVisitor<Void, Env<String, ASTHypothesis>> {
 
     private final Map<IASTExp, IFormula> formulas;
 
@@ -33,76 +38,80 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, IASTExp>>
 
     public static Map<IASTExp, IFormula> check(IASTND nd, Map<IASTExp, IFormula> formulas, Map<String, IASTExp> premises) {
         NDSideCondChecker checker = new NDSideCondChecker(formulas);
-        Env<String, IASTExp> env = new Env<>();
-        premises.forEach(env::bind);
+
+        //Stores all opened hypotheses
+        Env<String, ASTHypothesis> env = new Env<>();
         nd.accept(checker, env);
+
         return checker.formulas;
     }
 
     @Override
-    public Void visit(ASTHypothesis h, Env<String, IASTExp> env) {
+    public Void visit(ASTHypothesis h, Env<String, ASTHypothesis> env) {
+        env.bind(h.getM(), h);
+
         return null;
     }
 
     @Override
-    public Void visit(ASTIImp r, Env<String, IASTExp> env) {
+    public Void visit(ASTIImp r, Env<String, ASTHypothesis> env) {
         if (r.hasErrors()) return null;
         env = env.beginScope();
-        if (r.getCloseM() != null)
-            env.bind(r.getM(), r.getCloseM());
         r.getHyp().accept(this, env);
+        if (r.getCloseM() != null)
+            env.removeAllChildren(r.getM());
         env.endScope();
         return null;
     }
 
     @Override
-    public Void visit(ASTINeg r, Env<String, IASTExp> env) {
+    public Void visit(ASTINeg r, Env<String, ASTHypothesis> env) {
         if (r.hasErrors()) return null;
         env = env.beginScope();
-        if (r.getCloseM() != null)
-            env.bind(r.getM(), r.getCloseM());
         r.getHyp().accept(this, env);
+        if (r.getCloseM() != null)
+            env.removeAllChildren(r.getM());
         env.endScope();
         return null;
     }
 
     @Override
-    public Void visit(ASTERConj r, Env<String, IASTExp> env) {
+    public Void visit(ASTERConj r, Env<String, ASTHypothesis> env) {
         if (r.hasErrors()) return null;
         return r.getHyp().accept(this, env);
     }
 
     @Override
-    public Void visit(ASTELConj r, Env<String, IASTExp> env) {
+    public Void visit(ASTELConj r, Env<String, ASTHypothesis> env) {
         if (r.hasErrors()) return null;
         return r.getHyp().accept(this, env);
     }
 
     @Override
-    public Void visit(ASTIRDis r, Env<String, IASTExp> env) {
+    public Void visit(ASTIRDis r, Env<String, ASTHypothesis> env) {
         if (r.hasErrors()) return null;
         return r.getHyp().accept(this, env);
     }
 
     @Override
-    public Void visit(ASTILDis r, Env<String, IASTExp> env) {
+    public Void visit(ASTILDis r, Env<String, ASTHypothesis> env) {
         if (r.hasErrors()) return null;
         return r.getHyp().accept(this, env);
     }
 
     @Override
-    public Void visit(ASTAbsurdity r, Env<String, IASTExp> env) {
+    public Void visit(ASTAbsurdity r, Env<String, ASTHypothesis> env) {
         if (r.hasErrors()) return null;
         env = env.beginScope();
-        if (r.getCloseM() != null)
-            env.bind(r.getM(), r.getCloseM());
         r.getHyp().accept(this, env);
+        if (r.getCloseM() != null)
+            env.removeAllChildren(r.getM());
         env.endScope();
         return null;
     }
 
     @Override
-    public Void visit(ASTIConj r, Env<String, IASTExp> env) {
+    public Void visit(ASTIConj r, Env<String, ASTHypothesis> env) {
         if (r.hasErrors()) return null;
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
@@ -110,26 +119,26 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, IASTExp>>
     }
 
     @Override
-    public Void visit(ASTEDis r, Env<String, IASTExp> env) {
+    public Void visit(ASTEDis r, Env<String, ASTHypothesis> env) {
         if (r.hasErrors()) return null;
         r.getHyp1().accept(this, env);
 
         env = env.beginScope();
-        if (r.getCloseM() != null)
-            env.bind(r.getM(), r.getCloseM());
         r.getHyp2().accept(this, env);
+        if (r.getCloseM() != null)
+            env.removeAllChildren(r.getM());
         env.endScope();
 
         env = env.beginScope();
-        if (r.getCloseN() != null)
-            env.bind(r.getN(), r.getCloseN());
         r.getHyp3().accept(this, env);
+        if (r.getCloseN() != null)
+            env.removeAllChildren(r.getN());
         env.endScope();
         return null;
     }
 
     @Override
-    public Void visit(ASTEImp r, Env<String, IASTExp> env) {
+    public Void visit(ASTEImp r, Env<String, ASTHypothesis> env) {
         if (r.hasErrors()) return null;
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
@@ -137,7 +146,7 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, IASTExp>>
     }
 
     @Override
-    public Void visit(ASTENeg r, Env<String, IASTExp> env) {
+    public Void visit(ASTENeg r, Env<String, ASTHypothesis> env) {
         if (r.hasErrors()) return null;
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
@@ -145,13 +154,13 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, IASTExp>>
     }
 
     @Override
-    public Void visit(ASTEUni r, Env<String, IASTExp> env) {
+    public Void visit(ASTEUni r, Env<String, ASTHypothesis> env) {
         if (r.hasErrors()) return null;
         ASTUniversal uni = (ASTUniversal) r.getHyp().getConclusion();
         IFOLFormula psi = (IFOLFormula) formulas.get(ExpUtils.removeParenthesis(uni.getRight()));
 
         if (r.getMapping() instanceof ASTVariable x && psi.isABoundedVariable(x)) {
-            r.appendErrors(new NotFreeVariableException(x, uni.getLeft(), psi.getAST()));
+            r.appendErrors(new EUniNotFreeVariableException(r, x, uni.getLeft(), psi));
             return null;
         }
 
@@ -159,13 +168,13 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, IASTExp>>
     }
 
     @Override
-    public Void visit(ASTIExist r, Env<String, IASTExp> env) {
+    public Void visit(ASTIExist r, Env<String, ASTHypothesis> env) {
         if (r.hasErrors()) return null;
         ASTExistential exi = (ASTExistential) r.getConclusion();
         IFOLFormula psi = (IFOLFormula) formulas.get(ExpUtils.removeParenthesis(exi.getRight()));
 
         if (r.getMapping() instanceof ASTVariable x && psi.isABoundedVariable(x)) {
-            r.appendErrors(new NotFreeVariableException(x, exi.getLeft(), psi.getAST()));
+            r.appendErrors(new IExistNotFreeVariableException(r, x, exi.getLeft(), psi));
             return null;
         }
 
@@ -173,61 +182,74 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, IASTExp>>
     }
 
     @Override
-    public Void visit(ASTIUni r, Env<String, IASTExp> env) {
+    public Void visit(ASTIUni r, Env<String, ASTHypothesis> env) {
         if (r.hasErrors()) return null;
+
+        r.getHyp().accept(this, env);
+
         ASTUniversal uni = (ASTUniversal) r.getConclusion();
         IFOLFormula psi = (IFOLFormula) formulas.get(ExpUtils.removeParenthesis(uni.getRight()));
 
         if (!uni.getLeft().equals(r.getMapping()) && psi.appearsFreeVariable(r.getMapping())) {
-            r.appendErrors(new FreeVariableException(r.getMapping(), psi.getAST(), true));
+            r.appendErrors(new FreeVariableException(List.of(r.getHyp()), r.getMapping(), (ASTVariable) uni.getLeft()));
             return null;
         }
 
-        for (Map.Entry<String, IASTExp> e : env.mapParent().entrySet()) {
-            IFOLFormula formula = (IFOLFormula) formulas.get(e.getValue());
+        List<IASTND> freeFormulas = new LinkedList<>();
+        for (Map.Entry<String, ASTHypothesis> e : env.mapChild().entrySet()) {
+            IFOLFormula formula = (IFOLFormula) formulas.get(e.getValue().getConclusion());
 
-            if (formula.appearsFreeVariable(r.getMapping())) {
-                r.appendErrors(new FreeVariableException(r.getMapping(), e.getValue(), false));
-                return null;
-            }
+            if (formula.appearsFreeVariable(r.getMapping()))
+                freeFormulas.add(e.getValue());
         }
 
-        return r.getHyp().accept(this, env);
+        if (!freeFormulas.isEmpty()) {
+            r.appendErrors(new FreeVariableException(freeFormulas, r.getMapping(), null));
+            return null;
+        }
+
+        return null;
     }
 
     @Override
-    public Void visit(ASTEExist r, Env<String, IASTExp> env) {
+    public Void visit(ASTEExist r, Env<String, ASTHypothesis> env) {
         if (r.hasErrors()) return null;
         ASTExistential exi = (ASTExistential) r.getHyp1().getConclusion();
         IFOLFormula psi = (IFOLFormula) formulas.get(ExpUtils.removeParenthesis(exi.getRight()));
         IFOLFormula exp = (IFOLFormula) formulas.get(r.getConclusion());
 
+        r.getHyp1().accept(this, env);
+
+        env = env.beginScope();
+        r.getHyp2().accept(this, env);
+
         if (!exi.getLeft().equals(r.getMapping()) && psi.appearsFreeVariable(r.getMapping())) {
-            r.appendErrors(new FreeVariableException(r.getMapping(), psi.getAST(), true));
+            r.appendErrors(new FreeVariableException(List.of(r.getHyp1()), r.getMapping(), (ASTVariable) exi.getLeft()));
             return null;
         }
 
         if (exp.appearsFreeVariable(r.getMapping())) {
-            r.appendErrors(new FreeVariableException(r.getMapping(), exp.getAST(), true));
+            r.appendErrors(new FreeVariableException(List.of(r.getHyp2()), r.getMapping(), null));
             return null;
         }
 
-        for (Map.Entry<String, IASTExp> e : env.mapParent().entrySet()) {
-            IFOLFormula formula = (IFOLFormula) formulas.get(e.getValue());
+        List<IASTND> freeFormulas = new LinkedList<>();
+        for (Map.Entry<String, ASTHypothesis> e : env.mapChild().entrySet()) {
+            IFOLFormula formula = (IFOLFormula) formulas.get(e.getValue().getConclusion());
 
-            if (!e.getValue().equals(r.getCloseM()) && formula != null && formula.appearsFreeVariable(r.getMapping())) {
-                r.appendErrors(new FreeVariableException(r.getMapping(), e.getValue(), false));
-                return null;
-            }
+            if (!e.getValue().getConclusion().equals(r.getCloseM()) && formula != null && formula.appearsFreeVariable(r.getMapping()))
+                freeFormulas.add(e.getValue());
         }
 
-        r.getHyp1().accept(this, env);
+        if (!freeFormulas.isEmpty()) {
+            r.appendErrors(new FreeVariableException(freeFormulas, r.getMapping(), null));
+            return null;
+        }
 
-        env = env.beginScope();
         if (r.getCloseM() != null)
-            env.bind(r.getM(), r.getCloseM());
-        r.getHyp2().accept(this, env);
+            env.removeAllChildren(r.getM());
         env.endScope();
+
 
         return null;
     }
