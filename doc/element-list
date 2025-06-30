@@ -9,8 +9,8 @@ com.logic.exps.checkers
 com.logic.exps.interpreters
 com.logic.nd
 com.logic.nd.algorithm
-com.logic.nd.algorithm.state
-com.logic.nd.algorithm.state.strategies
+com.logic.nd.algorithm.proofs
+com.logic.nd.algorithm.proofs.strategies
 com.logic.nd.algorithm.transition
 com.logic.nd.asts
 com.logic.nd.asts.binary

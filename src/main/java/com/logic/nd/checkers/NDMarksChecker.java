@@ -53,7 +53,7 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
 
         IASTExp hyp = h.getConclusion();
 
-        if (hypotheses.containsKey(h.getM()) && !hypotheses.get(h.getM()).equals(hyp)) {
+        if (h.getM() != null && hypotheses.containsKey(h.getM()) && !hypotheses.get(h.getM()).equals(hyp)) {
             h.appendErrors(new MarkAssignException(h.getM(), hyp));
             return null;
         }

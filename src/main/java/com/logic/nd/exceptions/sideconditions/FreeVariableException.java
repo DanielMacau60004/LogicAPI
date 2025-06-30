@@ -39,7 +39,7 @@ public class FreeVariableException extends NDRuleException {
             }
             case HIGH,SOLUTION -> {
                 for(IASTND h : freeHypotheses)
-                    h.appendErrors(new NDTextException(EFeedbackPosition.CONCLUSION, "Opened hypothesis!"+
+                    h.appendErrors(new NDTextException(EFeedbackPosition.CONCLUSION, "Open hypothesis!"+
                             (from != null && variable != null ? "\nVariables: " +from + " ≠ " + variable : "")+
                             (variable != null ? "\nVariable " + variable.getName() + " appears free!" : "\nFree variable!")));
 
