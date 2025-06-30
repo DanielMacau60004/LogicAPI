@@ -43,18 +43,6 @@ public abstract class AASTND implements IASTND {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof AASTND s)
-            return this.toString().equals(s.toString());
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return this.toString().hashCode();
-    }
-
-    @Override
     public String toString() {
         return NDInterpretString.interpret(this);
     }
