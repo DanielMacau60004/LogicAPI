@@ -9,14 +9,13 @@ import java.util.Iterator;
  * The {@code IFormula} interface represents a logical formula in either propositional logic or first-order logic.
  * It provides methods for retrieving the underlying expression, iterating over generic (arbitrary) components,
  * and checking for the presence of generics within the formula.
- * <p>
+ *
  * This interface serves as a common abstraction for various logical expressions, supporting:
  * <ul>
  *     <li>Propositional logic formulas</li>
  *     <li>First-order logic formulas</li>
  *     <li>Expressions containing generic placeholders</li>
  * </ul>
- * </p>
  *
  * @author Daniel Macau
  * @version 1.1
