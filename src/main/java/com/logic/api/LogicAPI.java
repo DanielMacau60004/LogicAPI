@@ -9,14 +9,13 @@ import java.util.Set;
 
 /**
  * The {@code LogicAPI} class provides utility methods for parsing and verifying logical expressions and natural deduction proofs.
- * <p>
+ *
  * It supports:
  * <ul>
  *     <li>Parsing and checking well-formedness of propositional logic (PL) formulas.</li>
  *     <li>Parsing and checking well-formedness of first-order logic (FOL) formulas.</li>
  *     <li>Parsing and validating natural deduction (ND) proofs for both PL and FOL.</li>
  * </ul>
- * </p>
  *
  * <p>This class is not intended to be instantiated.</p>
  *
