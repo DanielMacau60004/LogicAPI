@@ -12,7 +12,7 @@ import java.util.Iterator;
  * This interface provides methods for iterating over different components of a first-order logic formula,
  * such as functions, predicates, bounded variables, unbounded variables, and terms. It also includes
  * methods for checking whether a variable belongs to a specific category and whether the formula is a sentence.
- * <p>
+ *
  * Implementations of {@code IFOLFormula} represent logical expressions composed of:
  * <ul>
  *     <li>Functions (e.g., f(x), g(a, b))</li>
@@ -22,7 +22,6 @@ import java.util.Iterator;
  *     <li>Terms (sub-expressions within a formula)</li>
  *     <li>Sentences (formulas with no free variables)</li>
  * </ul>
- * </p>
  *
  * <p>
  * This interface allows structured manipulation of logical formulas, supporting operations such as
