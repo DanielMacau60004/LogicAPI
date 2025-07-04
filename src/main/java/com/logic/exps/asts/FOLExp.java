@@ -7,7 +7,6 @@ import com.logic.others.Utils;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.Set;
 
 public class FOLExp implements IFOLFormula {
@@ -37,7 +36,7 @@ public class FOLExp implements IFOLFormula {
     }
 
     @Override
-    public IASTExp getFormula() {
+    public IASTExp getAST() {
         return exp;
     }
 
@@ -101,10 +100,15 @@ public class FOLExp implements IFOLFormula {
     }
 
     @Override
-    public boolean isAFreeVariable(ASTVariable variable) {
+    public boolean appearsFreeVariable(ASTVariable variable) {
         if (hasGenerics())
             return isAnUnboundedVariable(variable) || !isAVariable(variable);
         return isAnUnboundedVariable(variable);
+    }
+
+    @Override
+    public boolean isFreeVariable(ASTVariable variable) {
+        return !isABoundedVariable(variable);
     }
 
     @Override
@@ -126,11 +130,11 @@ public class FOLExp implements IFOLFormula {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof IFormula formula)) return false;
-        return exp.equals(formula.getFormula());
+        return exp.equals(formula.getAST());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(exp);
+        return exp.hashCode();
     }
 }

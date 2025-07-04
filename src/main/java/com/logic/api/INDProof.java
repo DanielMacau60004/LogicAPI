@@ -1,6 +1,9 @@
 package com.logic.api;
 
+import com.logic.nd.asts.IASTND;
+
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * The {@code INDProof} interface represents a natural deduction (ND) proof.
@@ -13,6 +16,7 @@ import java.util.Iterator;
  *     <li>Iterating over its premises.</li>
  *     <li>Measuring the height (depth) of the proof tree.</li>
  *     <li>Determining the total number of steps (size) in the proof.</li>
+ *     <li>Checking whether a given set of premises can derive a specific conclusion.</li>
  * </ul>
  *
  * <p>
@@ -21,8 +25,8 @@ import java.util.Iterator;
  * </p>
  *
  * @author Daniel Macau
- * @version 1.0
- * @since 23-03-2025
+ * @version 1.1
+ * @since 04-07-2025
  */
 public interface INDProof {
 
@@ -32,6 +36,15 @@ public interface INDProof {
      * @return The {@code IFormula} representing the final conclusion of the proof.
      */
     IFormula getConclusion();
+
+    /**
+     * Returns an iterator over the hypotheses used in this proof.
+     *
+     * <p>Hypotheses represent assumptions or temporarily introduced formulas during the proof.</p>
+     *
+     * @return An {@code Iterator} over entries mapping hypothesis labels to their {@code IFormula} objects.
+     */
+    Iterator<Map.Entry<String, IFormula>> getHypotheses();
 
     /**
      * Returns an iterator over the premises of this proof.
@@ -59,5 +72,11 @@ public interface INDProof {
      * @return An integer representing the total number of steps in the proof.
      */
     int size();
-}
 
+    /**
+     * Returns the abstract syntax tree (AST) representation of the natural deduction proof.
+     *
+     * @return The {@code IASTND} object representing the proof's AST.
+     */
+    IASTND getAST();
+}

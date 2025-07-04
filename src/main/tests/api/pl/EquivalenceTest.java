@@ -12,6 +12,7 @@ public class EquivalenceTest {
     private boolean evaluateEquivalence(String exp1, String exp2) throws Exception {
         IPLFormula e1 = LogicAPI.parsePL(exp1);
         IPLFormula e2 = LogicAPI.parsePL(exp2);
+
         return e1.isEquivalentTo(e2);
     }
 

@@ -1,18 +1,11 @@
 package com.logic.api;
 
-import com.logic.exps.asts.IASTExp;
-import com.logic.exps.checkers.FOLWFFChecker;
-import com.logic.exps.checkers.PLWFFChecker;
-import com.logic.nd.asts.IASTND;
-import com.logic.nd.checkers.NDMarksChecker;
-import com.logic.nd.checkers.NDSideCondChecker;
-import com.logic.nd.checkers.NDWWFChecker;
-import com.logic.nd.checkers.NDWWFExpsChecker;
-import com.logic.nd.interpreters.NDInterpreter;
-import com.logic.parser.Parser;
+import com.logic.exps.Expressions;
+import com.logic.exps.exceptions.ExpException;
+import com.logic.nd.NDProofs;
+import com.logic.nd.exceptions.NDRuleException;
 
-import java.io.ByteArrayInputStream;
-import java.util.Map;
+import java.util.Set;
 
 /**
  * The {@code LogicAPI} class provides utility methods for parsing and verifying logical expressions and natural deduction proofs.
@@ -56,11 +49,10 @@ public class LogicAPI {
      *
      * @param expression The propositional logic formula to parse and check.
      * @return The parsed {@code IPLFormula} representation of the formula.
-     * @throws Exception If the formula is syntactically incorrect or cannot be parsed.
+     * @throws ExpException If the formula return an error.
      */
-    public static IPLFormula parsePL(String expression) throws Exception {
-        Parser parser = new Parser(new ByteArrayInputStream(expression.getBytes()));
-        return PLWFFChecker.check(parser.parsePL());
+    public static IPLFormula parsePL(String expression) throws ExpException {
+        return Expressions.parsePLFormula(expression);
     }
 
     /**
@@ -82,11 +74,10 @@ public class LogicAPI {
      *
      * @param expression The first-order logic formula to parse and check.
      * @return The parsed {@code IFOLFormula} representation of the formula.
-     * @throws Exception If the formula is syntactically incorrect or cannot be parsed.
+     * @throws ExpException If the formula return an error.
      */
-    public static IFOLFormula parseFOL(String expression) throws Exception {
-        Parser parser = new Parser(new ByteArrayInputStream(expression.getBytes()));
-        return FOLWFFChecker.check(parser.parseFOL());
+    public static IFOLFormula parseFOL(String expression) throws ExpException {
+        return Expressions.parseFOLFormula(expression);
     }
 
     /**
@@ -107,11 +98,11 @@ public class LogicAPI {
      *     <li><b>Absurdity (⊥ Introduction):</b> <code>[⊥, m] [formula. [rule]]</code></li>
      *     <li><b>Negation Introduction (¬I):</b> <code>[¬I, m] [formula. [rule]]</code></li>
      *     <li><b>Negation Elimination (¬E):</b> <code>[¬E] [⊥. [rule1] [rule2]]</code></li>
-     *     <li><b>Conjunction Elimination Left (∧EL):</b> <code>[∧EL] [formula. [rule]]</code></li>
-     *     <li><b>Conjunction Elimination Right (∧ER):</b> <code>[∧ER] [formula. [rule]]</code></li>
+     *     <li><b>Conjunction Elimination Left (∧El):</b> <code>[∧El] [formula. [rule]]</code></li>
+     *     <li><b>Conjunction Elimination Right (∧Er):</b> <code>[∧Er] [formula. [rule]]</code></li>
      *     <li><b>Conjunction Introduction (∧I):</b> <code>[∧I] [formula. [rule1] [rule2]]</code></li>
-     *     <li><b>Disjunction Introduction Left (∨IL):</b> <code>[∨IL] [formula. [rule]]</code></li>
-     *     <li><b>Disjunction Introduction Right (∨IR):</b> <code>[∨IR] [formula. [rule]]</code></li>
+     *     <li><b>Disjunction Introduction Left (∨Il):</b> <code>[∨Il] [formula. [rule]]</code></li>
+     *     <li><b>Disjunction Introduction Right (∨Ir):</b> <code>[∨Ir] [formula. [rule]]</code></li>
      *     <li><b>Disjunction Elimination (∨E):</b> <code>[∨E, m, n] [formula. [rule1] [rule2] [rule3]]</code></li>
      *     <li><b>Implication Introduction (→I):</b> <code>[→I, m] [formula. [rule]]</code></li>
      *     <li><b>Implication Elimination (→E):</b> <code>[→E] [formula. [rule1] [rule2]]</code></li>
@@ -122,23 +113,19 @@ public class LogicAPI {
      * [→I, 1] [(p ∨ q) → (q ∨ p).
      *     [∨E, 2, 3] [q ∨ p.
      *         [H, 1] [p ∨ q.]
-     *         [∨IL] [q ∨ p.
+     *         [∨Il] [q ∨ p.
      *             [H, 2] [p.]]
-     *         [∨IR] [q ∨ p.
+     *         [∨Ir] [q ∨ p.
      *             [H, 3] [q.]]]]
      * </pre>
      *
      * @param expression The string representation of the propositional logic ND proof.
      * @return The parsed and validated {@code INDProof} object.
-     * @throws Exception If the proof is invalid or cannot be parsed.
+     * @throws ExpException If the proof contains an invalid expression.
+     * @throws NDRuleException If the proof uses a rule incorrectly.
      */
-    public static INDProof parseNDPLProof(String expression) throws Exception {
-        IASTND proof = new Parser(new ByteArrayInputStream(expression.getBytes())).parseNDPL();
-
-        Map<IASTExp, IFormula> formulas = NDWWFExpsChecker.checkPL(proof);
-        NDWWFChecker.check(proof, formulas);
-        Map<IASTExp, Integer> premises = NDMarksChecker.check(proof, formulas);
-        return NDInterpreter.interpret(proof, formulas, premises);
+    public static INDProof parseNDPLProof(String expression) throws ExpException, NDRuleException {
+        return NDProofs.parseNDPLProof(expression);
     }
 
 
@@ -179,16 +166,37 @@ public class LogicAPI {
      *
      * @param expression The string representation of the first-order logic ND proof.
      * @return The parsed and validated {@code INDProof} object.
-     * @throws Exception If the proof is invalid or cannot be parsed.
+     * @throws ExpException If the proof contains an invalid expression.
+     * @throws NDRuleException If the proof uses a rule incorrectly.
      */
-    public static INDProof parseNDFOLProof(String expression) throws Exception {
-        IASTND proof = new Parser(new ByteArrayInputStream(expression.getBytes())).parseNDFOL();
+    public static INDProof parseNDFOLProof(String expression) throws ExpException, NDRuleException {
+        return NDProofs.parseNDFOLProof(expression);
+    }
 
-        Map<IASTExp, IFormula> formulas = NDWWFExpsChecker.checkFOL(proof);
-        NDWWFChecker.check(proof, formulas);
-        Map<IASTExp, Integer> premises = NDMarksChecker.check(proof, formulas);
-        NDSideCondChecker.check(proof, formulas, premises);
-        return NDInterpreter.interpret(proof, formulas, premises);
+    /**
+     * Validates a complete natural deduction (ND) proof against a set of premises and an expected conclusion.
+     *
+     * <p>
+     * This method checks whether the given ND proof:
+     * </p>
+     * <ul>
+     *     <li>Is correctly derived using valid ND inference rules.</li>
+     *     <li>Properly uses the provided premises.</li>
+     *     <li>Successfully derives the expected conclusion as the final line of the proof.</li>
+     * </ul>
+     *
+     * <p><b>Use Case:</b></p>
+     * <p>This method is ideal for validating that a user's proof actually solves a logical problem (e.g., exercises or automated grading).</p>
+     *
+     * @param proof The structured and validated ND proof object.
+     * @param premises The set of initial premises the proof must be based on.
+     * @param conclusion The formula that should be concluded from the premises.
+     * @return The same {@code INDProof} object if the proof solves the problem.
+     * @throws ExpException If any expressions in the proof are invalid.
+     * @throws NDRuleException If the proof is structurally incorrect or does not derive the conclusion.
+     */
+    public static INDProof checkNDProblem(INDProof proof, Set<IFormula> premises, IFormula conclusion) throws ExpException, NDRuleException {
+        return NDProofs.checkNDProblem(proof, premises, conclusion);
     }
 
 }

@@ -4,37 +4,33 @@ import com.logic.exps.asts.IASTExp;
 import com.logic.nd.ERule;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
+import com.logic.nd.interpreters.NDInterpretString;
 
 public class ASTINeg extends AASTUnaryND {
 
-    private final int m;
-    private IASTExp generatedHypothesis;
+    private final String m;
+    private IASTExp closeM;
 
-    public ASTINeg(IASTND hypothesis, IASTExp conclusion, int m) {
-        super(hypothesis, conclusion);
+    public ASTINeg(IASTND hypothesis, IASTExp conclusion, String m) {
+        super(ERule.INTRO_NEGATION, hypothesis, conclusion);
         this.m = m;
     }
 
-    public void setGeneratedHypothesis(IASTExp generatedHypothesis) {
-        this.generatedHypothesis = generatedHypothesis;
+    public void setCloseM(IASTExp closeM) {
+        this.closeM = closeM;
     }
 
-    public IASTExp getGeneratedHypothesis() {
-        return generatedHypothesis;
+    public IASTExp getCloseM() {
+        return closeM;
     }
 
-    public int getM() {
+    public String getM() {
         return m;
     }
 
     @Override
     public <T, E> T accept(INDVisitor<T, E> v, E env) {
         return v.visit(this, env);
-    }
-
-    @Override
-    public String toString() {
-        return "[" + ERule.INTRO_NEGATION + ", " + m + "] " + super.toString();
     }
 
 }

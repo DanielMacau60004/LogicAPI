@@ -4,37 +4,33 @@ import com.logic.exps.asts.IASTExp;
 import com.logic.nd.ERule;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
+import com.logic.nd.interpreters.NDInterpretString;
 
 public class ASTAbsurdity extends AASTUnaryND {
 
-    private final int m;
-    private IASTExp generatedHypothesis;
+    private final String m;
+    private IASTExp closeM;
 
-    public ASTAbsurdity(IASTND hypothesis, IASTExp conclusion, int m) {
-        super(hypothesis, conclusion);
+    public ASTAbsurdity(IASTND hypothesis, IASTExp conclusion, String m) {
+        super(ERule.ABSURDITY, hypothesis, conclusion);
         this.m = m;
     }
 
-    public int getM() {
+    public String getM() {
         return m;
     }
 
-    public void setGeneratedHypothesis(IASTExp generatedHypothesis) {
-        this.generatedHypothesis = generatedHypothesis;
+    public void setCloseM(IASTExp closeM) {
+        this.closeM = closeM;
     }
 
-    public IASTExp getGeneratedHypothesis() {
-        return generatedHypothesis;
+    public IASTExp getCloseM() {
+        return closeM;
     }
 
     @Override
     public <T, E> T accept(INDVisitor<T, E> v, E env) {
         return v.visit(this, env);
-    }
-
-    @Override
-    public String toString() {
-        return "[" + ERule.ABSURDITY + ", " + m + "] " + super.toString();
     }
 
 }

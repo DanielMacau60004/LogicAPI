@@ -14,6 +14,71 @@ The Logic API provides a set of interfaces and utility methods designed to work 
 
 - **Well-Formed Formula (WFF) Checkers**: Ensure that logical formulas are syntactically correct and meet well-formedness criteria.
 
+
+## Conventions
+
+#### Propositional Logic (PL)
+
+- **Literals** Lowercase letters from `a` to `z`
+
+- **Generic Named Formulas** Symbols such as `φ`, `ψ`, `δ`, `α`, `β`, `γ`
+
+- **Logical Symbols**
+    - `¬`  (negation)
+    - `∧`  (conjunction)
+    - `∨`  (disjunction)
+    - `→`  (implication)
+    - `⊥`  (bottom)
+    - `⊤`  (top)
+---
+
+#### First-Order Logic (FOL)
+
+- **Variables** Lowercase letters (`w`–`z`), optionally followed by digits (e.g., `x`, `x1`, `z2`)
+
+- **Constants** Lowercase words representing objects (e.g., `daniel`, `zero`) or lowercase letters (`a`-`v`)
+
+- **Functions** Lowercase function names applied to terms (e.g., `f(x)`, `height(daniel)`)
+
+- **Predicates** Uppercase names applied to terms (e.g., `P(x)`, `Loves(x, y)`, `Adult(daniel)`)
+
+- **Quantifiers**
+    - `∀x` — universal quantifier
+    - `∃x` — existential quantifier
+
+---
+### Natural Deduction Rule Formats
+
+- **Absurdity (⊥ Introduction):** `[⊥, m] formula. [rule]`
+
+- **Negation Introduction (¬I):** `[¬I, m] formula. [rule]`
+
+- **Negation Elimination (¬E):** `[¬E] ⊥. [rule1] [rule2]`
+
+- **Conjunction Elimination Left (∧El):** `[∧El] formula. [rule]`
+
+- **Conjunction Elimination Right (∧Er):** `[∧Er] formula. [rule]`
+
+- **Conjunction Introduction (∧I):** `[∧I] formula. [rule1] [rule2]`
+
+- **Disjunction Introduction Left (∨Il):** `[∨Il] formula. [rule]`
+
+- **Disjunction Introduction Right (∨Ir):** `[∨Ir] formula. [rule]`
+
+- **Disjunction Elimination (∨E):** `[∨E, m, n] formula. [rule1] [rule2] [rule3]`
+
+- **Implication Introduction (→I):** `[→I, m] formula. [rule]`
+
+- **Implication Elimination (→E):** `[→E] formula. [rule1] [rule2]`
+
+- **Universal Introduction (∀I):** `[∀I] formula. [rule]`
+
+- **Universal Elimination (∀E):** `[∀E] formula. [rule]`
+
+- **Existential Introduction (∃I):** `[∃I] formula. [rule]`
+
+- **Existential Elimination (∃E):** `[∃E, m] formula. [rule1] [rule2]`
+
 ## Interfaces
 
 ### `IFormula`
@@ -34,6 +99,7 @@ The `IFOLFormula` interface extends `IFormula` and represents a first-order logi
 - `Iterator<ASTPred> iteratePredicates()`: Iterate over predicate symbols in the formula.
 - `Iterator<ASTVariable> iterateBoundedVariables()`: Iterate over bounded variables in the formula.
 - `boolean isABoundedVariable(ASTVariable variable)`: Check if a variable is bounded in the formula.
+- `boolean isFreeVariable(ASTVariable variable)`: Check if a variable is free in the formula.
 - `boolean isASentence()`: Check whether the formula is a sentence (no unbounded variables).
 
 ### `IPLFormula`
@@ -52,9 +118,11 @@ The `INDProof` interface represents a natural deduction (ND) proof. It provides 
 
 #### Key Methods:
 - `IFormula getConclusion()`: Retrieve the conclusion of the proof.
+- `Iterator<Map.Entry<String, IFormula>> getHypotheses()`: Iterate over the hypotheses used in the proof, returning entries of labels and formulas.
 - `Iterator<IFormula> getPremises()`: Iterate over the premises of the proof.
 - `int height()`: Compute the height (depth) of the proof tree.
 - `int size()`: Compute the total number of steps (nodes) in the proof.
+- `IASTND getAST()`: Get the abstract syntax tree (AST) representation of the natural deduction proof.
 
 ## Utilities
 
@@ -67,6 +135,7 @@ The `LogicAPI` class provides utility methods for parsing and verifying logical 
 - `static IFOLFormula parseFOL(String expression)`: Parse a first-order logic formula and check if it is well-formed.
 - `static INDProof parseNDPLProof(String expression)`: Parse and validate a natural deduction proof for propositional logic.
 - `static INDProof parseNDFOLProof(String expression)`: Parse and validate a natural deduction proof for first-order logic.
+- `static INDProof checkNDProblem(INDProof proof, Set<IFormula> premises, IFormula conclusion)`: Validate a natural deduction proof against given premises and an expected conclusion.
 
 ## Example Usage
 
@@ -87,10 +156,9 @@ IFOLFormula formula = LogicAPI.parseFOL(expression);
 boolean isSentence = formula.isASentence();
 ```
 
-
 ### Natural Deduction Proof (Propositional Logic)
 ```java
-String proof = "[→I, 1] [(p ∨ q) → (q ∨ p). [∨E, 2, 3] [q ∨ p. [H, 1] [p ∨ q.] [∨IL] [q ∨ p. [H, 2] [p.]] [∨IR] [q ∨ p. [H, 3] [q.]]]]";
+String proof = "[→I, 1] [(p ∨ q) → (q ∨ p). [∨E, 2, 3] [q ∨ p. [H, 1] [p ∨ q.] [∨Il] [q ∨ p. [H, 2] [p.]] [∨Ir] [q ∨ p. [H, 3] [q.]]]]";
 INDProof ndProof = LogicAPI.parseNDPLProof(proof);
 ```
 
@@ -99,6 +167,20 @@ INDProof ndProof = LogicAPI.parseNDPLProof(proof);
 String proof = "[→I, 1] [∀x (P(x) → Q(x)) → ∃x (P(x) → Q(x)).]";
 INDProof ndProof = LogicAPI.parseNDFOLProof(proof);
 ```
+
+### Screenshots
+
+Example of a PL proof and corresponding tree:
+
+![PL](/examples/pl.png)
+![PL-TREE](/examples/pl-tree.png)
+---
+Example of a FOL proof and corresponding tree:
+
+![FOL](/examples/fol.png)
+![FOL-TREE](/examples/fol-tree.png)
+---
+
 ## Full Documentation
 You can find the full documentation at the following link:  
 [https://danielmacau60004.github.io/LogicAPI/doc/com/logic/api/package-summary.html](https://danielmacau60004.github.io/LogicAPI/doc/com/logic/api/package-summary.html)
@@ -107,4 +189,4 @@ You can find the full documentation at the following link:
 Daniel Macau
 
 ## Version
-1.0 - March 2025
+2.0 - July 2025

@@ -20,17 +20,17 @@ public class GenericsTest {
         return Stream.of(
                 new Object[]{
                         LogicAPI.parsePL("(α ↔ β) ∧ (γ → δ)"),
-                        Map.of(new ASTArbitrary("α"), LogicAPI.parsePL("(p → q)").getFormula(),
-                                new ASTArbitrary("γ"), LogicAPI.parsePL("(p ∧ q)").getFormula())
+                        Map.of(new ASTArbitrary("α"), LogicAPI.parsePL("(p → q)").getAST(),
+                                new ASTArbitrary("γ"), LogicAPI.parsePL("(p ∧ q)").getAST())
                 },
                 new Object[]{
                         LogicAPI.parsePL("(x ∨ β) → z"),
-                        Map.of(new ASTArbitrary("β"), LogicAPI.parsePL("(r ∧ s)").getFormula())
+                        Map.of(new ASTArbitrary("β"), LogicAPI.parsePL("(r ∧ s)").getAST())
                 },
                 new Object[]{
                         LogicAPI.parsePL("¬(β ∧ γ) ∨ (γ ↔ d)"),
-                        Map.of(new ASTArbitrary("β"), LogicAPI.parsePL("(e → f)").getFormula(),
-                                new ASTArbitrary("γ"), LogicAPI.parsePL("(g ∨ h)").getFormula())
+                        Map.of(new ASTArbitrary("β"), LogicAPI.parsePL("(e → f)").getAST(),
+                                new ASTArbitrary("γ"), LogicAPI.parsePL("(g ∨ h)").getAST())
                 }
         );
     }
@@ -39,7 +39,7 @@ public class GenericsTest {
     @MethodSource("testCasesPL")
     public void testFormulaReplacementPL(IPLFormula formula, Map<IASTExp, IASTExp> replacements) {
         String result = Utils.getToken(
-                FOLReplaceExps.replace(formula.getFormula(), replacements).toString()
+                FOLReplaceExps.replace(formula.getAST(), replacements).toString()
         );
 
         Assertions.assertDoesNotThrow(() -> LogicAPI.parsePL(result));
@@ -60,16 +60,16 @@ public class GenericsTest {
         return Stream.of(
                 new Object[]{
                         LogicAPI.parseFOL("∀x (φ → (α ∨ β))"),
-                        Map.of(new ASTArbitrary("φ"), LogicAPI.parseFOL("(P(x) → Q(x))").getFormula(),
-                                new ASTArbitrary("γ"), LogicAPI.parseFOL("(Z(x,x) ∨ P(x))").getFormula())
+                        Map.of(new ASTArbitrary("φ"), LogicAPI.parseFOL("(P(x) → Q(x))").getAST(),
+                                new ASTArbitrary("γ"), LogicAPI.parseFOL("(Z(x,x) ∨ P(x))").getAST())
                 },
                 new Object[]{
                         LogicAPI.parseFOL("∀z (φ6 → φ7) ↔ (φ2 ∨ (φ4 ∧ φ5))"),
-                        Map.of(new ASTArbitrary("φ6"), LogicAPI.parseFOL("(P(x) → Q(x))").getFormula(),
-                                new ASTArbitrary("φ7"), LogicAPI.parseFOL("(Z(x,x) ∨ P(x))").getFormula(),
-                                new ASTArbitrary("φ2"), LogicAPI.parseFOL("∀z (P(z) → Q(z))").getFormula(),
-                                new ASTArbitrary("φ4"), LogicAPI.parseFOL("Z(x,fun(x))").getFormula(),
-                                new ASTArbitrary("φ5"), LogicAPI.parseFOL("P(test)").getFormula())
+                        Map.of(new ASTArbitrary("φ6"), LogicAPI.parseFOL("(P(x) → Q(x))").getAST(),
+                                new ASTArbitrary("φ7"), LogicAPI.parseFOL("(Z(x,x) ∨ P(x))").getAST(),
+                                new ASTArbitrary("φ2"), LogicAPI.parseFOL("∀z (P(z) → Q(z))").getAST(),
+                                new ASTArbitrary("φ4"), LogicAPI.parseFOL("Z(x,fun(x))").getAST(),
+                                new ASTArbitrary("φ5"), LogicAPI.parseFOL("P(test)").getAST())
                 }
         );
     }
@@ -78,7 +78,7 @@ public class GenericsTest {
     @MethodSource("testCasesFOL")
     public void testFormulaReplacementFOL(IFOLFormula formula, Map<IASTExp, IASTExp> replacements) {
         String result = Utils.getToken(
-                FOLReplaceExps.replace(formula.getFormula(), replacements).toString()
+                FOLReplaceExps.replace(formula.getAST(), replacements).toString()
         );
 
         Assertions.assertDoesNotThrow(() -> LogicAPI.parseFOL(result));
