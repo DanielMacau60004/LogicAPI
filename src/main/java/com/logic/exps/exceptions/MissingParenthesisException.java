@@ -1,31 +1,26 @@
 package com.logic.exps.exceptions;
 
 import com.logic.exps.asts.IASTExp;
-import com.logic.feedback.FeedbackException;
-import com.logic.feedback.FeedbackLevel;
-import com.logic.feedback.FeedbackType;
-import com.logic.parser.Token;
+
 
 public class MissingParenthesisException extends ExpException {
 
-    private final Token token;
-    private final IASTExp before;
+    private final int column;
 
-    public MissingParenthesisException(IASTExp before, Token token) {
-        super(FeedbackType.SYNTAX_ERROR);
 
-        this.before = before;
-        this.token = token;
+    public MissingParenthesisException(IASTExp before, int column) {
+        super(before);
+
+        this.column = column;
     }
 
-    protected String produceFeedback(FeedbackLevel level) {
-        return switch (level) {
-            case NONE -> "";
-            case LOW -> "Invalid expression!";
-            case MEDIUM -> "Missing a parenthesis!";
-            case HIGH -> "You forgot to close the parentheses!";
-            case SOLUTION -> "Consider closing the parenthesis at column " + token.endColumn +
-                    ", after \"" + token.image + "\"!";
-        };
+    public int getColumn() {
+        return column;
     }
+
+    @Override
+    public String getMessage() {
+        return "You forgot to close the parentheses!";
+    }
+
 }

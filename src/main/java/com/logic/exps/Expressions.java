@@ -19,22 +19,22 @@ public class Expressions {
     public static IPLFormula parsePLFormula(String formula) throws ExpException {
         try {
             Parser parser = new Parser(new ByteArrayInputStream(formula.getBytes()));
-            return PLWFFInterpreter.check(parser.parsePL());
+            return PLWFFInterpreter.check(ExpUtils.removeParenthesis(parser.parsePL()));
         } catch (ParseException e) {
-            throw new ExpSyntaxException(e);
+            throw new ExpSyntaxException(null, e);
         } catch (TokenMgrError e) {
-            throw new ExpLexicalException(e);
+            throw new ExpLexicalException(null, e);
         }
     }
 
     public static IFOLFormula parseFOLFormula(String formula) throws ExpException {
         try {
             Parser parser = new Parser(new ByteArrayInputStream(formula.getBytes()));
-            return FOLWFFInterpreter.check(parser.parseFOL());
+            return FOLWFFInterpreter.check(ExpUtils.removeParenthesis(parser.parseFOL()));
         } catch (ParseException e) {
-            throw new ExpSyntaxException(e);
+            throw new ExpSyntaxException(null, e);
         } catch (TokenMgrError e) {
-            throw new ExpLexicalException(e);
+            throw new ExpLexicalException(null, e);
         }
     }
 

@@ -122,7 +122,7 @@ private IASTExp atomicsPL() : {
   | <NOT> e = atomicsPL() { return new ASTNot(e); }
   | <LPAR> e = atomicsPL() e = operationsPL(e)
     (<RPAR> { return new ASTParenthesis(e); }
-    | {throw new MissingParenthesisException(e, getToken(0));})
+    | {throw new MissingParenthesisException(e, getToken(0).endColumn);})
   | t = <LITERAL> { return new ASTLiteral(t.image); }
   | t = <GENERIC> { return new ASTArbitrary(t.image); }
 }
@@ -163,7 +163,7 @@ private IASTExp atomicsFOL() : {
   | <NOT> e = atomicsFOL() { return new ASTNot(e); }
   | <LPAR> e = atomicsFOL() e = operationsFOL(e)
     (<RPAR> { return new ASTParenthesis(e); }
-    | {throw new MissingParenthesisException(e, getToken(0));})
+    | {throw new MissingParenthesisException(e, getToken(0).endColumn);})
   | t = <GENERIC> { return new ASTArbitrary(t.image); }
   | <EXISTENTIAL> t = <VARIABLE> {e = new ASTVariable(t.image);} e1 = atomicsFOL() { return new ASTExistential(e, e1); }
   | <UNIVERSAL> t = <VARIABLE> {e = new ASTVariable(t.image);} e1 = atomicsFOL() { return new ASTUniversal(e, e1); }
@@ -176,7 +176,7 @@ private IASTExp predicateFOL(String name) : {
 } {
     <LPAR> e = termFOL() { pred.addTerm(e); } ( <COMMA> e = termFOL() { pred.addTerm(e); } )*
         (<RPAR> { return pred; }
-        | {throw new MissingParenthesisException(e, getToken(0));})
+        | {throw new MissingParenthesisException(e, getToken(0).endColumn);})
 }
 
 private IASTExp termFOL() : {
@@ -194,7 +194,7 @@ private IASTExp functionFOL(String name) : {
 } {
     <LPAR> e = termFOL() { fun.addTerm(e); } (LOOKAHEAD(2) <COMMA> e = termFOL() { fun.addTerm(e); } )*
         (<RPAR> { return fun; }
-        | {throw new MissingParenthesisException(e, getToken(0));})
+        | {throw new MissingParenthesisException(e, getToken(0).endColumn);})
 }
 
 /*

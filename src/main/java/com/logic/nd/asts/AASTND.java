@@ -15,31 +15,14 @@ public abstract class AASTND implements IASTND {
     protected String getToken(int kind) {
         return Parser.tokenImage[kind].replace("\"", "");
     }
-    protected List<NDRuleException> errors;
 
     public AASTND(ERule rule) {
         this.rule = rule;
-        errors = new ArrayList<>();
     }
 
     @Override
     public ERule getRule() {
         return rule;
-    }
-
-    @Override
-    public boolean hasErrors() {
-        return !errors.isEmpty();
-    }
-
-    @Override
-    public void appendErrors(NDRuleException error) {
-        errors.add(error);
-    }
-
-    @Override
-    public List<NDRuleException> getErrors() {
-        return errors;
     }
 
     @Override

@@ -14,9 +14,4 @@ public interface IASTND {
 
     ERule getRule();
 
-    boolean hasErrors();
-
-    void appendErrors(NDRuleException error);
-
-    List<NDRuleException> getErrors();
 }

@@ -1,24 +1,28 @@
 package com.logic.nd.exceptions;
 
-import com.logic.feedback.FeedbackLevel;
-import com.logic.feedback.FeedbackType;
+import com.logic.api.INDProof;
 import com.logic.parser.TokenMgrError;
 
-public class NDLexicalException extends NDRuleException {
+public class NDLexicalException extends RuntimeException {
 
-    protected TokenMgrError exception;
+    private final TokenMgrError exception;
+    private final INDProof proof;
 
-    public NDLexicalException(TokenMgrError exception) {
-        super(FeedbackType.LEXICAL_ERROR);
-
+    public NDLexicalException(INDProof proof, TokenMgrError exception) {
+        this.proof = proof;
         this.exception = exception;
     }
 
-    protected String produceFeedback(FeedbackLevel level) {
-        return switch (level) {
-            case NONE -> "";
-            case LOW -> "Invalid proof!";
-            case MEDIUM, HIGH, SOLUTION -> "Lexical error!";
-        };
+    public TokenMgrError getException() {
+        return exception;
+    }
+
+    public INDProof getProof() {
+        return proof;
+    }
+
+    @Override
+    public String getMessage() {
+        return exception.getMessage();
     }
 }

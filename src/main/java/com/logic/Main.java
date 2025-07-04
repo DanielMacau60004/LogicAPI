@@ -1,20 +1,13 @@
 package com.logic;
 
-import com.logic.api.INDProof;
 import com.logic.api.LogicAPI;
 import com.logic.exps.asts.IASTExp;
-import com.logic.feedback.FeedbackException;
-import com.logic.feedback.FeedbackLevel;
-import com.logic.nd.exceptions.NDException;
-import com.logic.others.Utils;
 import com.logic.parser.Parser;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Set;
 
 public class Main {
 

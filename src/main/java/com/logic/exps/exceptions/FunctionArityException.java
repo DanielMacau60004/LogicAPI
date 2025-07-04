@@ -1,8 +1,6 @@
 package com.logic.exps.exceptions;
 
-import com.logic.feedback.FeedbackException;
-import com.logic.feedback.FeedbackLevel;
-import com.logic.feedback.FeedbackType;
+import com.logic.exps.asts.IASTExp;
 
 public class FunctionArityException extends ExpException {
 
@@ -10,23 +8,28 @@ public class FunctionArityException extends ExpException {
     private final int expectedArity;
     private final int foundArity;
 
-    public FunctionArityException(String name, int expectedArity, int foundArity) {
-        super(FeedbackType.SYNTAX_ERROR);
+    public FunctionArityException(IASTExp exp, String name, int expectedArity, int foundArity) {
+        super(exp);
 
         this.name = name;
         this.expectedArity = expectedArity;
         this.foundArity = foundArity;
     }
 
-    protected String produceFeedback(FeedbackLevel level) {
-        return switch (level) {
-            case NONE -> "";
-            case LOW -> "Invalid expression!";
-            case MEDIUM -> "Invalid function arity!";
-            case HIGH -> "Invalid function arity in function \""+name+"\"!";
-            case SOLUTION -> "Invalid function arity in function \"" + name +
-                    "\" found " + foundArity + " but expected " + expectedArity + "!"
-            ;
-        };
+    public String getFunctionName() {
+        return name;
+    }
+
+    public int getExpectedArity() {
+        return expectedArity;
+    }
+
+    public int getFoundArity() {
+        return foundArity;
+    }
+
+    @Override
+    public String getMessage() {
+        return "Different arities for function \"" + name + "!";
     }
 }

@@ -1,9 +1,8 @@
-package com.logic.nd.interpreters;
+package com.logic.nd.checkers;
 
 import com.logic.api.IFormula;
 import com.logic.api.INDProof;
 import com.logic.exps.asts.IASTExp;
-import com.logic.feedback.FeedbackType;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
 import com.logic.nd.asts.binary.ASTEExist;
@@ -14,41 +13,37 @@ import com.logic.nd.asts.others.ASTEDis;
 import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
 import com.logic.nd.exceptions.ConclusionException;
-import com.logic.nd.exceptions.NDException;
-import com.logic.nd.exceptions.NDRuleException;
-import com.logic.nd.exceptions.PremiseException;
 import com.logic.others.Env;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class NDInterpretProblem implements INDVisitor<Void, Env<String, IASTExp>> {
-
-    private final List<NDRuleException> errors;
+public class NDProblemChecker implements INDVisitor<Void, Env<String, IASTExp>> {
 
     private final Set<IASTExp> premises;
+    private final Map<ASTHypothesis, Env<String, IASTExp>> rules;
 
-    NDInterpretProblem(Set<IASTExp> premises) {
-        this.errors = new ArrayList<>();
+    NDProblemChecker(Set<IASTExp> premises) {
         this.premises = premises;
+        this.rules = new HashMap<>();
     }
 
-    public static INDProof solve(INDProof proof, Set<IFormula> premises, IFormula conclusion) throws NDException {
+    public static INDProof solve(INDProof proof, Set<IFormula> premises, IFormula conclusion) {
         IASTND proofAST = proof.getAST();
 
-        NDInterpretProblem interpreter = new NDInterpretProblem(premises.stream()
+        NDProblemChecker interpreter = new NDProblemChecker(premises.stream()
                 .map(IFormula::getAST).collect(Collectors.toSet()));
         proofAST.accept(interpreter, new Env<>());
 
-        if (!interpreter.errors.isEmpty() || !proofAST.getConclusion().equals(conclusion.getAST())) {
+        if (!proofAST.getConclusion().equals(conclusion.getAST()) || !interpreter.rules.isEmpty()) {
             Set<IFormula> premisesSet = new HashSet<>();
             proof.getPremises().forEachRemaining(premisesSet::add);
 
-            NDRuleException exception = new ConclusionException(premisesSet, proof.getConclusion());
-            throw new NDException(proof, FeedbackType.SEMANTIC_ERROR, interpreter.errors, exception);
+            throw new ConclusionException(proof.getAST(), premises, conclusion, premisesSet, proof.getConclusion(),
+                    interpreter.rules);
         }
 
         return proof;
@@ -60,11 +55,8 @@ public class NDInterpretProblem implements INDVisitor<Void, Env<String, IASTExp>
         if (h.getM() != null && env.findParent(h.getM()) != null)
             return null;
 
-        if (!premises.contains(h.getConclusion())) {
-            NDRuleException exception = new PremiseException(h.getConclusion(), h.getM() != null, premises, env);
-            h.appendErrors(exception);
-            errors.add(exception);
-        }
+        if (!premises.contains(h.getConclusion()))
+            rules.put(h, env);
 
         return null;
     }

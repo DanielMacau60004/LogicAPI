@@ -3,7 +3,7 @@ package com.logic.api;
 import com.logic.exps.Expressions;
 import com.logic.exps.exceptions.ExpException;
 import com.logic.nd.NDProofs;
-import com.logic.nd.exceptions.NDException;
+import com.logic.nd.exceptions.NDRuleException;
 
 import java.util.Set;
 
@@ -121,9 +121,10 @@ public class LogicAPI {
      *
      * @param expression The string representation of the propositional logic ND proof.
      * @return The parsed and validated {@code INDProof} object.
-     * @throws NDException If the proof is invalid or cannot be parsed.
+     * @throws ExpException If the proof contains an invalid expression.
+     * @throws NDRuleException If the proof uses a rule incorrectly.
      */
-    public static INDProof parseNDPLProof(String expression) throws NDException {
+    public static INDProof parseNDPLProof(String expression) throws ExpException, NDRuleException {
         return NDProofs.parseNDPLProof(expression);
     }
 
@@ -165,13 +166,14 @@ public class LogicAPI {
      *
      * @param expression The string representation of the first-order logic ND proof.
      * @return The parsed and validated {@code INDProof} object.
-     * @throws NDException If the proof is invalid or cannot be parsed.
+     * @throws ExpException If the proof contains an invalid expression.
+     * @throws NDRuleException If the proof uses a rule incorrectly.
      */
-    public static INDProof parseNDFOLProof(String expression) throws NDException {
+    public static INDProof parseNDFOLProof(String expression) throws ExpException, NDRuleException {
         return NDProofs.parseNDFOLProof(expression);
     }
 
-    public static INDProof checkNDProblem(INDProof proof, Set<IFormula> premises, IFormula conclusion) throws NDException {
+    public static INDProof checkNDProblem(INDProof proof, Set<IFormula> premises, IFormula conclusion) throws ExpException, NDRuleException {
         return NDProofs.checkNDProblem(proof, premises, conclusion);
     }
 

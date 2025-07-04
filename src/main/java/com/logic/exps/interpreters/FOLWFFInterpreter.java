@@ -78,7 +78,7 @@ public class FOLWFFInterpreter implements IExpsVisitor<Void, Env<String, ASTVari
             functionsMap.put(e.getName(), 0);
             functions.add(e);
         } else if (size != 0)
-            throw new FunctionArityException(e.getName(), size, 0);
+            throw new FunctionArityException(e, e.getName(), size, 0);
 
         return null;
     }
@@ -91,7 +91,7 @@ public class FOLWFFInterpreter implements IExpsVisitor<Void, Env<String, ASTVari
             predicatesMap.put(e.getName(), 0);
             predicates.add(e);
         } else if (size != 0)
-            throw new PredicateArityException(e.getName(), size, 0);
+            throw new PredicateArityException(e, e.getName(), size, 0);
 
         return null;
     }
@@ -158,7 +158,7 @@ public class FOLWFFInterpreter implements IExpsVisitor<Void, Env<String, ASTVari
             functionsMap.put(e.getName(), arity);
             functions.add(e);
         } else if (size != arity)
-            throw new FunctionArityException(e.getName(), size, arity);
+            throw new FunctionArityException(e, e.getName(), size, arity);
 
         e.getTerms().forEach(t -> t.accept(this, env));
         return null;
@@ -173,7 +173,7 @@ public class FOLWFFInterpreter implements IExpsVisitor<Void, Env<String, ASTVari
             predicatesMap.put(e.getName(), arity);
             predicates.add(e);
         } else if (size != arity)
-            throw new PredicateArityException(e.getName(), size, arity);
+            throw new PredicateArityException(e, e.getName(), size, arity);
 
         e.getTerms().forEach(t -> t.accept(this, env));
         return null;

@@ -140,7 +140,7 @@ public class Parser implements ParserConstants {
         break;
       default:
         jj_la1[5] = jj_gen;
-       {if (true) throw new MissingParenthesisException(e, getToken(0));}
+       {if (true) throw new MissingParenthesisException(e, getToken(0).endColumn);}
       }
       break;
     case LITERAL:
@@ -286,7 +286,7 @@ public class Parser implements ParserConstants {
         break;
       default:
         jj_la1[12] = jj_gen;
-       {if (true) throw new MissingParenthesisException(e, getToken(0));}
+       {if (true) throw new MissingParenthesisException(e, getToken(0).endColumn);}
       }
       break;
     case GENERIC:
@@ -354,7 +354,7 @@ public class Parser implements ParserConstants {
       break;
     default:
       jj_la1[16] = jj_gen;
-           {if (true) throw new MissingParenthesisException(e, getToken(0));}
+           {if (true) throw new MissingParenthesisException(e, getToken(0).endColumn);}
     }
     throw new Error("Missing return statement in function");
   }
@@ -412,7 +412,7 @@ public class Parser implements ParserConstants {
       break;
     default:
       jj_la1[19] = jj_gen;
-           {if (true) throw new MissingParenthesisException(e, getToken(0));}
+           {if (true) throw new MissingParenthesisException(e, getToken(0).endColumn);}
     }
     throw new Error("Missing return statement in function");
   }

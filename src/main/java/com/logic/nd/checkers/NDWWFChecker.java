@@ -8,8 +8,8 @@ import com.logic.exps.asts.binary.*;
 import com.logic.exps.asts.others.AASTTerm;
 import com.logic.exps.asts.others.ASTVariable;
 import com.logic.exps.asts.unary.ASTNot;
-import com.logic.exps.interpreters.FOLWFFInterpreter;
 import com.logic.exps.interpreters.FOLReplaceExps;
+import com.logic.exps.interpreters.FOLWFFInterpreter;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
 import com.logic.nd.asts.binary.ASTEExist;
@@ -19,10 +19,8 @@ import com.logic.nd.asts.binary.ASTIConj;
 import com.logic.nd.asts.others.ASTEDis;
 import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
-import com.logic.nd.exceptions.sideconditions.EUniInvalidMappingException;
-import com.logic.nd.exceptions.rules.*;
-import com.logic.nd.exceptions.sideconditions.IExistInvalidMappingException;
-import com.logic.nd.exceptions.sideconditions.IUniInvalidMappingException;
+import com.logic.nd.exceptions.NDRuleException;
+import com.logic.nd.exceptions.InvalidMappingException;
 
 import java.util.*;
 
@@ -46,146 +44,105 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
     @Override
     public Void visit(ASTIImp r, Void env) {
-        if(r.hasErrors()) return null;
         IASTExp exp = r.getConclusion();
 
-        if (!(exp instanceof ASTConditional cond)) {
-            r.appendErrors(new IImpException(r));
-            return null;
-        }
+        if (!(exp instanceof ASTConditional cond))
+            throw new NDRuleException(r);
 
         IASTExp right = ExpUtils.removeParenthesis(cond.getRight());
 
-        if (!right.equals(r.getHyp().getConclusion())) {
-            r.appendErrors(new IImpException(r, cond));
-            return null;
-        }
+        if (!right.equals(r.getHyp().getConclusion()))
+            throw new NDRuleException(r);
 
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTINeg r, Void env) {
-        if(r.hasErrors()) return null;
         IASTExp exp = r.getConclusion();
 
-        if (!(exp instanceof ASTNot neg)) {
-            r.appendErrors(new INegException(r));
-            return null;
-        }
-
-        if (!r.getHyp().getConclusion().equals(ExpUtils.BOT)) {
-            r.appendErrors(new INegException(r, neg));
-            return null;
-        }
+        if (!(exp instanceof ASTNot) || !r.getHyp().getConclusion().equals(ExpUtils.BOT))
+            throw new NDRuleException(r);
 
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTERConj r, Void env) {
-        if(r.hasErrors()) return null;
         IASTExp exp = r.getConclusion();
 
-        if (!(r.getHyp().getConclusion() instanceof ASTAnd and)) {
-            r.appendErrors(new ERConjException(r));
-            return null;
-        }
+        if (!(r.getHyp().getConclusion() instanceof ASTAnd and))
+            throw new NDRuleException(r);
 
         IASTExp left = ExpUtils.removeParenthesis(and.getLeft());
-        if (!left.equals(exp)) {
-            r.appendErrors(new ERConjException(r, and));
-            return null;
-        }
+        if (!left.equals(exp))
+            throw new NDRuleException(r);
 
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTELConj r, Void env) {
-        if(r.hasErrors()) return null;
         IASTExp exp = r.getConclusion();
 
-        if (!(r.getHyp().getConclusion() instanceof ASTAnd and)) {
-            r.appendErrors(new ELConjException(r));
-            return null;
-        }
+        if (!(r.getHyp().getConclusion() instanceof ASTAnd and))
+            throw new NDRuleException(r);
 
         IASTExp right = ExpUtils.removeParenthesis(and.getRight());
-        if (!right.equals(exp)) {
-            r.appendErrors(new ELConjException(r, and));
-            return null;
-        }
+        if (!right.equals(exp))
+            throw new NDRuleException(r);
 
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTIRDis r, Void env) {
-        if(r.hasErrors()) return null;
         IASTExp exp = r.getConclusion();
 
-        if (!(exp instanceof ASTOr or)) {
-            r.appendErrors(new IRDisException(r));
-            return null;
-        }
+        if (!(exp instanceof ASTOr or))
+            throw new NDRuleException(r);
 
         IASTExp left = ExpUtils.removeParenthesis(or.getLeft());
-        if (!left.equals(r.getHyp().getConclusion())) {
-            r.appendErrors(new IRDisException(r, or));
-            return null;
-        }
+        if (!left.equals(r.getHyp().getConclusion()))
+            throw new NDRuleException(r);
 
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTILDis r, Void env) {
-        if(r.hasErrors()) return null;
         IASTExp exp = r.getConclusion();
 
-        if (!(exp instanceof ASTOr or)) {
-            r.appendErrors(new ILDisException(r));
-            return null;
-        }
+        if (!(exp instanceof ASTOr or))
+            throw new NDRuleException(r);
 
         IASTExp right = ExpUtils.removeParenthesis(or.getRight());
-        if (!right.equals(r.getHyp().getConclusion())) {
-            r.appendErrors(new ILDisException(r, or));
-            return null;
-        }
+        if (!right.equals(r.getHyp().getConclusion()))
+            throw new NDRuleException(r);
 
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTAbsurdity r, Void env) {
-        if(r.hasErrors()) return null;
-        if (!r.getHyp().getConclusion().equals(ExpUtils.BOT)) {
-            r.appendErrors(new AbsurdityException(r));
-            return null;
-        }
+        if (!r.getHyp().getConclusion().equals(ExpUtils.BOT))
+            throw new NDRuleException(r);
 
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTIConj r, Void env) {
-        if(r.hasErrors()) return null;
         IASTExp exp = r.getConclusion();
 
-        if (!(exp instanceof ASTAnd and)) {
-            r.appendErrors(new IConjException(r));
-            return null;
-        }
+        if (!(exp instanceof ASTAnd and))
+            throw new NDRuleException(r);
 
         IASTExp left = ExpUtils.removeParenthesis(and.getLeft());
         IASTExp right = ExpUtils.removeParenthesis(and.getRight());
 
-        if (!left.equals(r.getHyp1().getConclusion()) || !right.equals(r.getHyp2().getConclusion())) {
-            r.appendErrors(new IConjException(r, and));
-            return null;
-        }
+        if (!left.equals(r.getHyp1().getConclusion()) || !right.equals(r.getHyp2().getConclusion()))
+            throw new NDRuleException(r);
 
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
@@ -195,21 +152,16 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
     @Override
     public Void visit(ASTEDis r, Void env) {
-        if(r.hasErrors()) return null;
         IASTExp exp = r.getConclusion();
 
-        if (!(r.getHyp1().getConclusion() instanceof ASTOr or)) {
-            r.appendErrors(new EDisException(r));
-            return null;
-        }
+        if (!(r.getHyp1().getConclusion() instanceof ASTOr or))
+            throw new NDRuleException(r);
 
         IASTExp left = ExpUtils.removeParenthesis(r.getHyp2().getConclusion());
         IASTExp right = ExpUtils.removeParenthesis(r.getHyp3().getConclusion());
 
-        if (!exp.equals(left) || !exp.equals(right)) {
-            r.appendErrors(new EDisException(r, or));
-            return null;
-        }
+        if (!exp.equals(left) || !exp.equals(right))
+            throw new NDRuleException(r);
 
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
@@ -220,21 +172,16 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
     @Override
     public Void visit(ASTEImp r, Void env) {
-        if(r.hasErrors()) return null;
         IASTExp exp = r.getConclusion();
 
         IASTExp other = r.getHyp1().getConclusion();
-        if (!(r.getHyp2().getConclusion() instanceof ASTConditional imp)) {
-            r.appendErrors(new EImpException(r));
-            return null;
-        }
+        if (!(r.getHyp2().getConclusion() instanceof ASTConditional imp))
+            throw new NDRuleException(r);
 
         IASTExp left = ExpUtils.removeParenthesis(imp.getLeft());
         IASTExp right = ExpUtils.removeParenthesis(imp.getRight());
-        if (!left.equals(other) || !right.equals(exp)) {
-            r.appendErrors(new EImpException(r, imp));
-            return null;
-        }
+        if (!left.equals(other) || !right.equals(exp))
+            throw new NDRuleException(r);
 
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
@@ -244,21 +191,16 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
     @Override
     public Void visit(ASTENeg r, Void env) {
-        if(r.hasErrors()) return null;
         IASTExp exp = r.getConclusion();
 
-        if (!exp.equals(ExpUtils.BOT)) {
-            r.appendErrors(new ENegException(r, r.getHyp1().getConclusion()));
-            return null;
-        }
+        if (!exp.equals(ExpUtils.BOT))
+            throw new NDRuleException(r);
 
         IASTExp leftNot = ExpUtils.invert(r.getHyp2().getConclusion());
         IASTExp rightNot = ExpUtils.invert(r.getHyp1().getConclusion());
         if (!r.getHyp1().getConclusion().equals(leftNot) &&
-                !r.getHyp2().getConclusion().equals(rightNot)) {
-            r.appendErrors(new ENegException(r, r.getHyp1().getConclusion()));
-            return null;
-        }
+                !r.getHyp2().getConclusion().equals(rightNot))
+            throw new NDRuleException(r);
 
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
@@ -268,12 +210,8 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
     @Override
     public Void visit(ASTEUni r, Void env) {
-        if(r.hasErrors()) return null;
-
-        if (!(r.getHyp().getConclusion() instanceof ASTUniversal uni)) {
-            r.appendErrors(new EUniException(r));
-            return null;
-        }
+        if (!(r.getHyp().getConclusion() instanceof ASTUniversal uni))
+            throw new NDRuleException(r);
 
         //Find mapping
         ASTVariable x = (ASTVariable) uni.getLeft();
@@ -296,10 +234,8 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
                 }
             }
 
-        if (r.getMapping() == null) {
-            r.appendErrors(new EUniInvalidMappingException(r,  x, psi, psiXT.getAST(), outcomes));
-            return null;
-        }
+        if (r.getMapping() == null)
+            throw new InvalidMappingException(r, x, psi, psiXT.getAST(), outcomes);
 
         formulas.put(psi, FOLWFFInterpreter.check(psi));
 
@@ -308,11 +244,8 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
     @Override
     public Void visit(ASTIExist r, Void env) {
-        if(r.hasErrors()) return null;
-        if (!(r.getConclusion() instanceof ASTExistential exi)) {
-            r.appendErrors(new IExistException(r));
-            return null;
-        }
+        if (!(r.getConclusion() instanceof ASTExistential exi))
+            throw new NDRuleException(r);
 
         //Find mapping
         ASTVariable x = (ASTVariable) exi.getLeft();
@@ -335,10 +268,8 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
                 }
             }
 
-        if (r.getMapping() == null) {
-            r.appendErrors(new IExistInvalidMappingException(r, x, psi, psiXT.getAST(), outcomes));
-            return null;
-        }
+        if (r.getMapping() == null)
+            throw new InvalidMappingException(r, x, psi, psiXT.getAST(), outcomes);
 
         formulas.put(psi, FOLWFFInterpreter.check(psi));
 
@@ -347,12 +278,8 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
     @Override
     public Void visit(ASTIUni r, Void env) {
-        if(r.hasErrors()) return null;
-
-        if (!(r.getConclusion() instanceof ASTUniversal uni)) {
-            r.appendErrors(new IUniException(r));
-            return null;
-        }
+        if (!(r.getConclusion() instanceof ASTUniversal uni))
+            throw new NDRuleException(r);
 
         //Find mapping
         ASTVariable x = (ASTVariable) uni.getLeft();
@@ -375,10 +302,8 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
                 }
             }
 
-        if (r.getMapping() == null) {
-            r.appendErrors(new IUniInvalidMappingException(r, x, psi, psiXY.getAST(), outcomes));
-            return null;
-        }
+        if (r.getMapping() == null)
+            throw new InvalidMappingException(r, x, psi, psiXY.getAST(), outcomes);
 
         formulas.put(psi, FOLWFFInterpreter.check(psi));
 
@@ -387,16 +312,9 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
     @Override
     public Void visit(ASTEExist r, Void env) {
-        if(r.hasErrors()) return null;
-        if (!(r.getHyp1().getConclusion() instanceof ASTExistential exist)) {
-            r.appendErrors(new EExistException(r));
-            return null;
-        }
-
-        if (!r.getConclusion().equals(r.getHyp2().getConclusion())) {
-            r.appendErrors(new EExistException(r, exist));
-            return null;
-        }
+        if (!(r.getHyp1().getConclusion() instanceof ASTExistential exist) ||
+                !r.getConclusion().equals(r.getHyp2().getConclusion()))
+            throw new NDRuleException(r);
 
         IASTExp exp = ExpUtils.removeParenthesis(exist.getRight());
         formulas.put(exp, FOLWFFInterpreter.check(exp));

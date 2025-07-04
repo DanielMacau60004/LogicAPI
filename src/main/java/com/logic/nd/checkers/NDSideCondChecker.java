@@ -16,13 +16,9 @@ import com.logic.nd.asts.binary.ASTIConj;
 import com.logic.nd.asts.others.ASTEDis;
 import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
-import com.logic.nd.exceptions.EFeedbackPosition;
-import com.logic.nd.exceptions.NDTextException;
-import com.logic.nd.exceptions.sideconditions.EUniNotFreeVariableException;
-import com.logic.nd.exceptions.sideconditions.FreeVariableException;
-import com.logic.nd.exceptions.sideconditions.IExistNotFreeVariableException;
+import com.logic.nd.exceptions.NotFreeVariableException;
+import com.logic.nd.exceptions.FreeVariableException;
 import com.logic.others.Env;
-import com.logic.others.Utils;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -55,7 +51,6 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, ASTHypoth
 
     @Override
     public Void visit(ASTIImp r, Env<String, ASTHypothesis> env) {
-        if (r.hasErrors()) return null;
         env = env.beginScope();
         r.getHyp().accept(this, env);
         if (r.getCloseM() != null)
@@ -66,7 +61,6 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, ASTHypoth
 
     @Override
     public Void visit(ASTINeg r, Env<String, ASTHypothesis> env) {
-        if (r.hasErrors()) return null;
         env = env.beginScope();
         r.getHyp().accept(this, env);
         if (r.getCloseM() != null)
@@ -77,31 +71,26 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, ASTHypoth
 
     @Override
     public Void visit(ASTERConj r, Env<String, ASTHypothesis> env) {
-        if (r.hasErrors()) return null;
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTELConj r, Env<String, ASTHypothesis> env) {
-        if (r.hasErrors()) return null;
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTIRDis r, Env<String, ASTHypothesis> env) {
-        if (r.hasErrors()) return null;
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTILDis r, Env<String, ASTHypothesis> env) {
-        if (r.hasErrors()) return null;
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTAbsurdity r, Env<String, ASTHypothesis> env) {
-        if (r.hasErrors()) return null;
         env = env.beginScope();
         r.getHyp().accept(this, env);
         if (r.getCloseM() != null)
@@ -112,7 +101,6 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, ASTHypoth
 
     @Override
     public Void visit(ASTIConj r, Env<String, ASTHypothesis> env) {
-        if (r.hasErrors()) return null;
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
         return null;
@@ -120,7 +108,6 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, ASTHypoth
 
     @Override
     public Void visit(ASTEDis r, Env<String, ASTHypothesis> env) {
-        if (r.hasErrors()) return null;
         r.getHyp1().accept(this, env);
 
         env = env.beginScope();
@@ -139,7 +126,6 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, ASTHypoth
 
     @Override
     public Void visit(ASTEImp r, Env<String, ASTHypothesis> env) {
-        if (r.hasErrors()) return null;
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
         return null;
@@ -147,7 +133,6 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, ASTHypoth
 
     @Override
     public Void visit(ASTENeg r, Env<String, ASTHypothesis> env) {
-        if (r.hasErrors()) return null;
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
         return null;
@@ -155,45 +140,35 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, ASTHypoth
 
     @Override
     public Void visit(ASTEUni r, Env<String, ASTHypothesis> env) {
-        if (r.hasErrors()) return null;
         ASTUniversal uni = (ASTUniversal) r.getHyp().getConclusion();
         IFOLFormula psi = (IFOLFormula) formulas.get(ExpUtils.removeParenthesis(uni.getRight()));
 
-        if (r.getMapping() instanceof ASTVariable x && psi.isABoundedVariable(x)) {
-            r.appendErrors(new EUniNotFreeVariableException(r, x, uni.getLeft(), psi));
-            return null;
-        }
+        if (r.getMapping() instanceof ASTVariable x && psi.isABoundedVariable(x))
+            throw new NotFreeVariableException(r, x, uni.getLeft(), psi);
 
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTIExist r, Env<String, ASTHypothesis> env) {
-        if (r.hasErrors()) return null;
         ASTExistential exi = (ASTExistential) r.getConclusion();
         IFOLFormula psi = (IFOLFormula) formulas.get(ExpUtils.removeParenthesis(exi.getRight()));
 
-        if (r.getMapping() instanceof ASTVariable x && psi.isABoundedVariable(x)) {
-            r.appendErrors(new IExistNotFreeVariableException(r, x, exi.getLeft(), psi));
-            return null;
-        }
+        if (r.getMapping() instanceof ASTVariable x && psi.isABoundedVariable(x))
+            throw new NotFreeVariableException(r, x, exi.getLeft(), psi);
 
         return r.getHyp().accept(this, env);
     }
 
     @Override
     public Void visit(ASTIUni r, Env<String, ASTHypothesis> env) {
-        if (r.hasErrors()) return null;
-
         r.getHyp().accept(this, env);
 
         ASTUniversal uni = (ASTUniversal) r.getConclusion();
         IFOLFormula psi = (IFOLFormula) formulas.get(ExpUtils.removeParenthesis(uni.getRight()));
 
-        if (!uni.getLeft().equals(r.getMapping()) && psi.appearsFreeVariable(r.getMapping())) {
-            r.appendErrors(new FreeVariableException(List.of(r.getHyp()), r.getMapping(), (ASTVariable) uni.getLeft()));
-            return null;
-        }
+        if (!uni.getLeft().equals(r.getMapping()) && psi.appearsFreeVariable(r.getMapping()))
+            throw new FreeVariableException(r, List.of(r.getHyp()), r.getMapping(), (ASTVariable) uni.getLeft());
 
         List<IASTND> freeFormulas = new LinkedList<>();
         for (Map.Entry<String, ASTHypothesis> e : env.mapChild().entrySet()) {
@@ -203,17 +178,14 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, ASTHypoth
                 freeFormulas.add(e.getValue());
         }
 
-        if (!freeFormulas.isEmpty()) {
-            r.appendErrors(new FreeVariableException(freeFormulas, r.getMapping(), null));
-            return null;
-        }
+        if (!freeFormulas.isEmpty())
+            throw new FreeVariableException(r, freeFormulas, r.getMapping(), null);
 
         return null;
     }
 
     @Override
     public Void visit(ASTEExist r, Env<String, ASTHypothesis> env) {
-        if (r.hasErrors()) return null;
         ASTExistential exi = (ASTExistential) r.getHyp1().getConclusion();
         IFOLFormula psi = (IFOLFormula) formulas.get(ExpUtils.removeParenthesis(exi.getRight()));
         IFOLFormula exp = (IFOLFormula) formulas.get(r.getConclusion());
@@ -223,15 +195,11 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, ASTHypoth
         env = env.beginScope();
         r.getHyp2().accept(this, env);
 
-        if (!exi.getLeft().equals(r.getMapping()) && psi.appearsFreeVariable(r.getMapping())) {
-            r.appendErrors(new FreeVariableException(List.of(r.getHyp1()), r.getMapping(), (ASTVariable) exi.getLeft()));
-            return null;
-        }
+        if (!exi.getLeft().equals(r.getMapping()) && psi.appearsFreeVariable(r.getMapping()))
+            throw new FreeVariableException(r, List.of(r.getHyp1()), r.getMapping(), (ASTVariable) exi.getLeft());
 
-        if (exp.appearsFreeVariable(r.getMapping())) {
-            r.appendErrors(new FreeVariableException(List.of(r.getHyp2()), r.getMapping(), null));
-            return null;
-        }
+        if (exp.appearsFreeVariable(r.getMapping()))
+            throw new FreeVariableException(r, List.of(r.getHyp2()), r.getMapping(), null);
 
         List<IASTND> freeFormulas = new LinkedList<>();
         for (Map.Entry<String, ASTHypothesis> e : env.mapChild().entrySet()) {
@@ -241,10 +209,8 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, ASTHypoth
                 freeFormulas.add(e.getValue());
         }
 
-        if (!freeFormulas.isEmpty()) {
-            r.appendErrors(new FreeVariableException(freeFormulas, r.getMapping(), null));
-            return null;
-        }
+        if (!freeFormulas.isEmpty())
+            throw new FreeVariableException(r, freeFormulas, r.getMapping(), null);
 
         if (r.getCloseM() != null)
             env.removeAllChildren(r.getM());

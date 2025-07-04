@@ -1,32 +1,47 @@
 package com.logic.nd.exceptions;
 
 import com.logic.exps.asts.IASTExp;
-import com.logic.feedback.FeedbackLevel;
-import com.logic.feedback.FeedbackType;
-
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import com.logic.nd.asts.IASTND;
+import com.logic.nd.interpreters.NDInterpretString;
+import com.logic.others.Env;
 
 public class MarkAssignException extends NDRuleException {
 
     private final String mark;
-    private final IASTExp exp;
+    private final IASTExp assigned;
+    private final IASTExp expected;
+    private final Env<String, IASTExp> env;
 
-    public MarkAssignException(String mark, IASTExp exp) {
-        super(FeedbackType.SEMANTIC_ERROR);
+    public MarkAssignException(IASTND rule, String mark, IASTExp assigned, IASTExp expected, Env<String, IASTExp> env) {
+        super(rule);
 
         this.mark = mark;
-        this.exp = exp;
+        this.assigned = assigned;
+        this.expected = expected;
+        this.env = env;
     }
 
-    protected String produceFeedback(FeedbackLevel level) {
-        return switch (level) {
-            case NONE -> "";
-            case LOW -> "Invalid mark!";
-            case MEDIUM -> "Mark " + mark + " already assigned!";
-            case HIGH-> "Mark " + mark + " assigned to " + exp + "!";
-            case SOLUTION-> "Mark " + mark + " assigned to " + exp + "!\nConsider assigning a different mark!";
-        };
+    public String getMark() {
+        return mark;
+    }
+
+    public IASTExp getAssigned() {
+        return assigned;
+    }
+
+    public IASTExp getExpected() {
+        return expected;
+    }
+
+    public Env<String, IASTExp> getEnv() {
+        return env;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Mark " + mark + " already assigned: \n\t" +
+                NDInterpretString.interpret(rule);
     }
 }
+
