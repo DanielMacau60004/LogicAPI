@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="dc.created" content="2025-03-23">
-<meta name="description" content="declaration: package: com.logic.nd.algorithm.state, class: StateGraph">
+<meta name="description" content="declaration: package: com.logic.nd.algorithm.proofs, class: StateGraph">
 <meta name="generator" content="javadoc/ClassWriter">
 <link rel="stylesheet" type="text/css" href="../../../../../resource-files/jquery-ui.min.css" title="Style">
 <link rel="stylesheet" type="text/css" href="../../../../../resource-files/stylesheet.css" title="Style">
@@ -81,22 +81,22 @@ loadScripts(document, 'script');</script>
 <main role="main">
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
-<div class="sub-title"><span class="package-label-in-type">Package</span>&nbsp;<a href="package-summary.html">com.logic.nd.algorithm.state</a></div>
+<div class="sub-title"><span class="package-label-in-type">Package</span>&nbsp;<a href="package-summary.html">com.logic.nd.algorithm.proofs</a></div>
 <h1 title="Class StateGraph" class="title">Class StateGraph</h1>
 </div>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
-<div class="inheritance">com.logic.nd.algorithm.state.StateGraph</div>
+<div class="inheritance">module.feedback.algorithm.proofs.ProofGraphFOL</div>
 </div>
 <section class="class-description" id="class-description">
 <div class="horizontal-scroll">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code><a href="strategies/IStateGraph.html" title="interface in com.logic.nd.algorithm.state.strategies">IStateGraph</a></code></dd>
+<dd><code><a href="strategies/IStateGraph.html" title="interface in com.logic.nd.algorithm.proofs.strategies">IStateGraph</a></code></dd>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">StateGraph</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
-implements <a href="strategies/IStateGraph.html" title="interface in com.logic.nd.algorithm.state.strategies">IStateGraph</a></span></div>
+implements <a href="strategies/IStateGraph.html" title="interface in com.logic.nd.algorithm.proofs.strategies">IStateGraph</a></span></div>
 </div>
 </section>
 <section class="summary">
@@ -110,13 +110,13 @@ implements <a href="strategies/IStateGraph.html" title="interface in com.logic.n
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>protected final <a href="StateGraphSettings.html" title="class in com.logic.nd.algorithm.state">StateGraphSettings</a></code></div>
+<div class="col-first even-row-color"><code>protected final <a href="StateGraphSettings.html" title="class in com.logic.nd.algorithm.proofs">StateGraphSettings</a></code></div>
 <div class="col-second even-row-color"><code><a href="#settings" class="member-name-link">settings</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>protected final <a href="../transition/ITransitionGraph.html" title="interface in com.logic.nd.algorithm.transition">ITransitionGraph</a></code></div>
 <div class="col-second odd-row-color"><code><a href="#transitionGraph" class="member-name-link">transitionGraph</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a><wbr>&lt;<a href="StateNode.html" title="class in com.logic.nd.algorithm.state">StateNode</a>,<wbr><a href="StateEdge.html" title="class in com.logic.nd.algorithm.state">StateEdge</a>&gt;</code></div>
+<div class="col-first even-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a><wbr>&lt;<a href="StateNode.html" title="class in com.logic.nd.algorithm.proofs">StateNode</a>,<wbr><a href="StateEdge.html" title="class in com.logic.nd.algorithm.proofs">StateEdge</a>&gt;</code></div>
 <div class="col-second even-row-color"><code><a href="#tree" class="member-name-link">tree</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
@@ -131,7 +131,7 @@ implements <a href="strategies/IStateGraph.html" title="interface in com.logic.n
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
 <div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(com.logic.nd.algorithm.transition.ITransitionGraph,com.logic.nd.algorithm.state.StateGraphSettings)" class="member-name-link">StateGraph</a><wbr>(<a href="../transition/ITransitionGraph.html" title="interface in com.logic.nd.algorithm.transition">ITransitionGraph</a>&nbsp;transitionGraph,
- <a href="StateGraphSettings.html" title="class in com.logic.nd.algorithm.state">StateGraphSettings</a>&nbsp;settings)</code></div>
+ <a href="StateGraphSettings.html" title="class in com.logic.nd.algorithm.proofs">StateGraphSettings</a>&nbsp;settings)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
@@ -150,8 +150,8 @@ implements <a href="strategies/IStateGraph.html" title="interface in com.logic.n
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#build()" class="member-name-link">build</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="StateEdge.html" title="class in com.logic.nd.algorithm.state">StateEdge</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getEdge(com.logic.nd.algorithm.state.StateNode)" class="member-name-link">getEdge</a><wbr>(<a href="StateNode.html" title="class in com.logic.nd.algorithm.state">StateNode</a>&nbsp;node)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="StateEdge.html" title="class in com.logic.nd.algorithm.proofs">StateEdge</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getEdge(com.logic.nd.algorithm.state.StateNode)" class="member-name-link">getEdge</a><wbr>(<a href="StateNode.html" title="class in com.logic.nd.algorithm.proofs">StateNode</a>&nbsp;node)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../../api/IFormula.html" title="interface in com.logic.api">IFormula</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getInitialState()" class="member-name-link">getInitialState</a>()</code></div>
@@ -186,7 +186,7 @@ implements <a href="strategies/IStateGraph.html" title="interface in com.logic.n
 <section class="detail" id="tree">
 <h3>tree</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="StateNode.html" title="class in com.logic.nd.algorithm.state">StateNode</a>,<wbr><a href="StateEdge.html" title="class in com.logic.nd.algorithm.state">StateEdge</a>&gt;</span>&nbsp;<span class="element-name">tree</span></div>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="StateNode.html" title="class in com.logic.nd.algorithm.proofs">StateNode</a>,<wbr><a href="StateEdge.html" title="class in com.logic.nd.algorithm.proofs">StateEdge</a>&gt;</span>&nbsp;<span class="element-name">tree</span></div>
 </div>
 </section>
 </li>
@@ -202,7 +202,7 @@ implements <a href="strategies/IStateGraph.html" title="interface in com.logic.n
 <section class="detail" id="settings">
 <h3>settings</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">protected final</span>&nbsp;<span class="return-type"><a href="StateGraphSettings.html" title="class in com.logic.nd.algorithm.state">StateGraphSettings</a></span>&nbsp;<span class="element-name">settings</span></div>
+<div class="member-signature"><span class="modifiers">protected final</span>&nbsp;<span class="return-type"><a href="StateGraphSettings.html" title="class in com.logic.nd.algorithm.proofs">StateGraphSettings</a></span>&nbsp;<span class="element-name">settings</span></div>
 </div>
 </section>
 </li>
@@ -219,7 +219,7 @@ implements <a href="strategies/IStateGraph.html" title="interface in com.logic.n
 <h3>StateGraph</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">StateGraph</span><wbr><span class="parameters">(<a href="../transition/ITransitionGraph.html" title="interface in com.logic.nd.algorithm.transition">ITransitionGraph</a>&nbsp;transitionGraph,
- <a href="StateGraphSettings.html" title="class in com.logic.nd.algorithm.state">StateGraphSettings</a>&nbsp;settings)</span></div>
+ <a href="StateGraphSettings.html" title="class in com.logic.nd.algorithm.proofs">StateGraphSettings</a>&nbsp;settings)</span></div>
 </div>
 </section>
 </li>
@@ -238,7 +238,7 @@ implements <a href="strategies/IStateGraph.html" title="interface in com.logic.n
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../../api/IFormula.html" title="interface in com.logic.api">IFormula</a></span>&nbsp;<span class="element-name">getInitialState</span>()</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="strategies/IStateGraph.html#getInitialState()">getInitialState</a></code>&nbsp;in interface&nbsp;<code><a href="strategies/IStateGraph.html" title="interface in com.logic.nd.algorithm.state.strategies">IStateGraph</a></code></dd>
+<dd><code><a href="strategies/IStateGraph.html#getInitialState()">getInitialState</a></code>&nbsp;in interface&nbsp;<code><a href="strategies/IStateGraph.html" title="interface in com.logic.nd.algorithm.proofs.strategies">IStateGraph</a></code></dd>
 </dl>
 </div>
 </section>
@@ -250,7 +250,7 @@ implements <a href="strategies/IStateGraph.html" title="interface in com.logic.n
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../../../api/IFormula.html" title="interface in com.logic.api">IFormula</a>&gt;</span>&nbsp;<span class="element-name">getPremises</span>()</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="strategies/IStateGraph.html#getPremises()">getPremises</a></code>&nbsp;in interface&nbsp;<code><a href="strategies/IStateGraph.html" title="interface in com.logic.nd.algorithm.state.strategies">IStateGraph</a></code></dd>
+<dd><code><a href="strategies/IStateGraph.html#getPremises()">getPremises</a></code>&nbsp;in interface&nbsp;<code><a href="strategies/IStateGraph.html" title="interface in com.logic.nd.algorithm.proofs.strategies">IStateGraph</a></code></dd>
 </dl>
 </div>
 </section>
@@ -259,10 +259,10 @@ implements <a href="strategies/IStateGraph.html" title="interface in com.logic.n
 <section class="detail" id="getEdge(com.logic.nd.algorithm.state.StateNode)">
 <h3>getEdge</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="StateEdge.html" title="class in com.logic.nd.algorithm.state">StateEdge</a></span>&nbsp;<span class="element-name">getEdge</span><wbr><span class="parameters">(<a href="StateNode.html" title="class in com.logic.nd.algorithm.state">StateNode</a>&nbsp;node)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="StateEdge.html" title="class in com.logic.nd.algorithm.proofs">StateEdge</a></span>&nbsp;<span class="element-name">getEdge</span><wbr><span class="parameters">(<a href="StateNode.html" title="class in com.logic.nd.algorithm.proofs">StateNode</a>&nbsp;node)</span></div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="strategies/IStateGraph.html#getEdge(com.logic.nd.algorithm.state.StateNode)">getEdge</a></code>&nbsp;in interface&nbsp;<code><a href="strategies/IStateGraph.html" title="interface in com.logic.nd.algorithm.state.strategies">IStateGraph</a></code></dd>
+<dd><code><a href="strategies/IStateGraph.html#getEdge(com.logic.nd.algorithm.state.StateNode)">getEdge</a></code>&nbsp;in interface&nbsp;<code><a href="strategies/IStateGraph.html" title="interface in com.logic.nd.algorithm.proofs.strategies">IStateGraph</a></code></dd>
 </dl>
 </div>
 </section>
@@ -274,7 +274,7 @@ implements <a href="strategies/IStateGraph.html" title="interface in com.logic.n
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">build</span>()</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="strategies/IStateGraph.html#build()">build</a></code>&nbsp;in interface&nbsp;<code><a href="strategies/IStateGraph.html" title="interface in com.logic.nd.algorithm.state.strategies">IStateGraph</a></code></dd>
+<dd><code><a href="strategies/IStateGraph.html#build()">build</a></code>&nbsp;in interface&nbsp;<code><a href="strategies/IStateGraph.html" title="interface in com.logic.nd.algorithm.proofs.strategies">IStateGraph</a></code></dd>
 </dl>
 </div>
 </section>
@@ -286,7 +286,7 @@ implements <a href="strategies/IStateGraph.html" title="interface in com.logic.n
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isSolvable</span>()</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="strategies/IStateGraph.html#isSolvable()">isSolvable</a></code>&nbsp;in interface&nbsp;<code><a href="strategies/IStateGraph.html" title="interface in com.logic.nd.algorithm.state.strategies">IStateGraph</a></code></dd>
+<dd><code><a href="strategies/IStateGraph.html#isSolvable()">isSolvable</a></code>&nbsp;in interface&nbsp;<code><a href="strategies/IStateGraph.html" title="interface in com.logic.nd.algorithm.proofs.strategies">IStateGraph</a></code></dd>
 </dl>
 </div>
 </section>

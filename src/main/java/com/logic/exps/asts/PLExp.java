@@ -21,7 +21,7 @@ public class PLExp implements IPLFormula {
     }
 
     @Override
-    public IASTExp getFormula() {
+    public IASTExp getAST() {
         return exp;
     }
 
@@ -114,11 +114,11 @@ public class PLExp implements IPLFormula {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PLExp plExp = (PLExp) o;
-        return Objects.equals(exp, plExp.exp);
+        return exp.equals(plExp.getAST());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(exp);
+        return exp.hashCode();
     }
 }

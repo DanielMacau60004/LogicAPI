@@ -16,139 +16,152 @@ import com.logic.nd.asts.binary.ASTEExist;
 import com.logic.nd.asts.binary.ASTEImp;
 import com.logic.nd.asts.binary.ASTENeg;
 import com.logic.nd.asts.binary.ASTIConj;
-import com.logic.nd.asts.others.ASTEDisj;
+import com.logic.nd.asts.others.ASTEDis;
 import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
+import com.logic.nd.exceptions.CloseMarkException;
+import com.logic.nd.exceptions.MarkAssignException;
 import com.logic.others.Env;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class NDMarksChecker implements INDVisitor<Void, Env<Integer, IASTExp>> {
+public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
 
     private final Map<IASTExp, IFormula> formulas;
-    private final Map<IASTExp, Integer> premises;
-    private final Map<Integer, IASTExp> hypotheses;
+    private final Map<String, IASTExp> hypotheses;
 
-    NDMarksChecker(Map<IASTExp, IFormula> formulas) {
-        this.premises = new HashMap<>();
-        this.hypotheses = new HashMap<>();
+    NDMarksChecker(Map<IASTExp, IFormula> formulas, Map<String, IASTExp> hypotheses) {
         this.formulas = formulas;
+        this.hypotheses = hypotheses;
     }
 
-    public static Map<IASTExp, Integer> check(IASTND nd, Map<IASTExp, IFormula> formulas) {
-        NDMarksChecker checker = new NDMarksChecker(formulas);
+    public static void check(IASTND nd, Map<IASTExp, IFormula> formulas, Map<String, IASTExp> premises,
+                             Map<String, IASTExp> hypotheses) {
+        NDMarksChecker checker = new NDMarksChecker(formulas, hypotheses);
+        Env<String, IASTExp> env = new Env<>();
+        nd.accept(checker, env);
 
-        nd.accept(checker, new Env<>());
-        return checker.premises;
+
+        premises.putAll(env.mapChild());
     }
 
     @Override
-    public Void visit(ASTHypothesis h, Env<Integer, IASTExp> env) {
+    public Void visit(ASTHypothesis h, Env<String, IASTExp> env) {
         IASTExp hyp = h.getConclusion();
-        IASTExp exp = hypotheses.get(h.getM());
 
-        if (exp != null && !exp.equals(hyp))
-            throw new RuntimeException("Mark " + h.getM() + " is assigned to " + exp + "!");
-
-        if (env.find(h.getM()) == null) { //It is a premise
-            Integer currentMark = premises.get(hyp);
-            if (currentMark != null && currentMark != h.getM())
-                throw new RuntimeException("Premise " + h + "has more than one mark!");
-
-            premises.put(hyp, h.getM());
-            hypotheses.put(h.getM(), hyp);
-            return null;
-        }
+        if (h.getM() != null && hypotheses.containsKey(h.getM()) && !hypotheses.get(h.getM()).equals(hyp))
+            throw new MarkAssignException(h, h.getM(), hyp, hypotheses.get(h.getM()), env);
 
         hypotheses.put(h.getM(), hyp);
+        env.bind(h.getM(), hyp);
+
         return null;
     }
 
     @Override
-    public Void visit(ASTIImp r, Env<Integer, IASTExp> env) {
+    public Void visit(ASTIImp r, Env<String, IASTExp> env) {
         ASTConditional cond = (ASTConditional) r.getConclusion();
-        IASTExp left = ExpUtils.removeParenthesis(cond.getLeft());
+        IASTExp mark = ExpUtils.removeParenthesis(cond.getLeft());
 
         env = env.beginScope();
-        env.bind(r.getM(), left);
         r.getHyp().accept(this, env);
 
-        if (hypotheses.containsKey(r.getM()) && !left.equals(hypotheses.get(r.getM())))
-            throw new RuntimeException("The introduction of the implication rule cannot close mark " + r.getM() + "!");
+        if (r.getM() != null) {
+            IASTExp refMark = env.findChild(r.getM());
 
-        r.setGeneratedHypothesis(left);
+            if ((hypotheses.containsKey(r.getM()) && !mark.equals(hypotheses.get(r.getM()))) ||
+                    (refMark != null && !mark.equals(refMark)))
+                throw new CloseMarkException(r, r.getM(), hypotheses.get(r.getM()), mark, env);
+
+            r.setCloseM(mark);
+            env.removeAllChildren(r.getM());
+
+        }
+
         env.endScope();
 
         return null;
     }
 
     @Override
-    public Void visit(ASTINeg r, Env<Integer, IASTExp> env) {
+    public Void visit(ASTINeg r, Env<String, IASTExp> env) {
         ASTNot neg = (ASTNot) r.getConclusion();
-        IASTExp notNeg = ExpUtils.removeParenthesis(neg.getExp());
+        IASTExp mark = ExpUtils.removeParenthesis(neg.getExp());
 
         env = env.beginScope();
-        env.bind(r.getM(), notNeg);
         r.getHyp().accept(this, env);
 
-        if (hypotheses.containsKey(r.getM()) && !notNeg.equals(hypotheses.get(r.getM())))
-            throw new RuntimeException("The introduction of the negation rule cannot close mark " + r.getM() + "!");
+        if (r.getM() != null) {
+            IASTExp refMark = env.findChild(r.getM());
 
-        r.setGeneratedHypothesis(notNeg);
+            if ((hypotheses.containsKey(r.getM()) && !mark.equals(hypotheses.get(r.getM()))) ||
+                    (refMark != null && !mark.equals(refMark)))
+                throw new CloseMarkException(r, r.getM(), hypotheses.get(r.getM()), mark, env);
+
+            r.setCloseM(mark);
+            env.removeAllChildren(r.getM());
+
+        }
+
         env.endScope();
 
         return null;
     }
 
     @Override
-    public Void visit(ASTERConj r, Env<Integer, IASTExp> env) {
+    public Void visit(ASTERConj r, Env<String, IASTExp> env) {
         return r.getHyp().accept(this, env);
     }
 
     @Override
-    public Void visit(ASTELConj r, Env<Integer, IASTExp> env) {
+    public Void visit(ASTELConj r, Env<String, IASTExp> env) {
         return r.getHyp().accept(this, env);
     }
 
     @Override
-    public Void visit(ASTIRDis r, Env<Integer, IASTExp> env) {
+    public Void visit(ASTIRDis r, Env<String, IASTExp> env) {
         return r.getHyp().accept(this, env);
     }
 
     @Override
-    public Void visit(ASTILDis r, Env<Integer, IASTExp> env) {
+    public Void visit(ASTILDis r, Env<String, IASTExp> env) {
         return r.getHyp().accept(this, env);
     }
 
     @Override
-    public Void visit(ASTAbsurdity r, Env<Integer, IASTExp> env) {
-        IASTExp neg = ExpUtils.negate(r.getConclusion());
+    public Void visit(ASTAbsurdity r, Env<String, IASTExp> env) {
+        IASTExp mark = ExpUtils.negate(r.getConclusion());
 
         env = env.beginScope();
-        env.bind(r.getM(), neg);
         r.getHyp().accept(this, env);
 
-        if (hypotheses.containsKey(r.getM()) && !neg.equals(hypotheses.get(r.getM())))
-            throw new RuntimeException("The absurdity rule cannot close mark " + r.getM() + "!");
+        if (r.getM() != null) {
+            IASTExp refMark = env.findChild(r.getM());
 
-        r.setGeneratedHypothesis(neg);
+            if ((hypotheses.containsKey(r.getM()) && !mark.equals(hypotheses.get(r.getM()))) ||
+                    (refMark != null && !mark.equals(refMark)))
+                throw new CloseMarkException(r, r.getM(), hypotheses.get(r.getM()), mark, env);
+            r.setCloseM(mark);
+            env.removeAllChildren(r.getM());
+
+        }
+
         env.endScope();
+
         return null;
     }
 
     @Override
-    public Void visit(ASTIConj r, Env<Integer, IASTExp> env) {
+    public Void visit(ASTIConj r, Env<String, IASTExp> env) {
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
-
         return null;
     }
 
     @Override
-    public Void visit(ASTEDisj r, Env<Integer, IASTExp> env) {
+    public Void visit(ASTEDis r, Env<String, IASTExp> env) {
         ASTOr or = (ASTOr) r.getHyp1().getConclusion();
         IASTExp left = ExpUtils.removeParenthesis(or.getLeft());
         IASTExp right = ExpUtils.removeParenthesis(or.getRight());
@@ -156,100 +169,115 @@ public class NDMarksChecker implements INDVisitor<Void, Env<Integer, IASTExp>> {
         r.getHyp1().accept(this, env);
 
         env = env.beginScope();
-        env.bind(r.getM(), left);
         r.getHyp2().accept(this, env);
 
-        if (hypotheses.containsKey(r.getM()) && !left.equals(hypotheses.get(r.getM())))
-            throw new RuntimeException("The elimination of the disjunction rule cannot close mark " + r.getM() + "!");
+        if (r.getM() != null) {
+            IASTExp refMark = env.findChild(r.getM());
 
-        r.setGeneratedHypothesisM(left);
-        env.endScope();
+            if ((hypotheses.containsKey(r.getM()) && !left.equals(hypotheses.get(r.getM()))) ||
+                    (refMark != null && !left.equals(refMark)))
+                throw new CloseMarkException(r, r.getM(), hypotheses.get(r.getM()), left, env);
 
-        env = env.beginScope();
-        env.bind(r.getN(), right);
-        r.getHyp3().accept(this, env);
+            r.setCloseM(left);
+            env.removeAllChildren(r.getM());
 
-        if (hypotheses.containsKey(r.getN()) && !right.equals(hypotheses.get(r.getN())))
-            throw new RuntimeException("The elimination of the disjunction rule cannot close mark " + r.getN() + "!");
-
-        r.setGeneratedHypothesisN(right);
-        env.endScope();
-
-        return null;
-    }
-
-    @Override
-    public Void visit(ASTEImp r, Env<Integer, IASTExp> env) {
-        r.getHyp1().accept(this, env);
-        r.getHyp2().accept(this, env);
-
-        return null;
-    }
-
-    @Override
-    public Void visit(ASTENeg r, Env<Integer, IASTExp> env) {
-        r.getHyp1().accept(this, env);
-        r.getHyp2().accept(this, env);
-
-        return null;
-    }
-
-    @Override
-    public Void visit(ASTEUni r, Env<Integer, IASTExp> env) {
-        return r.getHyp().accept(this, env);
-    }
-
-    @Override
-    public Void visit(ASTIExist r, Env<Integer, IASTExp> env) {
-        return r.getHyp().accept(this, env);
-    }
-
-    @Override
-    public Void visit(ASTIUni r, Env<Integer, IASTExp> env) {
-        return r.getHyp().accept(this, env);
-    }
-
-    @Override
-    public Void visit(ASTEExist r, Env<Integer, IASTExp> env) {
-
-        ASTExistential exi = (ASTExistential) r.getHyp1().getConclusion();
-        r.getHyp1().accept(this, env);
-
-        env = env.beginScope();
-        env.bind(r.getM(), exi);
-        r.getHyp2().accept(this, env);
-        env.endScope();
-
-        IASTExp exp = hypotheses.get(r.getM());
-        ASTVariable x = (ASTVariable) exi.getLeft();
-        IFOLFormula exiF = (IFOLFormula) formulas.get(exi);
-        //When the hypothesis is not used or involves generics, we will always assume that the mapping is the current variable
-        if (exp == null)
-            exp = exi.getRight();
-
-        IASTExp psi = ExpUtils.removeParenthesis(exi.getRight());
-        IFOLFormula psiXY = (IFOLFormula) formulas.get(exp);
-
-        List<ASTVariable> variables = new ArrayList<>();
-        variables.add(x); //It can be itself
-        psiXY.iterateVariables().forEachRemaining(variables::add);
-
-        for (ASTVariable var : variables) {
-            if (FOLReplaceExps.replace(psi, x, var).equals(psiXY.getFormula())) {
-                r.setMapping(var);
-                break;
-            }
         }
 
-        if (r.getMapping() == null)
-            throw new RuntimeException("The elimination of the existential rule is incorrectly typed!\n" +
-                    "There is no mapping of " + x + " in " + psi + " that can produce " + psiXY + "!");
+        env = env.endScope();
 
-        if (hypotheses.containsKey(r.getM()) && !exp.equals(hypotheses.get(r.getM())))
-            throw new RuntimeException("The elimination of the existential rule cannot close mark " + r.getM() + "!");
+        env = env.beginScope();
+        r.getHyp3().accept(this, env);
 
-        r.setGeneratedHypothesis(exp);
+        if (r.getN() != null) {
+            IASTExp refMark = env.findChild(r.getN());
+
+            if ((hypotheses.containsKey(r.getN()) && !right.equals(hypotheses.get(r.getN()))) ||
+                    (refMark != null && !right.equals(refMark)))
+                throw new CloseMarkException(r, r.getN(), hypotheses.get(r.getN()), right, env);
+
+            r.setCloseN(right);
+            env.removeAllChildren(r.getN());
+
+        }
+
+        env.endScope();
+
         return null;
     }
+
+    @Override
+    public Void visit(ASTEImp r, Env<String, IASTExp> env) {
+        r.getHyp1().accept(this, env);
+        r.getHyp2().accept(this, env);
+
+        return null;
+    }
+
+    @Override
+    public Void visit(ASTENeg r, Env<String, IASTExp> env) {
+        r.getHyp1().accept(this, env);
+        r.getHyp2().accept(this, env);
+
+        return null;
+    }
+
+    @Override
+    public Void visit(ASTEUni r, Env<String, IASTExp> env) {
+        return r.getHyp().accept(this, env);
+    }
+
+    @Override
+    public Void visit(ASTIExist r, Env<String, IASTExp> env) {
+        return r.getHyp().accept(this, env);
+    }
+
+    @Override
+    public Void visit(ASTIUni r, Env<String, IASTExp> env) {
+        return r.getHyp().accept(this, env);
+    }
+
+    @Override
+    public Void visit(ASTEExist r, Env<String, IASTExp> env) {
+        ASTExistential exi = (ASTExistential) r.getHyp1().getConclusion();
+        IASTExp mark = ExpUtils.removeParenthesis(exi.getRight());
+        r.getHyp1().accept(this, env);
+
+        env = env.beginScope();
+        r.getHyp2().accept(this, env);
+
+        if (r.getM() != null) {
+            IASTExp refMark = env.findChild(r.getM());
+            IASTExp mappingEx = null;
+
+            if (refMark != null) {
+                ASTVariable x = (ASTVariable) exi.getLeft();
+                IASTExp psi = ExpUtils.removeParenthesis(exi.getRight());
+                IFOLFormula psiXY = (IFOLFormula) formulas.get(refMark);
+
+                List<ASTVariable> variables = new ArrayList<>();
+                variables.add(x);
+                psiXY.iterateVariables().forEachRemaining(variables::add);
+
+                for (ASTVariable var : variables) {
+                    mappingEx = FOLReplaceExps.replace(psi, x, var);
+                    if (mappingEx.equals(refMark)) {
+                        r.setMapping(var);
+                        break;
+                    }
+                }
+
+                r.setCloseM(mappingEx);
+                env.removeAllChildren(r.getM());
+            }
+
+            if ((refMark != null && mappingEx == null))
+                throw new CloseMarkException(r, r.getM(), null, null, env);
+        }
+
+        env.endScope();
+
+        return null;
+    }
+
 
 }

@@ -5,13 +5,14 @@ import com.logic.exps.asts.others.AASTTerm;
 import com.logic.nd.ERule;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
+import com.logic.nd.interpreters.NDInterpretString;
 
 public class ASTEUni extends AASTUnaryND {
 
     private AASTTerm mapping;
 
     public ASTEUni(IASTND hypothesis, IASTExp conclusion) {
-        super(hypothesis, conclusion);
+        super(ERule.ELIM_UNIVERSAL, hypothesis, conclusion);
     }
 
     public void setMapping(AASTTerm mapping) {
@@ -25,11 +26,6 @@ public class ASTEUni extends AASTUnaryND {
     @Override
     public <T, E> T accept(INDVisitor<T, E> v, E env) {
         return v.visit(this, env);
-    }
-
-    @Override
-    public String toString() {
-        return "[" + ERule.ELIM_UNIVERSAL + "] " + super.toString();
     }
 
 }

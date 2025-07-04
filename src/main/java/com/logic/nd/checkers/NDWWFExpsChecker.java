@@ -2,15 +2,16 @@ package com.logic.nd.checkers;
 
 import com.logic.api.IFormula;
 import com.logic.exps.asts.IASTExp;
-import com.logic.exps.checkers.FOLWFFChecker;
-import com.logic.exps.checkers.PLWFFChecker;
+import com.logic.exps.exceptions.ExpException;
+import com.logic.exps.interpreters.FOLWFFInterpreter;
+import com.logic.exps.interpreters.PLWFFInterpreter;
 import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
 import com.logic.nd.asts.binary.ASTEExist;
 import com.logic.nd.asts.binary.ASTEImp;
 import com.logic.nd.asts.binary.ASTENeg;
 import com.logic.nd.asts.binary.ASTIConj;
-import com.logic.nd.asts.others.ASTEDisj;
+import com.logic.nd.asts.others.ASTEDis;
 import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
 
@@ -23,26 +24,26 @@ public class NDWWFExpsChecker implements INDVisitor<Void, Void> {
 
     private final Map<IASTExp, IFormula> formulas;
 
-    NDWWFExpsChecker(boolean fol) {
+    NDWWFExpsChecker(boolean fol, Map<IASTExp, IFormula> formulas) {
         this.fol = fol;
-        formulas = new HashMap<>();
+        this.formulas = formulas;
     }
 
     public static Map<IASTExp, IFormula> checkPL(IASTND nd) {
-        NDWWFExpsChecker checker = new NDWWFExpsChecker(false);
+        NDWWFExpsChecker checker = new NDWWFExpsChecker(false, new HashMap<>());
         nd.accept(checker, null);
         return checker.formulas;
     }
 
     public static Map<IASTExp, IFormula> checkFOL(IASTND nd) {
-        NDWWFExpsChecker checker = new NDWWFExpsChecker(true);
+        NDWWFExpsChecker checker = new NDWWFExpsChecker(true, new HashMap<>());
         nd.accept(checker, null);
         return checker.formulas;
     }
 
     private IFormula verifyAndCreateFormula(IASTExp exp) {
-        return fol ? FOLWFFChecker.check(exp)
-                : PLWFFChecker.check(exp);
+        return fol ? FOLWFFInterpreter.check(exp)
+                : PLWFFInterpreter.check(exp);
     }
 
     @Override
@@ -119,7 +120,7 @@ public class NDWWFExpsChecker implements INDVisitor<Void, Void> {
     }
 
     @Override
-    public Void visit(ASTEDisj r, Void env) {
+    public Void visit(ASTEDis r, Void env) {
         IASTExp exp = r.getConclusion();
         formulas.put(exp, verifyAndCreateFormula(exp));
 

@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta name="dc.created" content="2025-03-23">
-<meta name="description" content="declaration: package: com.logic.nd.algorithm.state.strategies, class: ParallelBuildStrategy">
+<meta name="description" content="declaration: package: com.logic.nd.algorithm.proofs.strategies, class: ParallelBuildStrategy">
 <meta name="generator" content="javadoc/ClassWriter">
 <link rel="stylesheet" type="text/css" href="../../../../../../resource-files/jquery-ui.min.css" title="Style">
 <link rel="stylesheet" type="text/css" href="../../../../../../resource-files/stylesheet.css" title="Style">
@@ -81,22 +81,22 @@ loadScripts(document, 'script');</script>
 <main role="main">
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
-<div class="sub-title"><span class="package-label-in-type">Package</span>&nbsp;<a href="package-summary.html">com.logic.nd.algorithm.state.strategies</a></div>
+<div class="sub-title"><span class="package-label-in-type">Package</span>&nbsp;<a href="package-summary.html">com.logic.nd.algorithm.proofs.strategies</a></div>
 <h1 title="Class ParallelBuildStrategy" class="title">Class ParallelBuildStrategy</h1>
 </div>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
-<div class="inheritance">com.logic.nd.algorithm.state.strategies.ParallelBuildStrategy</div>
+<div class="inheritance">com.logic.nd.algorithm.proofs.strategies.ParallelBuildStrategy</div>
 </div>
 <section class="class-description" id="class-description">
 <div class="horizontal-scroll">
 <dl class="notes">
 <dt>All Implemented Interfaces:</dt>
-<dd><code><a href="IBuildStrategy.html" title="interface in com.logic.nd.algorithm.state.strategies">IBuildStrategy</a></code></dd>
+<dd><code><a href="IBuildStrategy.html" title="interface in com.logic.nd.algorithm.proofs.strategies">IBuildStrategy</a></code></dd>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">ParallelBuildStrategy</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
-implements <a href="IBuildStrategy.html" title="interface in com.logic.nd.algorithm.state.strategies">IBuildStrategy</a></span></div>
+implements <a href="IBuildStrategy.html" title="interface in com.logic.nd.algorithm.proofs.strategies">IBuildStrategy</a></span></div>
 </div>
 </section>
 <section class="summary">
@@ -110,16 +110,16 @@ implements <a href="IBuildStrategy.html" title="interface in com.logic.nd.algori
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>final <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Queue.html" title="class or interface in java.util" class="external-link">Queue</a><wbr>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.state">StateNode</a>&gt;</code></div>
+<div class="col-first even-row-color"><code>final <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Queue.html" title="class or interface in java.util" class="external-link">Queue</a><wbr>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.proofs">StateNode</a>&gt;</code></div>
 <div class="col-second even-row-color"><code><a href="#closed" class="member-name-link">closed</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>final <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Queue.html" title="class or interface in java.util" class="external-link">Queue</a><wbr>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.state">StateNode</a>&gt;</code></div>
+<div class="col-first odd-row-color"><code>final <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Queue.html" title="class or interface in java.util" class="external-link">Queue</a><wbr>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.proofs">StateNode</a>&gt;</code></div>
 <div class="col-second odd-row-color"><code><a href="#explore" class="member-name-link">explore</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>final <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a><wbr>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.state">StateNode</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../StateEdge.html" title="class in com.logic.nd.algorithm.state">StateEdge</a>&gt;&gt;</code></div>
+<div class="col-first even-row-color"><code>final <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a><wbr>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.proofs">StateNode</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../StateEdge.html" title="class in com.logic.nd.algorithm.proofs">StateEdge</a>&gt;&gt;</code></div>
 <div class="col-second even-row-color"><code><a href="#graph" class="member-name-link">graph</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>final <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a><wbr>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.state">StateNode</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../StateEdge.html" title="class in com.logic.nd.algorithm.state">StateEdge</a>&gt;&gt;</code></div>
+<div class="col-first odd-row-color"><code>final <a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a><wbr>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.proofs">StateNode</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../StateEdge.html" title="class in com.logic.nd.algorithm.proofs">StateEdge</a>&gt;&gt;</code></div>
 <div class="col-second odd-row-color"><code><a href="#inverted" class="member-name-link">inverted</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 </div>
@@ -151,15 +151,15 @@ implements <a href="IBuildStrategy.html" title="interface in com.logic.nd.algori
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#build(com.logic.nd.algorithm.transition.ITransitionGraph,com.logic.nd.algorithm.state.StateGraphSettings)" class="member-name-link">build</a><wbr>(<a href="../../transition/ITransitionGraph.html" title="interface in com.logic.nd.algorithm.transition">ITransitionGraph</a>&nbsp;transitionGraph,
- <a href="../StateGraphSettings.html" title="class in com.logic.nd.algorithm.state">StateGraphSettings</a>&nbsp;settings)</code></div>
+ <a href="../StateGraphSettings.html" title="class in com.logic.nd.algorithm.proofs">StateGraphSettings</a>&nbsp;settings)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Queue.html" title="class or interface in java.util" class="external-link">Queue</a><wbr>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.state">StateNode</a>&gt;</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Queue.html" title="class or interface in java.util" class="external-link">Queue</a><wbr>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.proofs">StateNode</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getClosedNodes()" class="member-name-link">getClosedNodes</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a><wbr>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.state">StateNode</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../StateEdge.html" title="class in com.logic.nd.algorithm.state">StateEdge</a>&gt;&gt;</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a><wbr>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.proofs">StateNode</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../StateEdge.html" title="class in com.logic.nd.algorithm.proofs">StateEdge</a>&gt;&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getGraph()" class="member-name-link">getGraph</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a><wbr>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.state">StateNode</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../StateEdge.html" title="class in com.logic.nd.algorithm.state">StateEdge</a>&gt;&gt;</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a><wbr>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.proofs">StateNode</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../StateEdge.html" title="class in com.logic.nd.algorithm.proofs">StateEdge</a>&gt;&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getInvertedGraph()" class="member-name-link">getInvertedGraph</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
 </div>
@@ -183,7 +183,7 @@ implements <a href="IBuildStrategy.html" title="interface in com.logic.nd.algori
 <section class="detail" id="graph">
 <h3>graph</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.state">StateNode</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../StateEdge.html" title="class in com.logic.nd.algorithm.state">StateEdge</a>&gt;&gt;</span>&nbsp;<span class="element-name">graph</span></div>
+<div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.proofs">StateNode</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../StateEdge.html" title="class in com.logic.nd.algorithm.proofs">StateEdge</a>&gt;&gt;</span>&nbsp;<span class="element-name">graph</span></div>
 </div>
 </section>
 </li>
@@ -191,7 +191,7 @@ implements <a href="IBuildStrategy.html" title="interface in com.logic.nd.algori
 <section class="detail" id="closed">
 <h3>closed</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Queue.html" title="class or interface in java.util" class="external-link">Queue</a>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.state">StateNode</a>&gt;</span>&nbsp;<span class="element-name">closed</span></div>
+<div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Queue.html" title="class or interface in java.util" class="external-link">Queue</a>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.proofs">StateNode</a>&gt;</span>&nbsp;<span class="element-name">closed</span></div>
 </div>
 </section>
 </li>
@@ -199,7 +199,7 @@ implements <a href="IBuildStrategy.html" title="interface in com.logic.nd.algori
 <section class="detail" id="explore">
 <h3>explore</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Queue.html" title="class or interface in java.util" class="external-link">Queue</a>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.state">StateNode</a>&gt;</span>&nbsp;<span class="element-name">explore</span></div>
+<div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Queue.html" title="class or interface in java.util" class="external-link">Queue</a>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.proofs">StateNode</a>&gt;</span>&nbsp;<span class="element-name">explore</span></div>
 </div>
 </section>
 </li>
@@ -207,7 +207,7 @@ implements <a href="IBuildStrategy.html" title="interface in com.logic.nd.algori
 <section class="detail" id="inverted">
 <h3>inverted</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.state">StateNode</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../StateEdge.html" title="class in com.logic.nd.algorithm.state">StateEdge</a>&gt;&gt;</span>&nbsp;<span class="element-name">inverted</span></div>
+<div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.proofs">StateNode</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../StateEdge.html" title="class in com.logic.nd.algorithm.proofs">StateEdge</a>&gt;&gt;</span>&nbsp;<span class="element-name">inverted</span></div>
 </div>
 </section>
 </li>
@@ -240,10 +240,10 @@ implements <a href="IBuildStrategy.html" title="interface in com.logic.nd.algori
 <h3>build</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">build</span><wbr><span class="parameters">(<a href="../../transition/ITransitionGraph.html" title="interface in com.logic.nd.algorithm.transition">ITransitionGraph</a>&nbsp;transitionGraph,
- <a href="../StateGraphSettings.html" title="class in com.logic.nd.algorithm.state">StateGraphSettings</a>&nbsp;settings)</span></div>
+ <a href="../StateGraphSettings.html" title="class in com.logic.nd.algorithm.proofs">StateGraphSettings</a>&nbsp;settings)</span></div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="IBuildStrategy.html#build(com.logic.nd.algorithm.transition.ITransitionGraph,com.logic.nd.algorithm.state.StateGraphSettings)">build</a></code>&nbsp;in interface&nbsp;<code><a href="IBuildStrategy.html" title="interface in com.logic.nd.algorithm.state.strategies">IBuildStrategy</a></code></dd>
+<dd><code><a href="IBuildStrategy.html#build(com.logic.nd.algorithm.transition.ITransitionGraph,com.logic.nd.algorithm.state.StateGraphSettings)">build</a></code>&nbsp;in interface&nbsp;<code><a href="IBuildStrategy.html" title="interface in com.logic.nd.algorithm.proofs.strategies">IBuildStrategy</a></code></dd>
 </dl>
 </div>
 </section>
@@ -252,10 +252,10 @@ implements <a href="IBuildStrategy.html" title="interface in com.logic.nd.algori
 <section class="detail" id="getGraph()">
 <h3>getGraph</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.state">StateNode</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../StateEdge.html" title="class in com.logic.nd.algorithm.state">StateEdge</a>&gt;&gt;</span>&nbsp;<span class="element-name">getGraph</span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.proofs">StateNode</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../StateEdge.html" title="class in com.logic.nd.algorithm.proofs">StateEdge</a>&gt;&gt;</span>&nbsp;<span class="element-name">getGraph</span>()</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="IBuildStrategy.html#getGraph()">getGraph</a></code>&nbsp;in interface&nbsp;<code><a href="IBuildStrategy.html" title="interface in com.logic.nd.algorithm.state.strategies">IBuildStrategy</a></code></dd>
+<dd><code><a href="IBuildStrategy.html#getGraph()">getGraph</a></code>&nbsp;in interface&nbsp;<code><a href="IBuildStrategy.html" title="interface in com.logic.nd.algorithm.proofs.strategies">IBuildStrategy</a></code></dd>
 </dl>
 </div>
 </section>
@@ -264,10 +264,10 @@ implements <a href="IBuildStrategy.html" title="interface in com.logic.nd.algori
 <section class="detail" id="getInvertedGraph()">
 <h3>getInvertedGraph</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.state">StateNode</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../StateEdge.html" title="class in com.logic.nd.algorithm.state">StateEdge</a>&gt;&gt;</span>&nbsp;<span class="element-name">getInvertedGraph</span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.proofs">StateNode</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Set.html" title="class or interface in java.util" class="external-link">Set</a>&lt;<a href="../StateEdge.html" title="class in com.logic.nd.algorithm.proofs">StateEdge</a>&gt;&gt;</span>&nbsp;<span class="element-name">getInvertedGraph</span>()</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="IBuildStrategy.html#getInvertedGraph()">getInvertedGraph</a></code>&nbsp;in interface&nbsp;<code><a href="IBuildStrategy.html" title="interface in com.logic.nd.algorithm.state.strategies">IBuildStrategy</a></code></dd>
+<dd><code><a href="IBuildStrategy.html#getInvertedGraph()">getInvertedGraph</a></code>&nbsp;in interface&nbsp;<code><a href="IBuildStrategy.html" title="interface in com.logic.nd.algorithm.proofs.strategies">IBuildStrategy</a></code></dd>
 </dl>
 </div>
 </section>
@@ -276,10 +276,10 @@ implements <a href="IBuildStrategy.html" title="interface in com.logic.nd.algori
 <section class="detail" id="getClosedNodes()">
 <h3>getClosedNodes</h3>
 <div class="horizontal-scroll">
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Queue.html" title="class or interface in java.util" class="external-link">Queue</a>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.state">StateNode</a>&gt;</span>&nbsp;<span class="element-name">getClosedNodes</span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/22/docs/api/java.base/java/util/Queue.html" title="class or interface in java.util" class="external-link">Queue</a>&lt;<a href="../StateNode.html" title="class in com.logic.nd.algorithm.proofs">StateNode</a>&gt;</span>&nbsp;<span class="element-name">getClosedNodes</span>()</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="IBuildStrategy.html#getClosedNodes()">getClosedNodes</a></code>&nbsp;in interface&nbsp;<code><a href="IBuildStrategy.html" title="interface in com.logic.nd.algorithm.state.strategies">IBuildStrategy</a></code></dd>
+<dd><code><a href="IBuildStrategy.html#getClosedNodes()">getClosedNodes</a></code>&nbsp;in interface&nbsp;<code><a href="IBuildStrategy.html" title="interface in com.logic.nd.algorithm.proofs.strategies">IBuildStrategy</a></code></dd>
 </dl>
 </div>
 </section>

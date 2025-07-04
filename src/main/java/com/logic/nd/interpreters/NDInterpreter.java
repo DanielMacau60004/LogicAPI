@@ -10,13 +10,12 @@ import com.logic.nd.asts.binary.ASTEExist;
 import com.logic.nd.asts.binary.ASTEImp;
 import com.logic.nd.asts.binary.ASTENeg;
 import com.logic.nd.asts.binary.ASTIConj;
-import com.logic.nd.asts.others.ASTEDisj;
+import com.logic.nd.asts.others.ASTEDis;
 import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
 import com.logic.others.Env;
 
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class NDInterpreter implements INDVisitor<Integer, Env<Integer, IASTExp>> {
 
@@ -26,15 +25,22 @@ public class NDInterpreter implements INDVisitor<Integer, Env<Integer, IASTExp>>
         this.size = 0;
     }
 
-    public static INDProof interpret(IASTND nd, Map<IASTExp, IFormula> formulas, Map<IASTExp, Integer> premises) {
-        NDInterpreter interpret = new NDInterpreter();
-        int height = nd.accept(interpret, new Env<>());
-        return new NDProof(formulas.get(nd.getConclusion()), premises.entrySet().stream()
-                .collect(Collectors.toMap(
-                        entry -> formulas.get(entry.getKey()),
-                        Map.Entry::getValue
-                )), nd, height, interpret.size);
+    public static INDProof interpret(IASTND nd, Map<IASTExp, IFormula> formulas, Map<String, IASTExp> premises,
+                                     Map<String, IASTExp> hypotheses) {
+        NDInterpreter interpreter = new NDInterpreter();
+        int height = nd.accept(interpreter, new Env<>());
+
+        Set<IFormula> permSet = new HashSet<>();
+        for (Map.Entry<String, IASTExp> entry : premises.entrySet())
+            permSet.add(formulas.get(entry.getValue()));
+
+        Map<String, IFormula> hypMap = new HashMap<>();
+        for (Map.Entry<String, IASTExp> entry : hypotheses.entrySet())
+            hypMap.put(entry.getKey(), formulas.get(entry.getValue()));
+
+        return new NDProof(formulas.get(nd.getConclusion()), permSet, hypMap, nd, height, interpreter.size);
     }
+
 
     @Override
     public Integer visit(ASTHypothesis h, Env<Integer, IASTExp> env) {
@@ -91,7 +97,7 @@ public class NDInterpreter implements INDVisitor<Integer, Env<Integer, IASTExp>>
     }
 
     @Override
-    public Integer visit(ASTEDisj r, Env<Integer, IASTExp> env) {
+    public Integer visit(ASTEDis r, Env<Integer, IASTExp> env) {
         size++;
         return Math.max(r.getHyp1().accept(this, env),
                 Math.max(r.getHyp2().accept(this, env), r.getHyp3().accept(this, env))) + 1;
