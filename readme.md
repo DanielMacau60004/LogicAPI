@@ -173,11 +173,13 @@ INDProof ndProof = LogicAPI.parseNDFOLProof(proof);
 Example of a PL proof and corresponding tree:
 
 ![PL](/examples/pl.png)
+
 ![PL-TREE](/examples/pl-tree.png)
 ---
 Example of a FOL proof and corresponding tree:
 
 ![FOL](/examples/fol.png)
+
 ![FOL-TREE](/examples/fol-tree.png)
 ---
 
