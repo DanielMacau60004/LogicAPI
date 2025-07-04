@@ -185,7 +185,7 @@ Example of a FOL proof and corresponding tree:
 
 ## Full Documentation
 You can find the full documentation at the following link:  
-[https://danielmacau60004.github.io/LogicAPI/doc/com/logic/api/package-summary.html](https://danielmacau60004.github.io/LogicAPI/doc/com/logic/api/package-summary.html)
+https://danielmacau60004.github.io/LogicAPI/com/logic/api/package-summary.html
 
 ## Author
 Daniel Macau
