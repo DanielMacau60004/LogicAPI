@@ -98,11 +98,11 @@ public class LogicAPI {
      *     <li><b>Absurdity (⊥ Introduction):</b> <code>[⊥, m] [formula. [rule]]</code></li>
      *     <li><b>Negation Introduction (¬I):</b> <code>[¬I, m] [formula. [rule]]</code></li>
      *     <li><b>Negation Elimination (¬E):</b> <code>[¬E] [⊥. [rule1] [rule2]]</code></li>
-     *     <li><b>Conjunction Elimination Left (∧EL):</b> <code>[∧EL] [formula. [rule]]</code></li>
-     *     <li><b>Conjunction Elimination Right (∧ER):</b> <code>[∧ER] [formula. [rule]]</code></li>
+     *     <li><b>Conjunction Elimination Left (∧El):</b> <code>[∧El] [formula. [rule]]</code></li>
+     *     <li><b>Conjunction Elimination Right (∧Er):</b> <code>[∧Er] [formula. [rule]]</code></li>
      *     <li><b>Conjunction Introduction (∧I):</b> <code>[∧I] [formula. [rule1] [rule2]]</code></li>
-     *     <li><b>Disjunction Introduction Left (∨IL):</b> <code>[∨IL] [formula. [rule]]</code></li>
-     *     <li><b>Disjunction Introduction Right (∨IR):</b> <code>[∨IR] [formula. [rule]]</code></li>
+     *     <li><b>Disjunction Introduction Left (∨Il):</b> <code>[∨Il] [formula. [rule]]</code></li>
+     *     <li><b>Disjunction Introduction Right (∨Ir):</b> <code>[∨Ir] [formula. [rule]]</code></li>
      *     <li><b>Disjunction Elimination (∨E):</b> <code>[∨E, m, n] [formula. [rule1] [rule2] [rule3]]</code></li>
      *     <li><b>Implication Introduction (→I):</b> <code>[→I, m] [formula. [rule]]</code></li>
      *     <li><b>Implication Elimination (→E):</b> <code>[→E] [formula. [rule1] [rule2]]</code></li>
@@ -113,9 +113,9 @@ public class LogicAPI {
      * [→I, 1] [(p ∨ q) → (q ∨ p).
      *     [∨E, 2, 3] [q ∨ p.
      *         [H, 1] [p ∨ q.]
-     *         [∨IL] [q ∨ p.
+     *         [∨Il] [q ∨ p.
      *             [H, 2] [p.]]
-     *         [∨IR] [q ∨ p.
+     *         [∨Ir] [q ∨ p.
      *             [H, 3] [q.]]]]
      * </pre>
      *
@@ -173,6 +173,28 @@ public class LogicAPI {
         return NDProofs.parseNDFOLProof(expression);
     }
 
+    /**
+     * Validates a complete natural deduction (ND) proof against a set of premises and an expected conclusion.
+     *
+     * <p>
+     * This method checks whether the given ND proof:
+     * </p>
+     * <ul>
+     *     <li>Is correctly derived using valid ND inference rules.</li>
+     *     <li>Properly uses the provided premises.</li>
+     *     <li>Successfully derives the expected conclusion as the final line of the proof.</li>
+     * </ul>
+     *
+     * <p><b>Use Case:</b></p>
+     * <p>This method is ideal for validating that a user's proof actually solves a logical problem (e.g., exercises or automated grading).</p>
+     *
+     * @param proof The structured and validated ND proof object.
+     * @param premises The set of initial premises the proof must be based on.
+     * @param conclusion The formula that should be concluded from the premises.
+     * @return The same {@code INDProof} object if the proof solves the problem.
+     * @throws ExpException If any expressions in the proof are invalid.
+     * @throws NDRuleException If the proof is structurally incorrect or does not derive the conclusion.
+     */
     public static INDProof checkNDProblem(INDProof proof, Set<IFormula> premises, IFormula conclusion) throws ExpException, NDRuleException {
         return NDProofs.checkNDProblem(proof, premises, conclusion);
     }

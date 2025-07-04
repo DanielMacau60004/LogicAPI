@@ -108,6 +108,12 @@ public interface IFOLFormula extends IFormula {
      */
     boolean appearsFreeVariable(ASTVariable variable);
 
+    /**
+     * Checks whether a variable is free (not bounded) in the formula.
+     *
+     * @param variable The variable to check.
+     * @return {@code true} if the variable is free, {@code false} otherwise.
+     */
     boolean isFreeVariable(ASTVariable variable);
 
     /**

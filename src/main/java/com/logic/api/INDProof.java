@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * @author Daniel Macau
  * @version 1.1
- * @since 23-03-2025
+ * @since 04-07-2025
  */
 public interface INDProof {
 
@@ -37,6 +37,13 @@ public interface INDProof {
      */
     IFormula getConclusion();
 
+    /**
+     * Returns an iterator over the hypotheses used in this proof.
+     *
+     * <p>Hypotheses represent assumptions or temporarily introduced formulas during the proof.</p>
+     *
+     * @return An {@code Iterator} over entries mapping hypothesis labels to their {@code IFormula} objects.
+     */
     Iterator<Map.Entry<String, IFormula>> getHypotheses();
 
     /**
@@ -66,5 +73,10 @@ public interface INDProof {
      */
     int size();
 
+    /**
+     * Returns the abstract syntax tree (AST) representation of the natural deduction proof.
+     *
+     * @return The {@code IASTND} object representing the proof's AST.
+     */
     IASTND getAST();
 }
