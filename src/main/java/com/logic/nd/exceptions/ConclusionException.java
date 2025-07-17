@@ -18,16 +18,16 @@ public class ConclusionException extends NDRuleException {
     private final Set<IFormula> provedPremises;
     private final IFormula provedConclusion;
 
-    private final Map<ASTHypothesis, Env<String, IASTExp>> rules;
+    private final Set<ASTHypothesis> unclosed;
 
     public ConclusionException(IASTND rule, Set<IFormula> premises, IFormula conclusion, Set<IFormula> provedPremises,
-                               IFormula provedConclusion, Map<ASTHypothesis, Env<String, IASTExp>> rules) {
+                               IFormula provedConclusion, Set<ASTHypothesis> unclosed) {
         super(rule);
         this.premises = premises;
         this.conclusion = conclusion;
         this.provedPremises = provedPremises;
         this.provedConclusion = provedConclusion;
-        this.rules = rules;
+        this.unclosed = unclosed;
     }
 
     public Set<IFormula> getPremises() {
@@ -46,17 +46,17 @@ public class ConclusionException extends NDRuleException {
         return provedPremises;
     }
 
-    public Map<ASTHypothesis, Env<String, IASTExp>> getRules() {
-        return rules;
+    public Set<ASTHypothesis> getUnclosed() {
+        return unclosed;
     }
 
     @Override
     public String getMessage() {
         return "This tree doesn't solve the problem!\n" +
                 "You proved:\n" +
-                (premises != null && !premises.isEmpty()
-                        ? "{"+premises.stream().map(Object::toString).collect(Collectors.joining(", "))+"} "
+                (provedPremises != null && !provedPremises.isEmpty()
+                        ? "{"+provedPremises.stream().map(Object::toString).collect(Collectors.joining(", "))+"} "
                         : "") +
-                "⊢ " + conclusion.toString();
+                "⊢ " + provedConclusion.toString();
     }
 }

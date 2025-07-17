@@ -61,7 +61,7 @@ PARSER_END(Parser)
 }
 
 <FOL> TOKEN : {
-  < VARIABLE: ["w"-"z"] (["0"-"9"])* >
+  < VARIABLE: ["w"-"z"] (["0"-"9"])* | ["?"]>
   | < FUNCTION: ["a"-"v"] | ["a"-"z"](["a"-"z", "A"-"Z", "0"-"9"])+ >
   | < PREDICATE: ["A"-"Z"](["a"-"z", "A"-"Z", "0"-"9"])* >
   | < UNIVERSAL: "∀" >

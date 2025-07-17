@@ -19,7 +19,7 @@ public class Expressions {
     public static IPLFormula parsePLFormula(String formula) throws ExpException {
         try {
             Parser parser = new Parser(new ByteArrayInputStream(formula.getBytes()));
-            return PLWFFInterpreter.check(ExpUtils.removeParenthesis(parser.parsePL()));
+            return PLWFFInterpreter.check(parser.parsePL());
         } catch (ParseException e) {
             throw new ExpSyntaxException(null, e);
         } catch (TokenMgrError e) {
@@ -30,7 +30,7 @@ public class Expressions {
     public static IFOLFormula parseFOLFormula(String formula) throws ExpException {
         try {
             Parser parser = new Parser(new ByteArrayInputStream(formula.getBytes()));
-            return FOLWFFInterpreter.check(ExpUtils.removeParenthesis(parser.parseFOL()));
+            return FOLWFFInterpreter.check(parser.parseFOL());
         } catch (ParseException e) {
             throw new ExpSyntaxException(null, e);
         } catch (TokenMgrError e) {

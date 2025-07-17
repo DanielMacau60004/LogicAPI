@@ -1,6 +1,7 @@
 package com.logic.exps.exceptions;
 
 import com.logic.exps.asts.IASTExp;
+import com.logic.others.Utils;
 
 
 public class MissingParenthesisException extends ExpException {

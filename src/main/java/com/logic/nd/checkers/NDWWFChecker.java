@@ -54,6 +54,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         if (!right.equals(r.getHyp().getConclusion()))
             throw new NDRuleException(r);
 
+        r.getHyp().setParent(r);
         return r.getHyp().accept(this, env);
     }
 
@@ -64,6 +65,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         if (!(exp instanceof ASTNot) || !r.getHyp().getConclusion().equals(ExpUtils.BOT))
             throw new NDRuleException(r);
 
+        r.getHyp().setParent(r);
         return r.getHyp().accept(this, env);
     }
 
@@ -78,6 +80,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         if (!left.equals(exp))
             throw new NDRuleException(r);
 
+        r.getHyp().setParent(r);
         return r.getHyp().accept(this, env);
     }
 
@@ -92,6 +95,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         if (!right.equals(exp))
             throw new NDRuleException(r);
 
+        r.getHyp().setParent(r);
         return r.getHyp().accept(this, env);
     }
 
@@ -106,6 +110,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         if (!left.equals(r.getHyp().getConclusion()))
             throw new NDRuleException(r);
 
+        r.getHyp().setParent(r);
         return r.getHyp().accept(this, env);
     }
 
@@ -120,6 +125,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         if (!right.equals(r.getHyp().getConclusion()))
             throw new NDRuleException(r);
 
+        r.getHyp().setParent(r);
         return r.getHyp().accept(this, env);
     }
 
@@ -128,6 +134,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         if (!r.getHyp().getConclusion().equals(ExpUtils.BOT))
             throw new NDRuleException(r);
 
+        r.getHyp().setParent(r);
         return r.getHyp().accept(this, env);
     }
 
@@ -144,9 +151,11 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         if (!left.equals(r.getHyp1().getConclusion()) || !right.equals(r.getHyp2().getConclusion()))
             throw new NDRuleException(r);
 
+        r.getHyp1().setParent(r);
+        r.getHyp2().setParent(r);
+
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
-
         return null;
     }
 
@@ -167,6 +176,9 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         r.getHyp2().accept(this, env);
         r.getHyp3().accept(this, env);
 
+        r.getHyp1().setParent(r);
+        r.getHyp2().setParent(r);
+        r.getHyp3().setParent(r);
         return null;
     }
 
@@ -186,6 +198,8 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
 
+        r.getHyp1().setParent(r);
+        r.getHyp2().setParent(r);
         return null;
     }
 
@@ -205,6 +219,8 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
 
+        r.getHyp1().setParent(r);
+        r.getHyp2().setParent(r);
         return null;
     }
 
@@ -239,6 +255,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
         formulas.put(psi, FOLWFFInterpreter.check(psi));
 
+        r.getHyp().setParent(r);
         return r.getHyp().accept(this, env);
     }
 
@@ -273,6 +290,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
         formulas.put(psi, FOLWFFInterpreter.check(psi));
 
+        r.getHyp().setParent(r);
         return r.getHyp().accept(this, env);
     }
 
@@ -307,6 +325,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
         formulas.put(psi, FOLWFFInterpreter.check(psi));
 
+        r.getHyp().setParent(r);
         return r.getHyp().accept(this, env);
     }
 
@@ -322,6 +341,8 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
 
+        r.getHyp1().setParent(r);
+        r.getHyp2().setParent(r);
         return null;
     }
 

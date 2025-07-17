@@ -22,6 +22,7 @@ import com.logic.nd.asts.unary.*;
 import com.logic.nd.exceptions.CloseMarkException;
 import com.logic.nd.exceptions.MarkAssignException;
 import com.logic.others.Env;
+import com.logic.others.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,10 +32,12 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
 
     private final Map<IASTExp, IFormula> formulas;
     private final Map<String, IASTExp> hypotheses;
+    private Env<String, IASTExp> marksEnv;
 
     NDMarksChecker(Map<IASTExp, IFormula> formulas, Map<String, IASTExp> hypotheses) {
         this.formulas = formulas;
         this.hypotheses = hypotheses;
+        this.marksEnv = new Env<>();
     }
 
     public static void check(IASTND nd, Map<IASTExp, IFormula> formulas, Map<String, IASTExp> premises,
@@ -43,20 +46,19 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
         Env<String, IASTExp> env = new Env<>();
         nd.accept(checker, env);
 
-
         premises.putAll(env.mapChild());
     }
 
     @Override
     public Void visit(ASTHypothesis h, Env<String, IASTExp> env) {
         IASTExp hyp = h.getConclusion();
+        h.setEnv(marksEnv);
 
         if (h.getM() != null && hypotheses.containsKey(h.getM()) && !hypotheses.get(h.getM()).equals(hyp))
             throw new MarkAssignException(h, h.getM(), hyp, hypotheses.get(h.getM()), env);
 
         hypotheses.put(h.getM(), hyp);
         env.bind(h.getM(), hyp);
-
         return null;
     }
 
@@ -65,7 +67,11 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
         ASTConditional cond = (ASTConditional) r.getConclusion();
         IASTExp mark = ExpUtils.removeParenthesis(cond.getLeft());
 
+        r.setEnv(marksEnv);
+        marksEnv = marksEnv.beginScope();
         env = env.beginScope();
+        marksEnv.bind(r.getM() != null ? r.getM() : mark.toString(), mark);
+
         r.getHyp().accept(this, env);
 
         if (r.getM() != null) {
@@ -81,7 +87,7 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
         }
 
         env.endScope();
-
+        marksEnv = marksEnv.endScope();
         return null;
     }
 
@@ -90,7 +96,10 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
         ASTNot neg = (ASTNot) r.getConclusion();
         IASTExp mark = ExpUtils.removeParenthesis(neg.getExp());
 
+        r.setEnv(marksEnv);
+        marksEnv = marksEnv.beginScope();
         env = env.beginScope();
+        marksEnv.bind(r.getM() != null ? r.getM() : mark.toString(), mark);
         r.getHyp().accept(this, env);
 
         if (r.getM() != null) {
@@ -106,35 +115,46 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
         }
 
         env.endScope();
-
+        marksEnv = marksEnv.endScope();
         return null;
     }
 
     @Override
     public Void visit(ASTERConj r, Env<String, IASTExp> env) {
-        return r.getHyp().accept(this, env);
+        r.setEnv(marksEnv);
+        r.getHyp().accept(this, env);
+        return null;
     }
 
     @Override
     public Void visit(ASTELConj r, Env<String, IASTExp> env) {
-        return r.getHyp().accept(this, env);
+        r.setEnv(marksEnv);
+        r.getHyp().accept(this, env);
+        return null;
     }
 
     @Override
     public Void visit(ASTIRDis r, Env<String, IASTExp> env) {
-        return r.getHyp().accept(this, env);
+        r.setEnv(marksEnv);
+        r.getHyp().accept(this, env);
+        return null;
     }
 
     @Override
     public Void visit(ASTILDis r, Env<String, IASTExp> env) {
-        return r.getHyp().accept(this, env);
+        r.setEnv(marksEnv);
+        r.getHyp().accept(this, env);
+        return null;
     }
 
     @Override
     public Void visit(ASTAbsurdity r, Env<String, IASTExp> env) {
         IASTExp mark = ExpUtils.negate(r.getConclusion());
 
+        r.setEnv(marksEnv);
+        marksEnv = marksEnv.beginScope();
         env = env.beginScope();
+        marksEnv.bind(r.getM() != null ? r.getM() : mark.toString(), mark);
         r.getHyp().accept(this, env);
 
         if (r.getM() != null) {
@@ -149,12 +169,13 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
         }
 
         env.endScope();
-
+        marksEnv = marksEnv.endScope();
         return null;
     }
 
     @Override
     public Void visit(ASTIConj r, Env<String, IASTExp> env) {
+        r.setEnv(marksEnv);
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
         return null;
@@ -166,9 +187,12 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
         IASTExp left = ExpUtils.removeParenthesis(or.getLeft());
         IASTExp right = ExpUtils.removeParenthesis(or.getRight());
 
+        r.setEnv(marksEnv);
         r.getHyp1().accept(this, env);
 
+        marksEnv = marksEnv.beginScope();
         env = env.beginScope();
+        marksEnv.bind(r.getM() != null ? r.getM() : left.toString(), left);
         r.getHyp2().accept(this, env);
 
         if (r.getM() != null) {
@@ -184,8 +208,11 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
         }
 
         env = env.endScope();
+        marksEnv = marksEnv.endScope();
 
+        marksEnv = marksEnv.beginScope();
         env = env.beginScope();
+        marksEnv.bind(r.getN() != null ? r.getN() : right.toString(), right);
         r.getHyp3().accept(this, env);
 
         if (r.getN() != null) {
@@ -201,48 +228,67 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
         }
 
         env.endScope();
+        marksEnv = marksEnv.endScope();
 
         return null;
     }
 
     @Override
     public Void visit(ASTEImp r, Env<String, IASTExp> env) {
+        r.setEnv(marksEnv);
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
-
         return null;
     }
 
     @Override
     public Void visit(ASTENeg r, Env<String, IASTExp> env) {
+        r.setEnv(marksEnv);
         r.getHyp1().accept(this, env);
         r.getHyp2().accept(this, env);
-
         return null;
     }
 
     @Override
     public Void visit(ASTEUni r, Env<String, IASTExp> env) {
-        return r.getHyp().accept(this, env);
+        r.setEnv(marksEnv);
+        r.getHyp().accept(this, env);
+        return null;
     }
 
     @Override
     public Void visit(ASTIExist r, Env<String, IASTExp> env) {
-        return r.getHyp().accept(this, env);
+        r.setEnv(marksEnv);
+        r.getHyp().accept(this, env);
+        return null;
     }
 
     @Override
     public Void visit(ASTIUni r, Env<String, IASTExp> env) {
-        return r.getHyp().accept(this, env);
+        r.setEnv(marksEnv);
+        r.getHyp().accept(this, env);
+        return null;
     }
 
     @Override
     public Void visit(ASTEExist r, Env<String, IASTExp> env) {
         ASTExistential exi = (ASTExistential) r.getHyp1().getConclusion();
-        IASTExp mark = ExpUtils.removeParenthesis(exi.getRight());
         r.getHyp1().accept(this, env);
 
+        r.setEnv(marksEnv);
+
+        //TODO *****************************
+        //IASTExp mark = ExpUtils.removeParenthesis(exi.getRight();
+        ASTVariable replaceable = new ASTVariable("?");
+        IASTExp mark = FOLReplaceExps.replace(ExpUtils.removeParenthesis(exi.getRight())
+                , exi.getLeft(), replaceable);
+        r.setCloseM(mark);
+        r.setMapping(replaceable);
+        //TODO *****************************
+
+        marksEnv = marksEnv.beginScope();
         env = env.beginScope();
+        marksEnv.bind(r.getM() != null ? r.getM() : mark.toString(), mark);
         r.getHyp2().accept(this, env);
 
         if (r.getM() != null) {
@@ -267,6 +313,8 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
                 }
 
                 r.setCloseM(mappingEx);
+                marksEnv.unbind(mark.toString());
+                marksEnv.bind(r.getM(), mappingEx);
                 env.removeAllChildren(r.getM());
             }
 
@@ -275,6 +323,7 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
         }
 
         env.endScope();
+        marksEnv = marksEnv.endScope();
 
         return null;
     }

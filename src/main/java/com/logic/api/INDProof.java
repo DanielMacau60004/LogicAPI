@@ -79,4 +79,8 @@ public interface INDProof {
      * @return The {@code IASTND} object representing the proof's AST.
      */
     IASTND getAST();
+
+    int numberOfRules();
+
+    int numberOfLeaves();
 }

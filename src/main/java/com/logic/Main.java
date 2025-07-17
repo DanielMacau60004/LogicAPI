@@ -1,13 +1,17 @@
 package com.logic;
 
+import com.logic.api.INDProof;
 import com.logic.api.LogicAPI;
 import com.logic.exps.asts.IASTExp;
+import com.logic.others.Utils;
 import com.logic.parser.Parser;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 
 public class Main {
 
@@ -42,24 +46,25 @@ public class Main {
 
         //System.out.println(s.findSolution());
 
-        /*try {
+        try {
             ByteArrayInputStream stream = readFile("src/main/java/com/logic/code.logic");
             String result = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
 
-            INDProof proofObj = LogicAPI.parseNDPLProof(result);
 
-            System.out.print("{");
-            proofObj.getPremises().forEachRemaining(i -> System.out.print(Utils.getToken(i + ".")));
-            System.out.println("} |= " + proofObj.getConclusion());
-            System.out.println(Utils.getToken(proofObj + ""));
+            System.out.println(Utils.getToken(LogicAPI.parseNDFOLProof(result).toString()));
 
-            LogicAPI.checkNDProblem(proofObj,
-                    Set.of(/*LogicAPI.parsePL("p ∧ q")),
-                    LogicAPI.parsePL("(a ∨ a) → a"));
+            //System.out.print("{");
+            //proofObj.getPremises().forEachRemaining(i -> System.out.print(Utils.getToken(i + ".")));
+            //System.out.println("} |= " + proofObj.getConclusion());
+            //System.out.println(Utils.getToken(proofObj + ""));
 
-        }catch (NDException e) {
-            System.out.println(e.getFeedback(FeedbackLevel.SOLUTION));
-        }*/
+            //LogicAPI.checkNDProblem(proofObj,
+            //        Set.of(/*LogicAPI.parsePL("p ∧ q")),
+             //       LogicAPI.parsePL("(a ∨ a) → a"));
+
+        }catch (Exception e) {
+            System.out.println(Utils.getToken(e.getMessage()));
+        }
 
         /*try{
             System.out.println(LogicAPI.parseFOL(""));
@@ -71,7 +76,7 @@ public class Main {
         //System.out.println(LogicAPI.parsePL("a ∨ (c ∨ d)."));
         //System.out.println(LogicAPI.parsePL("(a ∨ c) ∨ d."));
 
-        System.out.println(LogicAPI.parseNDFOLProof("[∀I] [∀x P(x).[⊥,3] [P(x).[¬E] [⊥.[∃I] [∃x ¬P(x).[H,1] [¬P(x).]][H,2] [¬∃x ¬P(x).]]]]"));
+        //System.out.println(LogicAPI.parseNDFOLProof("[∀I] [∀x P(x).[⊥,3] [P(x).[¬E] [⊥.[∃I] [∃x ¬P(x).[H,1] [¬P(x).]][H,2] [¬∃x ¬P(x).]]]]"));
 
         //ByteArrayInputStream stream = new ByteArrayInputStream((proof).getBytes());
         //System.out.println(new Parser(stream).parseNDPL());

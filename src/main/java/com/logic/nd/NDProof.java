@@ -17,14 +17,16 @@ public class NDProof implements INDProof {
     private final IASTND proof;
     private final int height;
     private final int size;
+    private final int leaves;
 
-    public NDProof(IFormula conclusion, Set<IFormula> premises, Map<String, IFormula> hypotheses, IASTND proof, int height, int size) {
+    public NDProof(IFormula conclusion, Set<IFormula> premises, Map<String, IFormula> hypotheses, IASTND proof, int height, int size, int leaves) {
         this.conclusion = conclusion;
         this.premises = premises;
         this.hypotheses = hypotheses;
         this.proof = proof;
         this.height = height;
         this.size = size;
+        this.leaves = leaves;
     }
 
     @Override
@@ -55,6 +57,16 @@ public class NDProof implements INDProof {
     @Override
     public IASTND getAST() {
         return this.proof;
+    }
+
+    @Override
+    public int numberOfRules() {
+        return size - leaves;
+    }
+
+    @Override
+    public int numberOfLeaves() {
+        return leaves;
     }
 
     @Override

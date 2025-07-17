@@ -24,11 +24,11 @@ import java.util.stream.Collectors;
 public class NDProblemChecker implements INDVisitor<Void, Env<String, IASTExp>> {
 
     private final Set<IASTExp> premises;
-    private final Map<ASTHypothesis, Env<String, IASTExp>> rules;
+    private final Set<ASTHypothesis> unclosed;
 
     NDProblemChecker(Set<IASTExp> premises) {
         this.premises = premises;
-        this.rules = new HashMap<>();
+        this.unclosed = new HashSet<>();
     }
 
     public static INDProof solve(INDProof proof, Set<IFormula> premises, IFormula conclusion) {
@@ -38,12 +38,12 @@ public class NDProblemChecker implements INDVisitor<Void, Env<String, IASTExp>> 
                 .map(IFormula::getAST).collect(Collectors.toSet()));
         proofAST.accept(interpreter, new Env<>());
 
-        if (!proofAST.getConclusion().equals(conclusion.getAST()) || !interpreter.rules.isEmpty()) {
+        if (!proofAST.getConclusion().equals(conclusion.getAST()) || !interpreter.unclosed.isEmpty()) {
             Set<IFormula> premisesSet = new HashSet<>();
             proof.getPremises().forEachRemaining(premisesSet::add);
 
             throw new ConclusionException(proof.getAST(), premises, conclusion, premisesSet, proof.getConclusion(),
-                    interpreter.rules);
+                    interpreter.unclosed);
         }
 
         return proof;
@@ -56,7 +56,7 @@ public class NDProblemChecker implements INDVisitor<Void, Env<String, IASTExp>> 
             return null;
 
         if (!premises.contains(h.getConclusion()))
-            rules.put(h, env);
+            unclosed.add(h);
 
         return null;
     }

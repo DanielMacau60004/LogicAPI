@@ -14,12 +14,14 @@ import com.logic.nd.asts.others.ASTEDis;
 import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
 import com.logic.others.Env;
+import com.logic.others.Utils;
 
 import java.util.*;
 
 public class NDInterpreter implements INDVisitor<Integer, Env<Integer, IASTExp>> {
 
     private int size;
+    private int leaves;
 
     NDInterpreter() {
         this.size = 0;
@@ -38,13 +40,15 @@ public class NDInterpreter implements INDVisitor<Integer, Env<Integer, IASTExp>>
         for (Map.Entry<String, IASTExp> entry : hypotheses.entrySet())
             hypMap.put(entry.getKey(), formulas.get(entry.getValue()));
 
-        return new NDProof(formulas.get(nd.getConclusion()), permSet, hypMap, nd, height, interpreter.size);
+        return new NDProof(formulas.get(nd.getConclusion()), permSet, hypMap, nd, height, interpreter.size,
+                interpreter.leaves);
     }
 
 
     @Override
     public Integer visit(ASTHypothesis h, Env<Integer, IASTExp> env) {
         size++;
+        leaves++;
         return 1;
     }
 

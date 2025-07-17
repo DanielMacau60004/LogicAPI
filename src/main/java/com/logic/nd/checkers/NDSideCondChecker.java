@@ -19,6 +19,7 @@ import com.logic.nd.asts.unary.*;
 import com.logic.nd.exceptions.NotFreeVariableException;
 import com.logic.nd.exceptions.FreeVariableException;
 import com.logic.others.Env;
+import com.logic.others.Utils;
 
 import java.util.LinkedList;
 import java.util.List;
