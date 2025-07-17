@@ -1,2 +1,5 @@
 jdk:
   - openjdk16
+
+env:
+  - JDK_VERSION=16
