@@ -277,14 +277,11 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
 
         r.setEnv(marksEnv);
 
-        //TODO *****************************
-        //IASTExp mark = ExpUtils.removeParenthesis(exi.getRight();
         ASTVariable replaceable = new ASTVariable("?");
         IASTExp mark = FOLReplaceExps.replace(ExpUtils.removeParenthesis(exi.getRight())
                 , exi.getLeft(), replaceable);
         r.setCloseM(mark);
         r.setMapping(replaceable);
-        //TODO *****************************
 
         marksEnv = marksEnv.beginScope();
         env = env.beginScope();

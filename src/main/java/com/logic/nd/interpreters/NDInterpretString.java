@@ -32,8 +32,7 @@ public class NDInterpretString implements INDVisitor<String, Integer> {
         String hypStr = hypotheses == null ? "" : hypotheses.stream().map(h ->
                         "\n" + "\t".repeat(depth) + h.accept(this, depth+1))
                 .collect(Collectors.joining());
-
-        return "[" + rule + marksStr + "] [" + conclusion + "." + hypStr + "] " + r.getEnv().mapParent();
+        return "[" + rule + marksStr + "] [" + conclusion + "." + hypStr + "] ";
     }
 
     @Override
