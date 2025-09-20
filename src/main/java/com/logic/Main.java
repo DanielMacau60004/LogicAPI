@@ -47,11 +47,14 @@ public class Main {
         //System.out.println(s.findSolution());
 
         try {
+            //System.out.println(Utils.getToken(LogicAPI.parsePL("a ?a b").toString()));
             ByteArrayInputStream stream = readFile("src/main/java/com/logic/code.logic");
             String result = new String(stream.readAllBytes(), StandardCharsets.UTF_8);
 
-
-            System.out.println(Utils.getToken(LogicAPI.parseNDFOLProof(result).toString()));
+            var a = LogicAPI.parseNDFOLProof(result);
+            //System.out.println(Utils.getToken(a.getConclusion()+" " ));
+            //a.getPremises().forEachRemaining(p->   System.out.println(Utils.getToken(p+" " )));
+            System.out.println(Utils.getToken(a.toString()));
 
             //System.out.print("{");
             //proofObj.getPremises().forEachRemaining(i -> System.out.print(Utils.getToken(i + ".")));

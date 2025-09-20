@@ -5,7 +5,7 @@ import com.logic.nd.ERule;
 import com.logic.nd.asts.AASTND;
 import com.logic.nd.asts.IASTND;
 
-public abstract class AASTUnaryND extends AASTND implements IASTND {
+public abstract class AASTUnaryND extends AASTND {
 
     protected final IASTND hyp;
     protected final IASTExp conclusion;

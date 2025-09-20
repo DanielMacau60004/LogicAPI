@@ -52,7 +52,9 @@ public interface IPLFormula extends IFormula {
      * @return {@code boolean} - {@code true} if the expression evaluates to true under the given interpretation, {@code false} otherwise.
      * @throws RuntimeException If a literal does not have a truth value in the interpretation or if the expression contains arbitrary expressions.
      */
-    boolean interpret(Map<ASTLiteral, Boolean> interpretation);
+
+
+    ;
 
     /**
      * Generates and returns the truth table for the propositional expression.

@@ -5,7 +5,7 @@ import com.logic.exps.asts.AASTExp;
 import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.IExpsVisitor;
 
-public class ASTArbitrary extends AASTExp implements IASTExp {
+public class ASTArbitrary extends AASTExp {
 
     private final String id;
 

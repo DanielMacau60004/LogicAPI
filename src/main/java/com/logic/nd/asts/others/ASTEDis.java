@@ -7,7 +7,7 @@ import com.logic.nd.asts.IASTND;
 import com.logic.nd.asts.INDVisitor;
 import com.logic.nd.interpreters.NDInterpretString;
 
-public class ASTEDis extends AASTND implements IASTND {
+public class ASTEDis extends AASTND {
 
     private final IASTND hyp1;
     private final IASTND hyp2;

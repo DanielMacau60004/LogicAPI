@@ -315,7 +315,7 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
                 env.removeAllChildren(r.getM());
             }
 
-            if ((refMark != null && mappingEx == null))
+            if ((refMark != null && r.getMapping().equals(replaceable)))
                 throw new CloseMarkException(r, r.getM(), null, null, env);
         }
 

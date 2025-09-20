@@ -43,7 +43,9 @@ public class NDFOLTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            " [∃E,2] [∃z(Par(z) ∧ P(z)). [H,1] [∃x (Par(x) ∧ P(y)).] [∃I] [∃z (Par(z) ∧ P(z)). [H,2] [Par(y) ∧ P(y).]]]",
+            //" [∃E,2] [∃z(Par(z) ∧ P(z)). [H,1] [∃x (Par(x) ∧ P(y)).] [∃I] [∃z (Par(z) ∧ P(z)). [H,2] [Par(y) ∧ P(y).]]]",
+            "[→I,1] [∃x ¬P(x) → ¬∀x P(x). [¬I,2] [¬∀x P(x). [¬E] [⊥. [∀E] [P(x). [H,2] [∀x P(x).]] " +
+            "[∃E,3] [¬P(x). [H,1] [∃x ¬P(x).] [H,3] [¬P(x).]]]]]"
     })
     void testFailSingle1(String proof) {
         Throwable thrown = Assertions.assertThrows(Throwable.class, () -> {

@@ -3,7 +3,7 @@ package com.logic.exps.asts.binary;
 import com.logic.exps.asts.AASTExp;
 import com.logic.exps.asts.IASTExp;
 
-public abstract class AASTBinaryExp extends AASTExp implements IASTExp {
+public abstract class AASTBinaryExp extends AASTExp {
 
     protected final IASTExp left;
     protected final IASTExp right;

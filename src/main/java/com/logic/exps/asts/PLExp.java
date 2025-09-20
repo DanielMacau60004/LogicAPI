@@ -40,7 +40,6 @@ public class PLExp implements IPLFormula {
         return literals.iterator();
     }
 
-    @Override
     public boolean interpret(Map<ASTLiteral, Boolean> interpretation) {
         return PLInterpreter.interpret(exp, interpretation);
     }

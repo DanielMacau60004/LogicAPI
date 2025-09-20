@@ -4,7 +4,7 @@ package com.logic.exps.asts.others;
 import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.IExpsVisitor;
 
-public class ASTLiteral extends ASTPred implements IASTExp {
+public class ASTLiteral extends ASTPred {
 
     public ASTLiteral(String name) {
         super(name);

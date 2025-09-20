@@ -20,6 +20,7 @@ import com.logic.nd.exceptions.NotFreeVariableException;
 import com.logic.nd.exceptions.FreeVariableException;
 import com.logic.others.Env;
 import com.logic.others.Utils;
+import jdk.jshell.execution.Util;
 
 import java.util.LinkedList;
 import java.util.List;
