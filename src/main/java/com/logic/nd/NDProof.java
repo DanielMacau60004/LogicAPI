@@ -71,6 +71,6 @@ public class NDProof implements INDProof {
 
     @Override
     public String toString() {
-        return Utils.getToken(proof.toString());
+        return Utils.printFormattedExp(proof.toString());
     }
 }

@@ -121,7 +121,7 @@ private IASTExp atomicsPL() : {
   | <BOTTOM> { return new ASTBottom(); }
   | <NOT> e = atomicsPL() { return new ASTNot(e); }
   | <LPAR> e = atomicsPL() e = operationsPL(e)
-    (<RPAR> { return new ASTParenthesis(e); }
+    (<RPAR> { return e; }
     | {throw new MissingParenthesisException(e, getToken(0).endColumn);})
   | t = <LITERAL> { return new ASTLiteral(t.image); }
   | t = <GENERIC> { return new ASTArbitrary(t.image); }
@@ -162,7 +162,7 @@ private IASTExp atomicsFOL() : {
   | <BOTTOM> { return new ASTBottom(); }
   | <NOT> e = atomicsFOL() { return new ASTNot(e); }
   | <LPAR> e = atomicsFOL() e = operationsFOL(e)
-    (<RPAR> { return new ASTParenthesis(e); }
+    (<RPAR> { return e; }
     | {throw new MissingParenthesisException(e, getToken(0).endColumn);})
   | t = <GENERIC> { return new ASTArbitrary(t.image); }
   | <EXISTENTIAL> t = <VARIABLE> {e = new ASTVariable(t.image);} e1 = atomicsFOL() { return new ASTExistential(e, e1); }

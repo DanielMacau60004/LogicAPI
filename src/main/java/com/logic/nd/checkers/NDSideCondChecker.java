@@ -143,7 +143,7 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, ASTHypoth
     @Override
     public Void visit(ASTEUni r, Env<String, ASTHypothesis> env) {
         ASTUniversal uni = (ASTUniversal) r.getHyp().getConclusion();
-        IFOLFormula psi = (IFOLFormula) formulas.get(ExpUtils.removeParenthesis(uni.getRight()));
+        IFOLFormula psi = (IFOLFormula) formulas.get(uni.getRight());
 
         if (r.getMapping() instanceof ASTVariable x && psi.isABoundedVariable(x))
             throw new NotFreeVariableException(r, x, uni.getLeft(), psi);
@@ -154,7 +154,7 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, ASTHypoth
     @Override
     public Void visit(ASTIExist r, Env<String, ASTHypothesis> env) {
         ASTExistential exi = (ASTExistential) r.getConclusion();
-        IFOLFormula psi = (IFOLFormula) formulas.get(ExpUtils.removeParenthesis(exi.getRight()));
+        IFOLFormula psi = (IFOLFormula) formulas.get(exi.getRight());
 
         if (r.getMapping() instanceof ASTVariable x && psi.isABoundedVariable(x))
             throw new NotFreeVariableException(r, x, exi.getLeft(), psi);
@@ -167,7 +167,7 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, ASTHypoth
         r.getHyp().accept(this, env);
 
         ASTUniversal uni = (ASTUniversal) r.getConclusion();
-        IFOLFormula psi = (IFOLFormula) formulas.get(ExpUtils.removeParenthesis(uni.getRight()));
+        IFOLFormula psi = (IFOLFormula) formulas.get(uni.getRight());
 
         if (!uni.getLeft().equals(r.getMapping()) && psi.appearsFreeVariable(r.getMapping()))
             throw new FreeVariableException(r, List.of(r.getHyp()), r.getMapping(), (ASTVariable) uni.getLeft());
@@ -189,7 +189,7 @@ public class NDSideCondChecker implements INDVisitor<Void, Env<String, ASTHypoth
     @Override
     public Void visit(ASTEExist r, Env<String, ASTHypothesis> env) {
         ASTExistential exi = (ASTExistential) r.getHyp1().getConclusion();
-        IFOLFormula psi = (IFOLFormula) formulas.get(ExpUtils.removeParenthesis(exi.getRight()));
+        IFOLFormula psi = (IFOLFormula) formulas.get(exi.getRight());
         IFOLFormula exp = (IFOLFormula) formulas.get(r.getConclusion());
 
         r.getHyp1().accept(this, env);

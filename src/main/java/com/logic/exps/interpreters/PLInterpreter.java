@@ -5,7 +5,6 @@ import com.logic.exps.asts.IExpsVisitor;
 import com.logic.exps.asts.binary.*;
 import com.logic.exps.asts.others.*;
 import com.logic.exps.asts.unary.ASTNot;
-import com.logic.exps.asts.unary.ASTParenthesis;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -139,9 +138,5 @@ public class PLInterpreter implements IExpsVisitor<Boolean, Void> {
         throw new RuntimeException(ERROR_MESSAGE);
     }
 
-    @Override
-    public Boolean visit(ASTParenthesis e, Void env) {
-        return e.getExp().accept(this, env);
-    }
 
 }

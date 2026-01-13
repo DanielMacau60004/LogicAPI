@@ -11,6 +11,7 @@ import com.logic.nd.asts.binary.ASTIConj;
 import com.logic.nd.asts.others.ASTEDis;
 import com.logic.nd.asts.others.ASTHypothesis;
 import com.logic.nd.asts.unary.*;
+import com.logic.others.Utils;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,7 +33,7 @@ public class NDInterpretString implements INDVisitor<String, Integer> {
         String hypStr = hypotheses == null ? "" : hypotheses.stream().map(h ->
                         "\n" + "\t".repeat(depth) + h.accept(this, depth+1))
                 .collect(Collectors.joining());
-        return "[" + rule + marksStr + "] [" + conclusion + "." + hypStr + "] ";
+        return "[" + rule + marksStr + "] [" + Utils.printFormattedExp(conclusion.toString()) + "." + hypStr + "] ";
     }
 
     @Override

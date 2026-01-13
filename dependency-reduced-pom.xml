@@ -4,7 +4,7 @@
   <groupId>com.logic.api</groupId>
   <artifactId>LogicAPI</artifactId>
   <name>LogicAPI Maven Plugin</name>
-  <version>2.0</version>
+  <version>3.0</version>
   <build>
     <plugins>
       <plugin>

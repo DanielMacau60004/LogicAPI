@@ -7,7 +7,6 @@ import com.logic.exps.asts.IExpsVisitor;
 import com.logic.exps.asts.binary.*;
 import com.logic.exps.asts.others.*;
 import com.logic.exps.asts.unary.ASTNot;
-import com.logic.exps.asts.unary.ASTParenthesis;
 import com.logic.exps.exceptions.FunctionArityException;
 import com.logic.exps.exceptions.PredicateArityException;
 import com.logic.others.Env;
@@ -203,10 +202,5 @@ public class FOLWFFInterpreter implements IExpsVisitor<Void, Env<String, ASTVari
         return null;
     }
 
-    @Override
-    public Void visit(ASTParenthesis e, Env<String, ASTVariable> env) {
-        e.getExp().accept(this, env);
-        return null;
-    }
 
 }

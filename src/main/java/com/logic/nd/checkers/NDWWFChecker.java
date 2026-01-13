@@ -49,7 +49,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         if (!(exp instanceof ASTConditional cond))
             throw new NDRuleException(r);
 
-        IASTExp right = ExpUtils.removeParenthesis(cond.getRight());
+        IASTExp right = cond.getRight();
 
         if (!right.equals(r.getHyp().getConclusion()))
             throw new NDRuleException(r);
@@ -76,7 +76,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         if (!(r.getHyp().getConclusion() instanceof ASTAnd and))
             throw new NDRuleException(r);
 
-        IASTExp left = ExpUtils.removeParenthesis(and.getLeft());
+        IASTExp left = and.getLeft();
         if (!left.equals(exp))
             throw new NDRuleException(r);
 
@@ -91,7 +91,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         if (!(r.getHyp().getConclusion() instanceof ASTAnd and))
             throw new NDRuleException(r);
 
-        IASTExp right = ExpUtils.removeParenthesis(and.getRight());
+        IASTExp right = and.getRight();
         if (!right.equals(exp))
             throw new NDRuleException(r);
 
@@ -106,7 +106,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         if (!(exp instanceof ASTOr or))
             throw new NDRuleException(r);
 
-        IASTExp left = ExpUtils.removeParenthesis(or.getLeft());
+        IASTExp left = or.getLeft();
         if (!left.equals(r.getHyp().getConclusion()))
             throw new NDRuleException(r);
 
@@ -121,7 +121,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         if (!(exp instanceof ASTOr or))
             throw new NDRuleException(r);
 
-        IASTExp right = ExpUtils.removeParenthesis(or.getRight());
+        IASTExp right = or.getRight();
         if (!right.equals(r.getHyp().getConclusion()))
             throw new NDRuleException(r);
 
@@ -145,8 +145,8 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         if (!(exp instanceof ASTAnd and))
             throw new NDRuleException(r);
 
-        IASTExp left = ExpUtils.removeParenthesis(and.getLeft());
-        IASTExp right = ExpUtils.removeParenthesis(and.getRight());
+        IASTExp left = and.getLeft();
+        IASTExp right = and.getRight();
 
         if (!left.equals(r.getHyp1().getConclusion()) || !right.equals(r.getHyp2().getConclusion()))
             throw new NDRuleException(r);
@@ -166,8 +166,8 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         if (!(r.getHyp1().getConclusion() instanceof ASTOr or))
             throw new NDRuleException(r);
 
-        IASTExp left = ExpUtils.removeParenthesis(r.getHyp2().getConclusion());
-        IASTExp right = ExpUtils.removeParenthesis(r.getHyp3().getConclusion());
+        IASTExp left = r.getHyp2().getConclusion();
+        IASTExp right = r.getHyp3().getConclusion();
 
         if (!exp.equals(left) || !exp.equals(right))
             throw new NDRuleException(r);
@@ -190,8 +190,8 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
         if (!(r.getHyp2().getConclusion() instanceof ASTConditional imp))
             throw new NDRuleException(r);
 
-        IASTExp left = ExpUtils.removeParenthesis(imp.getLeft());
-        IASTExp right = ExpUtils.removeParenthesis(imp.getRight());
+        IASTExp left = imp.getLeft();
+        IASTExp right = imp.getRight();
         if (!left.equals(other) || !right.equals(exp))
             throw new NDRuleException(r);
 
@@ -231,7 +231,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
         //Find mapping
         ASTVariable x = (ASTVariable) uni.getLeft();
-        IASTExp psi = ExpUtils.removeParenthesis(uni.getRight());
+        IASTExp psi = uni.getRight();
         IFOLFormula psiXT = (IFOLFormula) formulas.get(r.getConclusion());
 
         List<AASTTerm> terms = new ArrayList<>();
@@ -266,7 +266,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
         //Find mapping
         ASTVariable x = (ASTVariable) exi.getLeft();
-        IASTExp psi = ExpUtils.removeParenthesis(exi.getRight());
+        IASTExp psi = exi.getRight();
         IFOLFormula psiXT = (IFOLFormula) formulas.get(r.getHyp().getConclusion());
 
         List<AASTTerm> terms = new ArrayList<>();
@@ -301,7 +301,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
 
         //Find mapping
         ASTVariable x = (ASTVariable) uni.getLeft();
-        IASTExp psi = ExpUtils.removeParenthesis(uni.getRight());
+        IASTExp psi = uni.getRight();
         IFOLFormula psiXY = (IFOLFormula) formulas.get(r.getHyp().getConclusion());
 
         List<ASTVariable> variables = new ArrayList<>();
@@ -335,7 +335,7 @@ public class NDWWFChecker implements INDVisitor<Void, Void> {
                 !r.getConclusion().equals(r.getHyp2().getConclusion()))
             throw new NDRuleException(r);
 
-        IASTExp exp = ExpUtils.removeParenthesis(exist.getRight());
+        IASTExp exp = exist.getRight();
         formulas.put(exp, FOLWFFInterpreter.check(exp));
 
         r.getHyp1().accept(this, env);

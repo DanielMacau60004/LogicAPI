@@ -38,7 +38,7 @@ public class GenericsTest {
     @ParameterizedTest
     @MethodSource("testCasesPL")
     public void testFormulaReplacementPL(IPLFormula formula, Map<IASTExp, IASTExp> replacements) {
-        String result = Utils.getToken(
+        String result = Utils.printFormattedExp(
                 FOLReplaceExps.replace(formula.getAST(), replacements).toString()
         );
 
@@ -49,11 +49,11 @@ public class GenericsTest {
             expected = expected.replace(entry.getKey().toString(), entry.getValue().toString());
         }
 
-        expected = Utils.getToken(expected);
+        expected = Utils.printFormattedExp(expected);
         Assertions.assertEquals(expected, result);
 
         System.out.println("Original Formula: " + formula);
-        System.out.println("Modified Formula: " + Utils.getToken(result));
+        System.out.println("Modified Formula: " + Utils.printFormattedExp(result));
     }
 
     static Stream<Object[]> testCasesFOL() throws Exception {
@@ -77,7 +77,7 @@ public class GenericsTest {
     @ParameterizedTest
     @MethodSource("testCasesFOL")
     public void testFormulaReplacementFOL(IFOLFormula formula, Map<IASTExp, IASTExp> replacements) {
-        String result = Utils.getToken(
+        String result = Utils.printFormattedExp(
                 FOLReplaceExps.replace(formula.getAST(), replacements).toString()
         );
 
@@ -88,11 +88,11 @@ public class GenericsTest {
             expected = expected.replace(entry.getKey().toString(), entry.getValue().toString());
         }
 
-        expected = Utils.getToken(expected);
+        expected = Utils.printFormattedExp(expected);
         Assertions.assertEquals(expected, result);
 
         System.out.println("Original Formula: " + formula);
-        System.out.println("Modified Formula: " + Utils.getToken(result));
+        System.out.println("Modified Formula: " + Utils.printFormattedExp(result));
     }
 
 }

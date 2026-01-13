@@ -18,7 +18,7 @@ public class NDFOLTest {
         Throwable thrown = Assertions.assertThrows(Throwable.class, () -> {
             LogicAPI.parseNDFOLProof(proof);
         });
-        System.out.println(Utils.getToken(thrown.getMessage()));
+        System.out.println(Utils.printFormattedExp(thrown.getMessage()));
     }
 
     @ParameterizedTest
@@ -38,7 +38,7 @@ public class NDFOLTest {
         Throwable thrown = Assertions.assertThrows(Throwable.class, () -> {
             LogicAPI.parseNDFOLProof(proof);
         });
-        System.out.println(Utils.getToken(thrown.getMessage()));
+        System.out.println(Utils.printFormattedExp(thrown.getMessage()));
     }
 
     @ParameterizedTest
@@ -51,7 +51,7 @@ public class NDFOLTest {
         Throwable thrown = Assertions.assertThrows(Throwable.class, () -> {
             LogicAPI.parseNDFOLProof(proof);
         });
-        System.out.println(Utils.getToken(thrown.getMessage()));
+        System.out.println(Utils.printFormattedExp(thrown.getMessage()));
     }
 
     @ParameterizedTest
@@ -74,7 +74,7 @@ public class NDFOLTest {
             INDProof ndProof = LogicAPI.parseNDFOLProof(proof);
 
             System.out.print("{");
-            ndProof.getPremises().forEachRemaining(i -> System.out.print(Utils.getToken(i + ".")));
+            ndProof.getPremises().forEachRemaining(i -> System.out.print(Utils.printFormattedExp(i + ".")));
             System.out.println("} |= " + ndProof.getConclusion());
         });
     }

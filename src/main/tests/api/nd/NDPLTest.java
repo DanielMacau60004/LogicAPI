@@ -1,16 +1,11 @@
 package api.nd;
 
-import com.logic.api.IFormula;
 import com.logic.api.INDProof;
-import com.logic.api.IPLFormula;
 import com.logic.api.LogicAPI;
 import com.logic.others.Utils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class NDPLTest {
 
@@ -25,7 +20,7 @@ public class NDPLTest {
         Assertions.assertDoesNotThrow(() -> {
             INDProof proof = LogicAPI.parseNDPLProof(exp);
             System.out.print("{");
-            proof.getPremises().forEachRemaining(i -> System.out.print(Utils.getToken(i + ".")));
+            proof.getPremises().forEachRemaining(i -> System.out.print(Utils.printFormattedExp(i + ".")));
             System.out.println("} |= " + proof.getConclusion());
             //System.out.println("Size: " + proof.size() + " Height: " + proof.height());
             //System.out.println(proof);

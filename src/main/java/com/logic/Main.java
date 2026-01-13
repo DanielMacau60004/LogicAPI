@@ -1,6 +1,5 @@
 package com.logic;
 
-import com.logic.api.INDProof;
 import com.logic.api.LogicAPI;
 import com.logic.exps.asts.IASTExp;
 import com.logic.others.Utils;
@@ -11,7 +10,6 @@ import java.io.ByteArrayInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
 
 public class Main {
 
@@ -54,7 +52,7 @@ public class Main {
             var a = LogicAPI.parseNDFOLProof(result);
             //System.out.println(Utils.getToken(a.getConclusion()+" " ));
             //a.getPremises().forEachRemaining(p->   System.out.println(Utils.getToken(p+" " )));
-            System.out.println(Utils.getToken(a.toString()));
+            System.out.println(Utils.printFormattedExp(a.toString()));
 
             //System.out.print("{");
             //proofObj.getPremises().forEachRemaining(i -> System.out.print(Utils.getToken(i + ".")));
@@ -66,7 +64,7 @@ public class Main {
              //       LogicAPI.parsePL("(a ∨ a) → a"));
 
         }catch (Exception e) {
-            System.out.println(Utils.getToken(e.getMessage()));
+            System.out.println(Utils.printFormattedExp(e.getMessage()));
         }
 
         /*try{

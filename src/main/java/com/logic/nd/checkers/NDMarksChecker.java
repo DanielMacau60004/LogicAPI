@@ -65,7 +65,7 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
     @Override
     public Void visit(ASTIImp r, Env<String, IASTExp> env) {
         ASTConditional cond = (ASTConditional) r.getConclusion();
-        IASTExp mark = ExpUtils.removeParenthesis(cond.getLeft());
+        IASTExp mark = cond.getLeft();
 
         r.setEnv(marksEnv);
         marksEnv = marksEnv.beginScope();
@@ -94,7 +94,7 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
     @Override
     public Void visit(ASTINeg r, Env<String, IASTExp> env) {
         ASTNot neg = (ASTNot) r.getConclusion();
-        IASTExp mark = ExpUtils.removeParenthesis(neg.getExp());
+        IASTExp mark = neg.getExp();
 
         r.setEnv(marksEnv);
         marksEnv = marksEnv.beginScope();
@@ -184,8 +184,8 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
     @Override
     public Void visit(ASTEDis r, Env<String, IASTExp> env) {
         ASTOr or = (ASTOr) r.getHyp1().getConclusion();
-        IASTExp left = ExpUtils.removeParenthesis(or.getLeft());
-        IASTExp right = ExpUtils.removeParenthesis(or.getRight());
+        IASTExp left = or.getLeft();
+        IASTExp right = or.getRight();
 
         r.setEnv(marksEnv);
         r.getHyp1().accept(this, env);
@@ -278,7 +278,7 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
         r.setEnv(marksEnv);
 
         ASTVariable replaceable = new ASTVariable("?");
-        IASTExp mark = FOLReplaceExps.replace(ExpUtils.removeParenthesis(exi.getRight())
+        IASTExp mark = FOLReplaceExps.replace(exi.getRight()
                 , exi.getLeft(), replaceable);
         r.setCloseM(mark);
         r.setMapping(replaceable);
@@ -294,7 +294,7 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
 
             if (refMark != null) {
                 ASTVariable x = (ASTVariable) exi.getLeft();
-                IASTExp psi = ExpUtils.removeParenthesis(exi.getRight());
+                IASTExp psi = exi.getRight();
                 IFOLFormula psiXY = (IFOLFormula) formulas.get(refMark);
 
                 List<ASTVariable> variables = new ArrayList<>();
@@ -316,7 +316,7 @@ public class NDMarksChecker implements INDVisitor<Void, Env<String, IASTExp>> {
             }
 
             if ((refMark != null && r.getMapping().equals(replaceable)))
-                throw new CloseMarkException(r, r.getM(), null, null, env);
+                throw new CloseMarkException(r, r.getM(), null, mark, env);
         }
 
         env.endScope();

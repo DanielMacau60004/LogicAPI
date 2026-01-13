@@ -123,7 +123,7 @@ public class FOLExp implements IFOLFormula {
 
     @Override
     public String toString() {
-        return Utils.getToken(exp.toString());
+        return Utils.printFormattedExp(exp.toString());
     }
 
     @Override

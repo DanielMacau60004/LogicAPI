@@ -4,6 +4,7 @@ package com.logic.exps.asts.binary;
 import com.logic.exps.asts.IASTExp;
 import com.logic.exps.asts.IExpsVisitor;
 import com.logic.parser.Parser;
+import com.logic.parser.ParserTokenManager;
 
 public class ASTBiconditional extends AASTBinaryExp {
 
@@ -18,7 +19,7 @@ public class ASTBiconditional extends AASTBinaryExp {
 
     @Override
     public String toString() {
-        return left.toString() + " " + getToken(Parser.BICONDITIONAL) + " " + right.toString();
+        return getToken(ParserTokenManager.LPAR) + left.toString() + " " + getToken(Parser.BICONDITIONAL) + " " + right.toString() + getToken(ParserTokenManager.RPAR);
     }
 
 }

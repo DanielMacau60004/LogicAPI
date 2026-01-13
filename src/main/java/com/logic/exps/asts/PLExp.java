@@ -105,7 +105,7 @@ public class PLExp implements IPLFormula {
 
     @Override
     public String toString() {
-        return Utils.getToken(exp.toString());
+        return Utils.printFormattedExp(exp.toString());
     }
 
     @Override

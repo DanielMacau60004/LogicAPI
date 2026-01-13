@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 public class Utils {
 
-    public static String getToken(String kind) {
+    public static String printFormattedExp(String kind) {
         Pattern pattern = Pattern.compile("\\\\u([0-9A-Fa-f]{4})");
         Matcher matcher = pattern.matcher(kind);
 
@@ -21,8 +21,29 @@ public class Utils {
         }
 
         matcher.appendTail(result);
-        return result.toString();
+        return removeOutermostParentheses(result.toString());
     }
+
+    public static String removeOutermostParentheses(String s) {
+        s = s.trim();
+
+        if (s.length() < 2) return s;
+        if (s.charAt(0) != '(' || s.charAt(s.length() - 1) != ')')
+            return s;
+
+        int balance = 0;
+        for (int i = 0; i < s.length() - 1; i++) {
+            char c = s.charAt(i);
+            if (c == '(') balance++;
+            else if (c == ')') balance--;
+
+            if (balance == 0)
+                return s;
+        }
+
+        return s.substring(1, s.length() - 1);
+    }
+
 
     public static void printTruthTable(Map<Map<String, Boolean>, Boolean> table) {
         if (table.isEmpty()) {

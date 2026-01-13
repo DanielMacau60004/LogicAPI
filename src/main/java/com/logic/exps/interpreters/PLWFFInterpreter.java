@@ -7,7 +7,6 @@ import com.logic.exps.asts.PLExp;
 import com.logic.exps.asts.binary.*;
 import com.logic.exps.asts.others.*;
 import com.logic.exps.asts.unary.ASTNot;
-import com.logic.exps.asts.unary.ASTParenthesis;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -116,9 +115,4 @@ public class PLWFFInterpreter implements IExpsVisitor<Void, Void> {
         throw new RuntimeException(ERROR_MESSAGE);
     }
 
-    @Override
-    public Void visit(ASTParenthesis e, Void env) {
-        e.getExp().accept(this, env);
-        return null;
-    }
 }

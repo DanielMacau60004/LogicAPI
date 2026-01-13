@@ -5,7 +5,6 @@ import com.logic.exps.asts.IExpsVisitor;
 import com.logic.exps.asts.binary.*;
 import com.logic.exps.asts.others.*;
 import com.logic.exps.asts.unary.ASTNot;
-import com.logic.exps.asts.unary.ASTParenthesis;
 
 import java.util.Map;
 
@@ -101,8 +100,4 @@ public class FOLReplaceExps implements IExpsVisitor<IASTExp, Void> {
         return replacers.getOrDefault(e, new ASTUniversal(e.getLeft().accept(this, env), e.getRight().accept(this, env)));
     }
 
-    @Override
-    public IASTExp visit(ASTParenthesis e, Void env) {
-        return replacers.getOrDefault(e, new ASTParenthesis(e.getExp().accept(this, env)));
-    }
 }

@@ -20,7 +20,7 @@ public class SyntaxTest {
     })
     void testParenthesisExps(String expression) {
         Throwable thrown = assertThrows(MissingParenthesisException.class, () -> LogicAPI.parseFOL(expression));
-        System.out.println(Utils.getToken(thrown.getMessage()));
+        System.out.println(Utils.printFormattedExp(thrown.getMessage()));
     }
 
     @ParameterizedTest
@@ -33,7 +33,7 @@ public class SyntaxTest {
     })
     void testAmbiguityExps(String expression) {
         Throwable thrown = assertThrows(AmbiguousException.class, () -> LogicAPI.parseFOL(expression));
-        System.out.println(Utils.getToken(thrown.getMessage()));
+        System.out.println(Utils.printFormattedExp(thrown.getMessage()));
     }
 
 }

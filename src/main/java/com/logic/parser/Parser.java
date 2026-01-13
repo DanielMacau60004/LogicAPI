@@ -136,7 +136,7 @@ public class Parser implements ParserConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case RPAR:
         jj_consume_token(RPAR);
-              {if (true) return new ASTParenthesis(e);}
+              {if (true) return e;}
         break;
       default:
         jj_la1[5] = jj_gen;
@@ -282,7 +282,7 @@ public class Parser implements ParserConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case RPAR:
         jj_consume_token(RPAR);
-              {if (true) return new ASTParenthesis(e);}
+              {if (true) return e;}
         break;
       default:
         jj_la1[12] = jj_gen;
